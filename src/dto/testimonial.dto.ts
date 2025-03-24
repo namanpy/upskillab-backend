@@ -1,12 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-
-import { TestimonialDTO } from './testimonial.dto';
+import { Testimonial } from 'src/schemas/testimonial.schema';
 
 export class GetTestimonialsRequestDTO {}
 
 export class GetTestimonialsResponseDTO {
   @ApiProperty({
-    type: [TestimonialDTO],
+    type: [Testimonial],
   })
-  testimonials: TestimonialDTO[];
+  testimonials: Testimonial[];
 }

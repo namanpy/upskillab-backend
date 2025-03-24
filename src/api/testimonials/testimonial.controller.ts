@@ -1,13 +1,12 @@
 import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { TestimonialLogicService } from 'src/api/testimonials/testimonial.logic';
-import { GetTestimonialsResponseDTO } from '../../dto/testimonial/get-testimonial.dto';
+import { GetTestimonialsResponseDTO } from '../../dto/testimonial.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('testimonial')
 export class TestimonialController {
   constructor(private testimonialLogicService: TestimonialLogicService) {}
 
-  @ApiTags('Testimonials')
   @ApiResponse({
     status: 200,
     description: 'Get testimonials',
