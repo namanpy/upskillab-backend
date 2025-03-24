@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Testimonial } from './testimonial.schema';
+import { Testimonial } from '../../schemas/testimonial.schema';
 
 @Injectable()
 export class TestimonialDataService {
@@ -9,13 +9,7 @@ export class TestimonialDataService {
     @InjectModel(Testimonial.name) private testimonialModel: Model<Testimonial>,
   ) {}
 
-  getTestimonials() {
-    return [
-      {
-        name: 'Student Name',
-        description: 'Best course ever',
-        rating: 5,
-      },
-    ];
+  async getTestimonials() {
+    return this.testimonialModel.find().lean().exec();
   }
 }

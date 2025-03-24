@@ -5,7 +5,9 @@ import { TestimonialDataService } from './testimonial.data';
 export class TestimonialLogicService {
   constructor(private testimonialDataService: TestimonialDataService) {}
 
-  getTestimonials() {
-    return this.testimonialDataService.getTestimonials();
+  async getTestimonials() {
+    return {
+      testimonials: await this.testimonialDataService.getTestimonials(),
+    };
   }
 }

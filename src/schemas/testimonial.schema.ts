@@ -9,7 +9,7 @@ export class Testimonial {
   name: string;
 
   @Prop()
-  description: number;
+  description: string;
 
   @Prop()
   rating: number;

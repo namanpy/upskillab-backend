@@ -3,7 +3,10 @@ import { TestimonialController } from './testimonial.controller';
 import { TestimonialLogicService } from './testimonial.logic';
 import { TestimonialDataService } from './testimonial.data';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Testimonial, TestimonialSchema } from './testimonial.schema';
+import {
+  Testimonial,
+  TestimonialSchema,
+} from '../../schemas/testimonial.schema';
 
 @Module({
   imports: [
