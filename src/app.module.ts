@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TestimonialModule } from './api/testimonials/testimonial.module';
+import { UsersModule } from './api/user/users.module';
 
 //MongooseModule.forRoot('mongodb://localhost/nest')
 @Module({
@@ -14,5 +15,9 @@ import { TestimonialModule } from './api/testimonials/testimonial.module';
   ],
   controllers: [AppController],
   providers: [AppService],
+})
+
+@Module({
+  imports: [UsersModule],
 })
 export class AppModule {}
