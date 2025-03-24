@@ -1,3 +1,9 @@
+/**
+ *
+ * Reference - https://docs.nestjs.com/techniques/mongodb
+ *
+ */
+
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
