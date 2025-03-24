@@ -12,12 +12,9 @@ import { UsersModule } from './api/user/users.module';
       'mongodb+srv://namanpy:namanpy@namanpy.fr257.mongodb.net/?retryWrites=true&w=majority&appName=namanpy',
     ),
     TestimonialModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
-})
-
-@Module({
-  imports: [UsersModule],
 })
 export class AppModule {}
