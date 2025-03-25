@@ -8,8 +8,8 @@ import {
     Param,
   } from '@nestjs/common';
 import { StoriesLogicService } from './stories.logic';
-import { CreateStoryDto } from '../../dto/stories.dto';
-import { GetStoriesResponseDTO } from '../../dto/stories.dto';
+import { CreateStoryDto, GetStoriesResponseDTO } from '../../dto/stories.dto';
+// import {  } from '../../dto/stories.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('stories')

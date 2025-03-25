@@ -3,8 +3,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TestimonialModule } from './api/testimonials/testimonial.module';
-// import { StoriesController } from './api/stories/stories.controller';
 import { StoriesModule } from './api/stories/stories.module';
+import { DemoSessionModule } from './api/demosessions/demosession.module';
 //MongooseModule.forRoot('mongodb://localhost/nest')
 @Module({
   imports: [
@@ -13,6 +13,7 @@ import { StoriesModule } from './api/stories/stories.module';
     ),
     StoriesModule,
     TestimonialModule,
+    DemoSessionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

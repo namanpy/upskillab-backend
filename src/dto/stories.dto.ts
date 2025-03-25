@@ -16,6 +16,11 @@ export class CreateStoryDto {
   @IsString()
   @IsNotEmpty()
   description: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  companyLogoUrl: string;
 }
 
 export class Story {
@@ -29,7 +34,7 @@ export class Story {
   userImageUrl: string;
 
   @ApiProperty()
-  description: string;
+  companyLogoUrl: string;
 
   @ApiProperty()
   createdAt: Date;

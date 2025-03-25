@@ -5,13 +5,13 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import mongoose, { HydratedDocument, Types } from 'mongoose';
 
-export type StoryDocument = HydratedDocument<Story> & {
+export type DemoSessionDocument = HydratedDocument<DemoSession> & {
   createdAt: Date;
   updatedAt: Date;
 };
 
 @Schema({ timestamps: true })
-export class Story {
+export class DemoSession {
   @ApiProperty({
     type: String,
   })
@@ -19,19 +19,19 @@ export class Story {
 
   @ApiProperty()
   @Prop({ required: true })
-  name: string;
+  fullName: string;
 
   @ApiProperty()
   @Prop({ required: true })
-  userImageUrl: string;
+  email: string;
 
   @ApiProperty()
   @Prop({ required: true })
-  description: string;
+  phoneNumber: string;
 
   @ApiProperty()
-  @Prop({ required: true })
-  companyLogoUrl: string;
+  @Prop({ required: true, enum: ['Fresher', 'Working Professional'] })
+  course: string;
 }
 
-export const StorySchema = SchemaFactory.createForClass(Story);
+export const DemoSessionSchema = SchemaFactory.createForClass(DemoSession);
