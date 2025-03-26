@@ -66,7 +66,9 @@ export class GetCategoryRequestDto {
   limit?: number;
 }
 export class GetCategoryResponseDto {
+  @ApiProperty({ type: [Category] })
   data: Category[];
+  @ApiProperty()
   count: number;
 }
 

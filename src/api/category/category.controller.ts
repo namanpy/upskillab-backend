@@ -37,9 +37,6 @@ export class CategoryController {
     return await this.categoryLogicService.createCategory(body);
   }
 
-  @ApiQuery({
-    type: GetCategoryRequestDto,
-  })
   @ApiResponse({
     status: 200,
     description: 'Get categories',
