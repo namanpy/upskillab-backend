@@ -3,6 +3,7 @@ import { Response } from 'express';
 import { HttpStatus } from '@nestjs/common';
 
 import { CustomError } from './error.class';
+import { ValidationError } from 'class-validator';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -14,6 +15,12 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       response.status(exception.code).json({
         reference: exception.reference,
         message: exception.message,
+      });
+    } else if (exception instanceof ValidationError) {
+      response.status(HttpStatus.BAD_REQUEST).json({
+        reference: 0,
+        message: exception.value,
+        data: exception,
       });
     } else {
       response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({

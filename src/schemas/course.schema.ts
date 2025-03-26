@@ -8,11 +8,17 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import mongoose, { HydratedDocument, Types } from 'mongoose';
 import { COURSE_MODE } from 'src/common/constants/course.constants';
+import { Category } from './category.schema';
 
 export type CourseDocuments = HydratedDocument<Course>;
 
 @Schema()
 export class Course {
+  @ApiProperty({
+    type: String,
+  })
+  _id: Types.ObjectId;
+
   @ApiProperty()
   @Prop({
     required: true,
@@ -20,12 +26,13 @@ export class Course {
   courseName: string;
 
   @ApiProperty()
-  @Prop({ type: { type: mongoose.Schema.Types.ObjectId, ref: 'categorys' } })
+  @Prop({ type: { type: mongoose.Schema.Types.ObjectId, ref: Category.name } })
   category: Types.ObjectId;
 
   @ApiProperty()
   @Prop({
     required: true,
+    unique: true,
   })
   courseCode: string;
 

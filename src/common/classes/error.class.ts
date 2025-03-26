@@ -1,11 +1,11 @@
 export class CustomError extends Error {
   code: number;
-  reference: string;
+  reference: number;
 
-  constructor(code: number, message: string, reference: string) {
-    super(message);
-    this.code = code;
-    this.reference = reference;
+  constructor(input: { code: number; message: string; reference: number }) {
+    super();
+    this.code = input.code;
+    this.reference = input.reference;
 
     // Set the prototype explicitly to maintain instanceof checks
     Object.setPrototypeOf(this, CustomError.prototype);
