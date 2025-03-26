@@ -1,4 +1,9 @@
-import { ExceptionFilter, Catch, ArgumentsHost } from '@nestjs/common';
+import {
+  ExceptionFilter,
+  Catch,
+  ArgumentsHost,
+  BadRequestException,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { HttpStatus } from '@nestjs/common';
 
@@ -16,13 +21,14 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         reference: exception.reference,
         message: exception.message,
       });
-    } else if (exception instanceof ValidationError) {
+    } else if (exception instanceof BadRequestException) {
       response.status(HttpStatus.BAD_REQUEST).json({
         reference: 0,
-        message: exception.value,
-        data: exception,
+        message: exception.message,
+        data: exception.getResponse(),
       });
     } else {
+      console.log(exception);
       response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         reference: 1,
         message: 'Internal Server Error',

@@ -6,6 +6,7 @@ export class CustomError extends Error {
     super();
     this.code = input.code;
     this.reference = input.reference;
+    this.message = input.message;
 
     // Set the prototype explicitly to maintain instanceof checks
     Object.setPrototypeOf(this, CustomError.prototype);

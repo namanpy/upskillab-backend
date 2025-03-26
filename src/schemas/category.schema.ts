@@ -33,6 +33,25 @@ export class Category {
   @ApiProperty()
   @Prop({
     required: true,
+  })
+  categoryImage: string;
+
+  @ApiProperty()
+  @Prop({
+    required: true,
+  })
+  categoryDescription: string;
+
+  @ApiProperty()
+  @Prop({
+    required: true,
+    default: true,
+  })
+  featured: boolean;
+
+  @ApiProperty()
+  @Prop({
+    required: true,
     default: true,
   })
   active: boolean;

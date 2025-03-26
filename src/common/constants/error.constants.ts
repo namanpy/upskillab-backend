@@ -10,7 +10,7 @@ export const ERROR = {
   CATEGORY_ALREADY_EXISTS: {
     code: HttpStatus.CONFLICT,
     reference: 2,
-    message: "Category doesn't exist",
+    message: 'Category already exists',
   },
 
   CATEGORY_NOT_FOUND: {

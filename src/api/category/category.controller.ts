@@ -60,6 +60,16 @@ export class CategoryController {
     description: 'Update category',
     type: UpdateCategoryResponseDto,
   })
+  @ApiResponse({
+    status: ERROR.CATEGORY_NOT_FOUND.code,
+    description: ERROR.CATEGORY_NOT_FOUND.message,
+    example: ERROR.CATEGORY_NOT_FOUND,
+  })
+  @ApiResponse({
+    status: ERROR.CATEGORY_ALREADY_EXISTS.code,
+    description: ERROR.CATEGORY_ALREADY_EXISTS.message,
+    example: ERROR.CATEGORY_ALREADY_EXISTS,
+  })
   @Put(':categoryId')
   async updateCategory(
     @Param() param: UpdateCategoryRequestParamsDto,

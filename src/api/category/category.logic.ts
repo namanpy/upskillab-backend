@@ -14,7 +14,11 @@ export class CategoryLogicService {
     };
   }
 
-  async getCategory(input: { skip?: number; limit?: number }) {
+  async getCategory(input: {
+    featured?: boolean;
+    skip?: number;
+    limit?: number;
+  }) {
     const { data, count } = await this.categoryDataService.getCategory(input);
 
     return {
@@ -28,7 +32,11 @@ export class CategoryLogicService {
       categoryId: string;
     } & Omit<Category, '_id'>,
   ) {
-    await this.categoryDataService.updateCategory(input);
+    const { categoryId, ...update } = input;
+    await this.categoryDataService.updateCategory({
+      categoryId,
+      update,
+    });
 
     return {
       isSuccess: true,

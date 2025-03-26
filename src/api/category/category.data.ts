@@ -22,20 +22,26 @@ export class CategoryDataService {
     }
 
     const newCategory = new this.categoryModel(input);
-    return await newCategory.save();
+    return (await newCategory.save()).toObject();
   }
 
-  async getCategory(input: { skip?: number; limit?: number } = {}) {
-    const { skip = 0, limit = 0 } = input;
+  async getCategory(
+    input: { featured?: boolean; skip?: number; limit?: number } = {},
+  ) {
+    const { featured, skip = 0, limit = 0 } = input;
+
+    const filter = {
+      ...(featured && { featured }),
+    };
 
     return {
       data: await this.categoryModel
-        .find()
+        .find(filter)
         .skip(skip)
         .limit(limit)
         .lean()
         .exec(),
-      count: await this.categoryModel.countDocuments(),
+      count: await this.categoryModel.countDocuments(filter),
     };
   }
 
@@ -45,14 +51,27 @@ export class CategoryDataService {
   }) {
     const { categoryId, update = {} } = input;
 
-    const category = await this.categoryModel.findOneAndUpdate(
-      {
-        _id: categoryId,
-      },
-      { $set: update },
-    );
+    if (update.categoryCode) {
+      const existingCategory = await this.categoryModel.findOne({
+        categoryCode: update.categoryCode,
+      });
 
-    if (!category) throw new CustomError(ERROR.CATEGORY_ALREADY_EXISTS);
+      if (existingCategory) {
+        throw new CustomError(ERROR.CATEGORY_ALREADY_EXISTS);
+      }
+    }
+
+    const category = await this.categoryModel
+      .findOneAndUpdate(
+        {
+          _id: categoryId,
+        },
+        { $set: update },
+      )
+      .lean()
+      .exec();
+
+    if (!category) throw new CustomError(ERROR.CATEGORY_NOT_FOUND);
 
     return category;
   }

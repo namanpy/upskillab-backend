@@ -21,6 +21,20 @@ export class CreateCategoryRequestDto {
   @ApiProperty()
   categoryCode: string;
 
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  categoryImage: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  categoryDescription: string;
+
+  @IsBoolean()
+  @ApiProperty()
+  featured: boolean;
+
   @IsBoolean()
   @IsOptional()
   @ApiProperty({
@@ -34,6 +48,11 @@ export class CreateCategoryResponseDto {
 }
 
 export class GetCategoryRequestDto {
+  @IsOptional()
+  @IsBoolean()
+  @ApiPropertyOptional()
+  featured?: boolean;
+
   @IsOptional()
   @IsInt()
   @Min(0)
@@ -63,6 +82,20 @@ export class UpdateCategoryRequestBodyDto {
   @IsString()
   @ApiProperty()
   categoryCode: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  categoryImage: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  categoryDescription: string;
+
+  @IsBoolean()
+  @ApiProperty()
+  featured: boolean;
 
   @IsBoolean()
   @ApiProperty()
