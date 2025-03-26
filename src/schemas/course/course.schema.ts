@@ -8,7 +8,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import mongoose, { HydratedDocument, Types } from 'mongoose';
 import { COURSE_MODE } from 'src/common/constants/course.constants';
-import { Category } from './category.schema';
+import { Category } from '../category.schema';
 
 export type CourseDocuments = HydratedDocument<Course>;
 
@@ -35,6 +35,12 @@ export class Course {
     unique: true,
   })
   courseCode: string;
+
+  @ApiProperty()
+  @Prop({
+    required: true,
+  })
+  courseImage: string;
 
   @ApiProperty()
   @Prop({
@@ -70,6 +76,18 @@ export class Course {
     default: null,
   })
   youtubeUrl: string | null;
+
+  @ApiProperty()
+  @Prop({
+    required: true,
+  })
+  brochure: string;
+
+  @ApiProperty()
+  @Prop({
+    required: true,
+  })
+  certificate: string;
 
   @ApiProperty()
   @Prop({
