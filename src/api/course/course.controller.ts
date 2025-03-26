@@ -43,7 +43,7 @@ export class CourseController {
     type: GetCourseDisplayResponseDto,
   })
   @Get('/display')
-  async getCourse(
+  async getCourseDisplay(
     @Query() query: GetCourseDisplayRequestDto,
   ): Promise<GetCourseDisplayResponseDto> {
     return await this.courseLogicService.getCourseDisplay(query);

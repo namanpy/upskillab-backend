@@ -11,7 +11,7 @@ import { COURSE_MODE } from 'src/common/constants/course.constants';
 import { Category } from '../category.schema';
 
 export type CourseDocuments = HydratedDocument<Course>;
-
+console.log(Category.name, '<==================');
 @Schema()
 export class Course {
   @ApiProperty({
@@ -26,7 +26,7 @@ export class Course {
   courseName: string;
 
   @ApiProperty()
-  @Prop({ type: { type: mongoose.Schema.Types.ObjectId, ref: Category.name } })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Category.name })
   category: Types.ObjectId;
 
   @ApiProperty()
@@ -45,6 +45,7 @@ export class Course {
   @ApiProperty()
   @Prop({
     required: true,
+    type: String,
     enum: Object.keys(COURSE_MODE),
   })
   courseMode: keyof typeof COURSE_MODE;
@@ -73,6 +74,7 @@ export class Course {
   @ApiProperty()
   @Prop({
     required: false,
+    type: String,
     default: null,
   })
   youtubeUrl: string | null;

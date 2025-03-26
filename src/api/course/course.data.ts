@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { Category } from 'src/schemas/category.schema';
 
 import { Course } from 'src/schemas/course/course.schema';
 
@@ -25,7 +26,19 @@ export class CourseDataService {
     const { skip = 0, limit = 0 } = input;
 
     return {
-      data: await this.courseModel.find().skip(skip).limit(limit).lean().exec(),
+      data: await this.courseModel
+        .find()
+        .skip(skip)
+        .populate<{
+          category:
+            | Category
+            | (undefined extends Course['category'] ? undefined : never);
+        }>({
+          path: 'category',
+        })
+        .limit(limit)
+        .lean()
+        .exec(),
       count: await this.courseModel.countDocuments(),
     };
   }
