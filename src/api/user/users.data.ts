@@ -8,7 +8,7 @@ import { User } from 'src/schemas/user.schema';
 export class UserDataService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
-  async findAll(): Promise<User[]> {
+  async users() {
     return this.userModel.find().exec();
   }
 }

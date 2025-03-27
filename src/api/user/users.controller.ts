@@ -13,7 +13,9 @@ export class UsersController {
     type: GetTestimonialsResponseDTO,
   })
   @Get('')
-  findAll() {
-    return { message: 'Users route is working!' };
+  async users(): Promise<GetTestimonialsResponseDTO>
+  {
+    return await this.usersService.users();
   }
+  
 }

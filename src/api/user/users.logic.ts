@@ -3,9 +3,11 @@ import { UserDataService } from './users.data';
 
 @Injectable()
 export class UsersLogicService {
-  constructor(private usersDataService: UsersLogicService) {}
+  constructor(private usersDataService: UserDataService) {}
 
-  async login() {}
-
-  async register() {}
+  async users() {
+    return{
+      users: await this.usersDataService.users(),
+    };
+  }
 }
