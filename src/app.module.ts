@@ -5,6 +5,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { TestimonialModule } from './api/testimonials/testimonial.module';
 import { StoriesModule } from './api/stories/stories.module';
 import { DemoSessionModule } from './api/demosessions/demosession.module';
+import { CategoryModule } from './api/category/category.module';
+import { BatchModule } from './api/batch/batch.module';
+import { CourseModule } from './api/course/course.module';
 //MongooseModule.forRoot('mongodb://localhost/nest')
 @Module({
   imports: [
@@ -14,6 +17,9 @@ import { DemoSessionModule } from './api/demosessions/demosession.module';
     StoriesModule,
     TestimonialModule,
     DemoSessionModule,
+    CategoryModule,
+    BatchModule,
+    CourseModule,
   ],
   controllers: [AppController],
   providers: [AppService],

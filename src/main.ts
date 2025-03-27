@@ -1,10 +1,20 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { GlobalExceptionFilter } from './common/classes/exception-filter.class';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Error Setup
+  app.useGlobalFilters(new GlobalExceptionFilter());
+  // CORS enabled
+  app.enableCors();
+  // Validation
+  app.useGlobalPipes(new ValidationPipe());
+
+  // Swagger setup
   const config = new DocumentBuilder()
     .setTitle('Upskillab.com Backend')
     .setDescription('The backend APIs for Upskillab')
