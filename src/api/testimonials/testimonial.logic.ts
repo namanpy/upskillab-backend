@@ -14,6 +14,7 @@ export class TestimonialLogicService {
       testimonials: testimonials.map((testimonial) => ({
         _id: testimonial._id.toString(),
         name: testimonial.name,
+        testimonialImageUrl: testimonial.testimonialImageUrl,
         email: testimonial.email,
         description: testimonial.description,
         socialMediaLinks: testimonial.socialMediaLinks.map((link) => ({
@@ -32,6 +33,7 @@ export class TestimonialLogicService {
       testimonial: {
         _id: testimonial._id.toString(),
         name: testimonial.name,
+        testimonialImageUrl: testimonial.testimonialImageUrl,
         email: testimonial.email,
         description: testimonial.description,
         socialMediaLinks: testimonial.socialMediaLinks.map((link) => ({
@@ -53,6 +55,7 @@ export class TestimonialLogicService {
       testimonial: {
         _id: testimonial._id.toString(),
         name: testimonial.name,
+        testimonialImageUrl: testimonial.testimonialImageUrl,
         email: testimonial.email,
         description: testimonial.description,
         socialMediaLinks: testimonial.socialMediaLinks.map((link) => ({
@@ -74,6 +77,7 @@ export class TestimonialLogicService {
       testimonial: {
         _id: testimonial._id.toString(),
         name: testimonial.name,
+        testimonialImageUrl: testimonial.testimonialImageUrl,
         email: testimonial.email,
         description: testimonial.description,
         socialMediaLinks: testimonial.socialMediaLinks.map((link) => ({

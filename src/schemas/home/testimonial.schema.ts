@@ -34,6 +34,10 @@ export class Testimonial {
 
   @ApiProperty()
   @Prop({ required: true })
+  testimonialImageUrl: string;
+
+  @ApiProperty()
+  @Prop({ required: true })
   email: string;
 
   @ApiProperty()

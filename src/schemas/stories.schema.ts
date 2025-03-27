@@ -23,6 +23,10 @@ export class Story {
 
   @ApiProperty()
   @Prop({ required: true })
+  jobTitle: string;
+
+  @ApiProperty()
+  @Prop({ required: true })
   userImageUrl: string;
 
   @ApiProperty()

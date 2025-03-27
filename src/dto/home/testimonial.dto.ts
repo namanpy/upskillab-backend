@@ -18,6 +18,11 @@ export class CreateTestimonialDto {
   @IsString()
   @IsNotEmpty()
   name: string;
+  
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  testimonialImageUrl: string;
 
   @ApiProperty()
   @IsEmail()
@@ -41,6 +46,9 @@ export class Testimonial {
 
   @ApiProperty()
   name: string;
+
+  @ApiProperty()
+  testimonialImageUrl: string;
 
   @ApiProperty()
   email: string;
