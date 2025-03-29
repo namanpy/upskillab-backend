@@ -10,25 +10,19 @@ import { ERROR } from 'src/common/constants/error.constants';
 @Injectable()
 export class UserDataService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
-  async getUserByEmailOrPhone({
-    email,
-    mobileNumber,
-  }: {
-    email: string | undefined;
-    mobileNumber: string | undefined;
-  }) {
+  async getUserByEmailOrPhone({ identifier }: { identifier: string }) {
     const user = await this.userModel
-      .findOne(
-        _.pickBy(
-          {
-            email,
-            mobileNumber,
-          },
-          _.identity,
-        ),
-      )
+      .findOne({
+        $or: [{ email: identifier }, { mobileNumber: identifier }],
+      })
+      .select({ password: true })
       .lean()
       .exec();
+    if (!user) throw new CustomError(ERROR.USER_NOT_FOUND);
+    return user;
+  }
+  async getUserById(id: string) {
+    const user = await this.userModel.findById(id).lean().exec();
     if (!user) throw new CustomError(ERROR.USER_NOT_FOUND);
     return user;
   }

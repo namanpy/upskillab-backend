@@ -1,32 +1,50 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
-import { TestimonialLogicService } from 'src/api/testimonials/testimonial.logic';
-import { GetTestimonialsResponseDTO } from '../../dto/testimonial.dto';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import { AuthLogicService } from './auth.logic';
+import { AuthLoginRequestDto, AuthLoginResponseDto } from 'src/dto/auth.dto';
 
-@Controller('users')
-export class UsersController {
-  constructor(private usersLogicService: TestimonialLogicService) {}
+@Controller('auth')
+export class AuthController {
+  constructor(private authLogicService: AuthLogicService) {}
 
   @ApiResponse({
     status: 200,
-    description: 'Get testimonials',
-    type: GetTestimonialsResponseDTO,
+    description: 'Get Users',
   })
   @Get('')
   async getUsers() {
     // TODO : - By Swapnil Pandy
   }
 
+  @ApiBody({
+    type: AuthLoginRequestDto,
+  })
   @ApiResponse({
     status: 200,
     description: 'User login',
+    type: AuthLoginResponseDto,
   })
-  @Post('login')
-  async loginUser(@Body() loginDto: { username: string; password: string }) {
-    // TODO: Implement login logic
-    return {
-      message: 'Login successful',
-      username: loginDto.username,
-    };
+  @UseGuards(AuthGuard('local'))
+  @Post('/login')
+  async login(@Request() req) {
+    return req.user;
+  }
+  @ApiResponse({
+    status: 200,
+    description: 'Get user details',
+  })
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/details')
+  getDetails(@Request() req) {
+    return req.user;
   }
 }
