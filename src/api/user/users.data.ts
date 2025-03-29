@@ -8,7 +8,18 @@ import { User } from 'src/schemas/user.schema';
 export class UserDataService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
-  async users() {
-    return this.userModel.find().exec();
+  async users(username: string | null) {
+    return this.userModel
+    .find({
+      name : username,
+    })
+    .exec();
+  }
+  async email(userEmail: string | null) {
+    return this.userModel
+    .find({
+      name : userEmail,
+    })
+    .exec();
   }
 }

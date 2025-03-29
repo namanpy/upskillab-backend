@@ -5,9 +5,15 @@ import { UserDataService } from './users.data';
 export class UsersLogicService {
   constructor(private usersDataService: UserDataService) {}
 
-  async users() {
+  async users(username : string | null) {
     return{
-      users: await this.usersDataService.users(),
+      users: await this.usersDataService.users(username),
     };
   }
+  async email(userEmail : string | null) {
+    return{
+      users: await this.usersDataService.users(userEmail),
+    };
+  }
+
 }
