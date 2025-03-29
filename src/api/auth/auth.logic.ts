@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 
 import { UserDataService } from '../user/users.data';
@@ -13,18 +13,11 @@ export class AuthLogicService {
     private jwtService: JwtService,
   ) {}
 
-  async login(input: {
-    mobileNumber?: string;
-    email?: string;
-    password: string;
-  }): Promise<any> {
-    const { email, mobileNumber, password } = input;
-
-    if (!email && !mobileNumber) throw new CustomError(ERROR.BAD_REQUEST);
+  async login(input: { identifier: string; password: string }) {
+    const { identifier, password } = input;
 
     const user = await this.userDataService.getUserByEmailOrPhone({
-      email,
-      mobileNumber,
+      identifier,
     });
 
     if (await bcrypt.compare(password, user.password)) {
@@ -35,7 +28,5 @@ export class AuthLogicService {
       });
       return { authToken };
     } else throw new CustomError(ERROR.INVALID_CREDENTIALS);
-
-    return null;
   }
 }

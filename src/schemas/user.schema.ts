@@ -11,8 +11,9 @@ export class User {
   })
   _id: Types.ObjectId;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({})
   @Prop({
+    type: String,
     validate: function (this, value: string) {
       this.mobileNumber && this.email ? false : true;
     },
@@ -20,8 +21,9 @@ export class User {
   })
   email: string | null;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({})
   @Prop({
+    type: String,
     validate: function (this, value: string) {
       this.mobileNumber && this.email ? false : true;
     },
@@ -37,6 +39,7 @@ export class User {
 
   @Prop({
     required: true,
+    select: false,
   })
   password: string;
 }
