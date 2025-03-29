@@ -13,7 +13,23 @@ export class UsersController {
     type: GetTestimonialsResponseDTO,
   })
   @Get('')
+  /**
+   *
+   * To search users either via mobile number or email, or username
+   * Note :- Should accept partial search, bonus points for single input only (name : searchString)
+   *
+   */
   async getUsers() {
+    // TODO : - By Swapnil Pandy
+  }
+
+  /**
+   *
+   * Endpoint to update user details
+   * Note :- Can take mongodb user _id as input
+   *
+   */
+  async updateUser() {
     // TODO : - By Swapnil Pandy
   }
 
