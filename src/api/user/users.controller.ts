@@ -6,15 +6,23 @@ import { UsersLogicService } from './users.logic';
 @Controller('users')
 export class UsersController {
 
-  constructor(private userslogicservice: UsersLogicService) {
-  }
+  constructor(private usersLogicService: UsersLogicService) {}
+
+  @ApiTags('Users')
   @ApiResponse({
     status: 200,
     description: 'Get testimonials',
     type: GetTestimonialsResponseDTO,
   })
   @Get('')
-  async users(@Query('username') username: string | null, @Query('email') userEmail: string | null) {
-    return await this.userslogicservice.users(username || userEmail);
+  async users(
+    @Query() inputs: { username?: string; email?: string; mobileNumber?: string },
+  ) {
+    const { username, email, mobileNumber } = inputs;
+    return await this.usersLogicService.findbyUsernameorEmailorMobile({
+      username,
+      email,
+      mobileNumber,
+    });
   }
 }

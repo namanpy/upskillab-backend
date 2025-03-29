@@ -5,15 +5,16 @@ import { UserDataService } from './users.data';
 export class UsersLogicService {
   constructor(private usersDataService: UserDataService) {}
 
-  async users(username : string | null) {
-    return{
-      users: await this.usersDataService.users(username),
+  async findbyUsernameorEmailorMobile(inputs: { username?: string; email?: string; mobileNumber?: string }) {
+    const { username, email, mobileNumber} = inputs;
+    return {
+      users: await this.usersDataService.findbyUsernameorEmailorMobile({
+        username,
+        email,
+        mobileNumber,
+      }),
     };
   }
-  async email(userEmail : string | null) {
-    return{
-      users: await this.usersDataService.users(userEmail),
-    };
-  }
+
 
 }
