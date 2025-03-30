@@ -49,6 +49,11 @@ export class CreateCategoryResponseDto {
 
 export class GetCategoryRequestDto {
   @IsOptional()
+  @IsString()
+  @ApiPropertyOptional()
+  searchString?: string;
+
+  @IsOptional()
   @IsBoolean()
   @ApiPropertyOptional()
   featured?: boolean;

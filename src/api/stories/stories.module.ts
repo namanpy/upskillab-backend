@@ -11,6 +11,6 @@ import { Story, StorySchema } from '../../schemas/stories.schema';
   ],
   providers: [StoriesDataService, StoriesLogicService],
   controllers: [StoriesController],
-  exports: [StoriesDataService], // Optional, agar baahar use karna ho
+  exports: [StoriesDataService],
 })
 export class StoriesModule {}
