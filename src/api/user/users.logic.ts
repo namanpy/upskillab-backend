@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UserDataService } from './users.data';
+import { ObjectId } from 'mongoose';
 
 @Injectable()
 export class UsersLogicService {
@@ -16,5 +17,17 @@ export class UsersLogicService {
     };
   }
 
+  async updateUserDetails(inputs: { _id: ObjectId; username?: string; email?: string; mobileNumber?: string }) {
+    const { _id, username, email, mobileNumber } = inputs;
+    
+    return {
+      user: await this.usersDataService.updateUserDetails({
+        _id,
+        username,
+        email,
+        mobileNumber,
+      }),
+    };
 
+  }
 }

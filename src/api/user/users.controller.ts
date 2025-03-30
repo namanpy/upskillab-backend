@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, Put } from '@nestjs/common';
 import { GetTestimonialsResponseDTO } from '../../dto/testimonial.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsersLogicService } from './users.logic';
+import { ObjectId } from 'mongoose';
 
 @Controller('users')
 export class UsersController {
@@ -20,6 +21,27 @@ export class UsersController {
   ) {
     const { username, email, mobileNumber } = inputs;
     return await this.usersLogicService.findbyUsernameorEmailorMobile({
+      username,
+      email,
+      mobileNumber,
+    });
+  }
+  @ApiTags('Users')
+  @ApiResponse({
+    status: 200,
+    description: 'Update user details',
+  })
+
+  
+
+  @Put(':_id')
+  async updateUser(
+    @Body() updateData: { _id: ObjectId; username?: string; email?: string; mobileNumber?: string },
+  ) {
+    const { _id, username, email, mobileNumber } = updateData;
+    
+    return await this.usersLogicService.updateUserDetails({
+      _id,
       username,
       email,
       mobileNumber,
