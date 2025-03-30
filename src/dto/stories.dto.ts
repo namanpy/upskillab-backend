@@ -10,6 +10,11 @@ export class CreateStoryDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  jobTitle: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   userImageUrl: string;
 
   @ApiProperty()
@@ -29,6 +34,9 @@ export class Story {
 
   @ApiProperty()
   name: string;
+
+  @ApiProperty()
+  jobTitle: string;
 
   @ApiProperty()
   userImageUrl: string;
