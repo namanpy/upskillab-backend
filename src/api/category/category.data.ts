@@ -36,7 +36,9 @@ export class CategoryDataService {
     const { searchString, featured, skip = 0, limit = 0 } = input;
 
     const filter = {
-        ...(searchString && { categoryName : { $regex: searchString, $options: 'i' }})
+      ...(searchString && {
+        categoryName: { $regex: searchString, $options: 'i' },
+      }),
       ...(featured && { featured }),
     };
 
