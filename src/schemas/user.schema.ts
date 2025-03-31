@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+<<<<<<< HEAD
 import { ApiPropertyOptional, ApiProperty } from '@nestjs/swagger';
 import { HydratedDocument, Types } from 'mongoose';
 
@@ -42,6 +43,20 @@ export class User {
     select: false,
   })
   password: string;
+=======
+import { Document } from 'mongoose';
+
+@Schema()
+export class User extends Document {
+  @Prop({ required: true })
+  username: string;
+
+  @Prop({ required: true, unique: true })
+  email: string;
+
+  @Prop()
+  mobileNumber: number;
+>>>>>>> demo
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
