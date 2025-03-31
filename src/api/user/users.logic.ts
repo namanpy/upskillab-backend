@@ -6,14 +6,10 @@ import { ObjectId } from 'mongoose';
 export class UsersLogicService {
   constructor(private usersDataService: UserDataService) {}
 
-  async findbyUsernameorEmailorMobile(inputs: { username?: string; email?: string; mobileNumber?: string }) {
-    const { username, email, mobileNumber} = inputs;
+  async findbyUsernameorEmailorMobile(inputs: { searchString: string }) {
+    const { searchString } = inputs;
     return {
-      users: await this.usersDataService.findbyUsernameorEmailorMobile({
-        username,
-        email,
-        mobileNumber,
-      }),
+      users: await this.usersDataService.findbyUsernameorEmailorMobile(searchString),
     };
   }
 
