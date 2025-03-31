@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-<<<<<<< HEAD
 import { ApiPropertyOptional, ApiProperty } from '@nestjs/swagger';
 import { HydratedDocument, Types } from 'mongoose';
 
@@ -12,7 +11,10 @@ export class User {
   })
   _id: Types.ObjectId;
 
-  @ApiPropertyOptional({})
+  @ApiPropertyOptional({
+    type: String,
+
+  })
   @Prop({
     type: String,
     validate: function (this, value: string) {
@@ -22,7 +24,9 @@ export class User {
   })
   email: string | null;
 
-  @ApiPropertyOptional({})
+  @ApiPropertyOptional({
+    type: String,
+  })
   @Prop({
     type: String,
     validate: function (this, value: string) {
@@ -43,20 +47,6 @@ export class User {
     select: false,
   })
   password: string;
-=======
-import { Document } from 'mongoose';
-
-@Schema()
-export class User extends Document {
-  @Prop({ required: true })
-  username: string;
-
-  @Prop({ required: true, unique: true })
-  email: string;
-
-  @Prop()
-  mobileNumber: number;
->>>>>>> demo
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
