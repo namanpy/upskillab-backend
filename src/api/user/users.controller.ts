@@ -1,36 +1,50 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
-import { TestimonialLogicService } from 'src/api/testimonials/testimonial.logic';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Param, Query, Put } from '@nestjs/common';
+import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { UsersLogicService } from './users.logic';
+import { GetUserRequestDTO, GetUserResponseDTO } from 'src/dto/user.dto';
 
 @Controller('users')
 export class UsersController {
-  constructor(private usersLogicService: TestimonialLogicService) {}
 
+  constructor(private usersLogicService: UsersLogicService) {}
+
+  @ApiTags('Users')
   @ApiResponse({
     status: 200,
-    description: 'Get testimonials',
+    description: 'Get Users',
+    type: GetUserResponseDTO,
   })
   @Get('')
-  /**
-   *
-   * To search users either via mobile number or email, or username
-   * Note :- Should accept partial search, bonus points for single input only (name : searchString)
-   *
-   */
-  async getUsers() {
-    // TODO : - By Swapnil Pandy
+  async users(
+    @Query() inputs: GetUserRequestDTO,
+  ):Promise<GetUserResponseDTO> {
+    const { username, email, mobileNumber } = inputs;
+    return await this.usersLogicService.findbyUsernameorEmailorMobile({
+      username,
+      email,
+      mobileNumber,
+    });
   }
+  @ApiTags('Users')
+  @ApiResponse({
+    status: 200,
+    description: 'Update user details',
+  })
 
-  /**
-   *
-   * Endpoint to update user details
-   * Note :- Can take mongodb user _id as input
-   *
-   */
-  async updateUser() {
-    // TODO : - By Swapnil Pandy
+  @Put(':_id')
+  async updateUser(
+    @Body() updateData: { username?: string; email?: string; mobileNumber?: string },
+    @Param('_id') _id: string,
+  ) {
+    const { username, email, mobileNumber } = updateData;
+    
+    return await this.usersLogicService.updateUserDetails({
+      _id,
+      username,
+      email,
+      mobileNumber,
+    });
   }
-
   @ApiResponse({
     status: 200,
     description: 'User login',
