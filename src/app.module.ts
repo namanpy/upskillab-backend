@@ -11,6 +11,7 @@ import { CourseModule } from './api/course/course.module';
 import { AuthModule } from './api/auth/auth.module';
 import { UsersModule } from './api/user/users.module';
 
+import { FAQModule } from './api/faq/faq.module';
 //MongooseModule.forRoot('mongodb://localhost/nest')
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { UsersModule } from './api/user/users.module';
     CourseModule,
     AuthModule,
     UsersModule,
+    FAQModule,
   ],
   controllers: [AppController],
   providers: [AppService],

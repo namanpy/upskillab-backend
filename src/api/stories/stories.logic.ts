@@ -13,6 +13,7 @@ export class StoriesLogicService {
       stories: stories.map((story) => ({
         _id: story._id.toString(),
         name: story.name,
+        jobTitle: story.jobTitle,
         userImageUrl: story.userImageUrl,
         description: story.description,
         companyLogoUrl: story.companyLogoUrl,
@@ -28,6 +29,7 @@ export class StoriesLogicService {
       story: {
         _id: story._id.toString(),
         name: story.name,
+        jobTitle: story.jobTitle,
         userImageUrl: story.userImageUrl,
         description: story.description,
         companyLogoUrl: story.companyLogoUrl,
@@ -46,6 +48,7 @@ export class StoriesLogicService {
       story: {
         _id: story._id.toString(),
         name: story.name,
+        jobTitle: story.jobTitle,
         userImageUrl: story.userImageUrl,
         description: story.description,
         companyLogoUrl: story.companyLogoUrl,
@@ -64,6 +67,7 @@ export class StoriesLogicService {
       story: {
         _id: story._id.toString(),
         name: story.name,
+        jobTitle: story.jobTitle,
         userImageUrl: story.userImageUrl,
         description: story.description,
         companyLogoUrl: story.companyLogoUrl,
