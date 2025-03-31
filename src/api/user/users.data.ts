@@ -41,7 +41,6 @@ export class UserDataService {
     if (username) updateData.username = username;
     if (email) updateData.email = email;
     if (mobileNumber) updateData.mobileNumber = mobileNumber;
-
     return this.userModel.findOneAndUpdate({_id}, updateData, { new: true }).exec();
   }
   async findOne(_id: Types.ObjectId) {
