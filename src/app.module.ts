@@ -9,6 +9,8 @@ import { CategoryModule } from './api/category/category.module';
 import { BatchModule } from './api/batch/batch.module';
 import { CourseModule } from './api/course/course.module';
 import { AuthModule } from './api/auth/auth.module';
+import { UsersModule } from './api/user/users.module';
+
 //MongooseModule.forRoot('mongodb://localhost/nest')
 @Module({
   imports: [
@@ -22,6 +24,7 @@ import { AuthModule } from './api/auth/auth.module';
     BatchModule,
     CourseModule,
     AuthModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
