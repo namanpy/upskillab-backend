@@ -1,8 +1,6 @@
 import { Controller, Get, Post, Body, Param, Query, Put } from '@nestjs/common';
-import { GetTestimonialsResponseDTO } from '../../dto/testimonial.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsersLogicService } from './users.logic';
-import { ObjectId } from 'mongoose';
 
 @Controller('users')
 export class UsersController {
@@ -13,7 +11,6 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'Get testimonials',
-    type: GetTestimonialsResponseDTO,
   })
   @Get('')
   async users(

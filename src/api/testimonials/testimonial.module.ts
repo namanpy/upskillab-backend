@@ -6,7 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import {
   Testimonial,
   TestimonialSchema,
-} from '../../schemas/testimonial.schema';
+} from '../../schemas/home/testimonial.schema';
 
 @Module({
   imports: [

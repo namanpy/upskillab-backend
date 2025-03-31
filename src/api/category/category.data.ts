@@ -26,11 +26,19 @@ export class CategoryDataService {
   }
 
   async getCategory(
-    input: { featured?: boolean; skip?: number; limit?: number } = {},
+    input: {
+      searchString?: string;
+      featured?: boolean;
+      skip?: number;
+      limit?: number;
+    } = {},
   ) {
-    const { featured, skip = 0, limit = 0 } = input;
+    const { searchString, featured, skip = 0, limit = 0 } = input;
 
     const filter = {
+      ...(searchString && {
+        categoryName: { $regex: searchString, $options: 'i' },
+      }),
       ...(featured && { featured }),
     };
 
