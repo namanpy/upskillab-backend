@@ -1,26 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { Course } from 'src/schemas/course/course.schema';
 import { Category } from 'src/schemas/category.schema';
 
-import { Course } from 'src/schemas/course/course.schema';
+import { CustomError } from 'src/common/classes/error.class';
+import { ERROR } from 'src/common/constants/error.constants';
 
 @Injectable()
 export class CourseDataService {
   constructor(@InjectModel(Course.name) private courseModel: Model<Course>) {}
 
-  //   async createCourse(input: Omit<Course, '_id'>) {
-  //     const existingCourse = await this.courseModel.findOne({
-  //       courseCode: input.courseCode,
-  //     });
+  async createCourse(input: Omit<Course, '_id'>) {
+    const existingCourse = await this.courseModel.findOne({
+      courseCode: input.courseCode,
+    });
 
-  //     if (existingCourse) {
-  //       throw new CustomError(ERROR.COURSE_ALREADY_EXISTS);
-  //     }
+    if (existingCourse) {
+      throw new CustomError(ERROR.COURSE_ALREADY_EXISTS);
+    }
 
-  //     const newCourse = new this.courseModel(input);
-  //     return (await newCourse.save()).toObject();
-  //   }
+    const newCourse = new this.courseModel(input);
+    return (await newCourse.save()).toObject();
+  }
 
   async getCourse(input: { skip?: number; limit?: number } = {}) {
     const { skip = 0, limit = 0 } = input;

@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Chapter, ChapterDocument } from '../../schemas/course/chapter.schema';
-import { CreateChapterDto } from '../../dto/course/chapter.dto';
+import {
+  Chapter,
+  ChapterDocument,
+} from '../../../schemas/course/chapter.schema';
 
 @Injectable()
 export class ChapterDataService {
@@ -14,7 +16,9 @@ export class ChapterDataService {
     return this.chapterModel.find({ courseId }).sort({ order: 1 }).exec();
   }
 
-  async createChapter(createChapterDto: CreateChapterDto): Promise<ChapterDocument> {
+  async createChapter(
+    createChapterDto: Omit<Chapter, '_id'>,
+  ): Promise<ChapterDocument> {
     const newChapter = new this.chapterModel(createChapterDto);
     return newChapter.save();
   }
@@ -25,7 +29,7 @@ export class ChapterDataService {
 
   async updateChapter(
     id: string,
-    updateChapterDto: Partial<CreateChapterDto>,
+    updateChapterDto: Partial<ChapterDocument>,
   ): Promise<ChapterDocument | null> {
     return this.chapterModel
       .findByIdAndUpdate(id, updateChapterDto, { new: true })

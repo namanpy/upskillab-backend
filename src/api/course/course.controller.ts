@@ -4,6 +4,8 @@ import { CourseLogicService } from './course.logic';
 import { ERROR } from 'src/common/constants/error.constants';
 
 import {
+  CreateCourseRequestDto,
+  CreateCourseResponseDto,
   //   CreateCourseRequestDto,
   //   CreateCourseResponseDto,
   GetCourseDisplayRequestDto,
@@ -17,25 +19,25 @@ import {
 export class CourseController {
   constructor(private courseLogicService: CourseLogicService) {}
 
-  //   @ApiBody({
-  //     type: CreateCourseRequestDto,
-  //   })
-  //   @ApiResponse({
-  //     status: 200,
-  //     description: 'Create course',
-  //     type: CreateCourseResponseDto,
-  //   })
-  //   @ApiResponse({
-  //     status: ERROR.COURSE_ALREADY_EXISTS.code,
-  //     description: ERROR.COURSE_ALREADY_EXISTS.message,
-  //     example: ERROR.COURSE_ALREADY_EXISTS,
-  //   })
-  //   @Post('')
-  //   async createCourse(
-  //     @Body() body: CreateCourseRequestDto,
-  //   ): Promise<CreateCourseResponseDto> {
-  //     return await this.courseLogicService.createCourse(body);
-  //   }
+  @ApiBody({
+    type: CreateCourseRequestDto,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Create course',
+    type: CreateCourseResponseDto,
+  })
+  @ApiResponse({
+    status: ERROR.COURSE_ALREADY_EXISTS.code,
+    description: ERROR.COURSE_ALREADY_EXISTS.message,
+    example: ERROR.COURSE_ALREADY_EXISTS,
+  })
+  @Post('')
+  async createCourse(
+    @Body() body: CreateCourseRequestDto,
+  ): Promise<CreateCourseResponseDto> {
+    return await this.courseLogicService.createCourse(body);
+  }
 
   @ApiResponse({
     status: 200,

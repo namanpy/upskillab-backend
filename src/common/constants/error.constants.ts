@@ -35,4 +35,10 @@ export const ERROR = {
     reference: 6,
     message: 'User not found',
   },
+
+  COURSE_ALREADY_EXISTS: {
+    code: HttpStatus.CONFLICT,
+    reference: 7,
+    message: 'Course already exists',
+  },
 };

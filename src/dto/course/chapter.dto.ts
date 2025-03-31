@@ -1,53 +1,40 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsNumber, IsUrl } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsString,
+  IsNotEmpty,
+  IsNumber,
+  ValidateNested,
+  IsArray,
+  IsBoolean,
+} from 'class-validator';
+import { TopicDto } from './topic.dto';
 
-export class CreateChapterDto {
+export class ChapterDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  title: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  @IsUrl() // Added URL validation
-  videoLink: string;
+  name: string;
 
   @ApiProperty()
   @IsNumber()
-  @IsNotEmpty()
-  order: number;
+  chapterNumber: number;
 
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  courseId: string;
-}
-
-export class Chapter {
-  @ApiProperty()
-  _id: string;
+  @IsNumber()
+  week: number;
 
   @ApiProperty()
-  title: string;
+  @IsNumber()
+  session: number;
+
+  @ApiProperty({ type: [TopicDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => TopicDto)
+  topics: TopicDto[];
 
   @ApiProperty()
-  videoLink: string;
-
-  @ApiProperty()
-  order: number;
-
-  @ApiProperty()
-  courseId: string;
-
-  @ApiProperty()
-  createdAt: Date;
-
-  @ApiProperty()
-  updatedAt: Date;
-}
-
-export class GetChaptersResponseDTO {
-  @ApiProperty({ type: [Chapter] })
-  chapters: Chapter[];
+  @IsBoolean()
+  active: boolean;
 }

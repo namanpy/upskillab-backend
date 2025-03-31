@@ -10,6 +10,8 @@ import { BatchModule } from './api/batch/batch.module';
 import { CourseModule } from './api/course/course.module';
 import { AuthModule } from './api/auth/auth.module';
 import { FAQModule } from './api/faq/faq.module';
+import { ChapterModule } from './api/course/chapter/chapter.module';
+import { TopicModule } from './api/course/topic/topic.module';
 //MongooseModule.forRoot('mongodb://localhost/nest')
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { FAQModule } from './api/faq/faq.module';
     CategoryModule,
     BatchModule,
     CourseModule,
+    ChapterModule,
+    TopicModule,
     AuthModule,
     FAQModule,
   ],

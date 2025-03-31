@@ -4,6 +4,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import mongoose, { HydratedDocument, Types } from 'mongoose';
+import { Topic } from './topic.schema';
 
 export type ChapterDocument = HydratedDocument<Chapter> & {
   createdAt: Date;
@@ -19,23 +20,26 @@ export class Chapter {
 
   @ApiProperty()
   @Prop({ required: true })
-  title: string;
+  name: string;
 
   @ApiProperty()
   @Prop({ required: true })
-  videoLink: string; // Changed from description to videoLink
+  chapterNumber: number;
 
   @ApiProperty()
   @Prop({ required: true })
-  order: number;
+  week: number;
+
+  @ApiProperty()
+  @Prop({ required: true })
+  session: number;
+
+  @ApiProperty()
+  @Prop({ default: true })
+  active: boolean;
 
   @ApiProperty({ type: String })
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Course', required: true })
-  courseId: Types.ObjectId;
-
-  @ApiProperty()
-  @Prop({ default: false })
-  isPublished: boolean;
+  course: Types.ObjectId;
 }
-
 export const ChapterSchema = SchemaFactory.createForClass(Chapter);
