@@ -24,13 +24,14 @@ export class UserDataService {
     if (!user) throw new CustomError(ERROR.USER_NOT_FOUND);
     return user;
   }
-  async findbyUsernameorEmailorMobile(inputs: { username?: string; email?: string; mobileNumber?: string }) {
-    const { username, email, mobileNumber } = inputs;
-
-    const filters = username? { username: { $regex: username } }: 
-                    email? { email: { $regex: email } }:
-                    mobileNumber? { mobileNumber: { $regex: mobileNumber } }: 
-                    {};
+  async findbyUsernameorEmailorMobile(searchString: string) {
+    const filters = {
+      $or: [
+        { username: { $regex: searchString } },
+        { email: { $regex: searchString } },
+        { mobileNumber: { $regex: searchString } }
+      ]
+    };
     return this.userModel.find(filters).exec();
   }
 

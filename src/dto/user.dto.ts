@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEmail } from 'class-validator';
 import { User } from 'src/schemas/user.schema';
 
 export class GetUserRequestDTO {
@@ -25,4 +25,26 @@ export class GetUserRequestDTO {
 export class GetUserResponseDTO {
     @ApiProperty({ type: [User] })
     users: User[];
+}
+
+export class UpdateUserRequestDTO {
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    username: string;
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    @IsEmail()
+    email: string;
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    mobileNumber: string;
+}
+export class UpdateUserResponseDTO {
+    @ApiProperty({ type: User })
+    user: User;
 }

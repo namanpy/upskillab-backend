@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Param, Query, Put } from '@nestjs/common';
 import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsersLogicService } from './users.logic';
-import { GetUserRequestDTO, GetUserResponseDTO } from 'src/dto/user.dto';
+import { GetUserRequestDTO, GetUserResponseDTO, UpdateUserRequestDTO, UpdateUserResponseDTO } from 'src/dto/user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -18,32 +18,30 @@ export class UsersController {
   async users(
     @Query() inputs: GetUserRequestDTO,
   ):Promise<GetUserResponseDTO> {
-    const { username, email, mobileNumber } = inputs;
-    return await this.usersLogicService.findbyUsernameorEmailorMobile({
-      username,
-      email,
-      mobileNumber,
-    });
+    const searchString = `${inputs.username || ''} ${inputs.email || ''} ${inputs.mobileNumber || ''}`.trim();
+    return await this.usersLogicService.findbyUsernameorEmailorMobile({ searchString });
   }
   @ApiTags('Users')
   @ApiResponse({
     status: 200,
     description: 'Update user details',
+    type: UpdateUserResponseDTO,
   })
 
   @Put(':_id')
   async updateUser(
-    @Body() updateData: { username?: string; email?: string; mobileNumber?: string },
+    @Body() updateData: UpdateUserRequestDTO,
     @Param('_id') _id: string,
-  ) {
+  ): Promise<UpdateUserResponseDTO> {
     const { username, email, mobileNumber } = updateData;
     
-    return await this.usersLogicService.updateUserDetails({
+    const result = await this.usersLogicService.updateUserDetails({
       _id,
       username,
       email,
       mobileNumber,
     });
+    return result as UpdateUserResponseDTO;
   }
   @ApiResponse({
     status: 200,
