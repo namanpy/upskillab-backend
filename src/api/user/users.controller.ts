@@ -1,11 +1,15 @@
 import { Controller, Get, Post, Body, Param, Query, Put } from '@nestjs/common';
 import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsersLogicService } from './users.logic';
-import { GetUserRequestDTO, GetUserResponseDTO, UpdateUserRequestDTO, UpdateUserResponseDTO } from 'src/dto/user.dto';
+import {
+  GetUserRequestDTO,
+  GetUserResponseDTO,
+  UpdateUserRequestDTO,
+  UpdateUserResponseDTO,
+} from 'src/dto/user.dto';
 
 @Controller('users')
 export class UsersController {
-
   constructor(private usersLogicService: UsersLogicService) {}
 
   @ApiTags('Users')
@@ -15,11 +19,12 @@ export class UsersController {
     type: GetUserResponseDTO,
   })
   @Get('')
-  async users(
-    @Query() inputs: GetUserRequestDTO,
-  ):Promise<GetUserResponseDTO> {
-    const searchString = `${inputs.username || ''} ${inputs.email || ''} ${inputs.mobileNumber || ''}`.trim();
-    return await this.usersLogicService.findbyUsernameorEmailorMobile({ searchString });
+  async users(@Query() inputs: GetUserRequestDTO): Promise<GetUserResponseDTO> {
+    console.log('searchString', inputs.searchString);
+
+    return await this.usersLogicService.findbyUsernameorEmailorMobile({
+      searchString: inputs.searchString,
+    });
   }
   @ApiTags('Users')
   @ApiResponse({
@@ -27,14 +32,13 @@ export class UsersController {
     description: 'Update user details',
     type: UpdateUserResponseDTO,
   })
-
   @Put(':_id')
   async updateUser(
     @Body() updateData: UpdateUserRequestDTO,
     @Param('_id') _id: string,
   ): Promise<UpdateUserResponseDTO> {
     const { username, email, mobileNumber } = updateData;
-    
+
     const result = await this.usersLogicService.updateUserDetails({
       _id,
       username,
