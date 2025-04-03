@@ -3,6 +3,7 @@ import { BatchRepository } from './batch.data';
 
 @Injectable()
 export class BatchService {
+  batchDataService: any;
   constructor(private readonly batchRepository: BatchRepository) {}
 
   async getBatches(skip: number, limit: number) {

@@ -35,17 +35,21 @@ export class BatchRepository {
   constructor(@InjectModel(Batch.name) private batchModel: Model<BatchDocuments>) {}
 
   async findBatches(skip: number, limit: number) {
-    return this.batchModel
-    .find()
-    .skip(skip)
-    .populate<{
-      Category:
-        | Course
-        | (undefined extends Batch['course'] ? undefined : never);
-    }>({
-      path: 'course',
-    })
-    .limit(limit)
-    .exec();
+    const batches = await this.batchModel
+      .find()
+      .skip(skip)
+      .limit(limit)
+      .populate({
+        path: 'course',
+        select: '_id courseName',
+      })
+      .lean()
+      .exec();
+    return batches.map(batch => ({
+      ...batch,
+      courseId: batch.course?._id,
+      courseName: (batch.course as unknown as Course)?.courseName,
+      course: undefined,
+    }));
   }
 }
