@@ -8,6 +8,8 @@ import {
   IsOptional,
 } from 'class-validator';
 import { Types } from 'mongoose';
+import { Course } from 'src/schemas/course/course.schema';
+import { Teacher } from '../teacher.dto';
 
 export class CreateBatchDto {
   @ApiProperty()
@@ -45,18 +47,20 @@ export class CreateBatchDto {
   active: boolean;
 }
 
-export class Batch {
-  @ApiProperty()
-  _id: string;
+export class BatchResponse {
+  @ApiProperty({
+    type: String,
+  })
+  _id: Types.ObjectId;
 
-  @ApiProperty({ type: String, nullable: true })
-  course: string | null;
+  @ApiProperty({ type: Course, nullable: true })
+  course: Course;
 
   @ApiProperty()
   startTime: number;
 
   @ApiProperty()
-  startDate: string;
+  startDate: Date;
 
   @ApiProperty()
   totalSeats: number;
@@ -67,8 +71,8 @@ export class Batch {
   @ApiProperty()
   duration: number;
 
-  @ApiProperty({ type: String, nullable: true })
-  teacher: string | null;
+  @ApiProperty({ type: Teacher, nullable: true })
+  teacher: Teacher;
 
   @ApiProperty()
   imageUrl: string;
@@ -84,8 +88,8 @@ export class Batch {
 }
 
 export class GetBatchesResponseDTO {
-  @ApiProperty({ type: [Batch] })
-  batches: Batch[];
+  @ApiProperty({ type: [BatchResponse] })
+  batches: BatchResponse[];
 }
 
 export class GetUpcomingBatchesRequestDTO {

@@ -38,6 +38,10 @@ export class CourseLogicService {
     // Create the course first
     const course = await this.courseDataService.createCourse({
       ...createCourseDto,
+      brochure: createCourseDto.brochure ? createCourseDto.brochure : undefined,
+      certificate: createCourseDto.certificate
+        ? createCourseDto.certificate
+        : undefined,
       language: Types.ObjectId.createFromHexString(createCourseDto.language),
       category: Types.ObjectId.createFromHexString(createCourseDto.category),
     });
@@ -223,11 +227,16 @@ export class CourseLogicService {
       }),
     );
 
+    const batch = await this.batchDataService.getLatestBatchForCourse(
+      course._id.toString(),
+    );
+
     return {
       ...course,
       courseLevel: COURSE_LEVELS[course.courseLevel],
       category: category._id.toString(),
       categoryName: category.categoryName,
+      batch: batch ? batch : undefined,
       language,
       chapters: chaptersWithTopics,
     };

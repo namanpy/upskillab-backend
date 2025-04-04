@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { Batch, BatchDocument } from '../../schemas/course/batch.schema';
 import { CreateBatchDto } from '../../dto/course/batch.dto';
 import { Course } from '../../schemas/course/course.schema';
-import { Teacher } from '../../schemas/teacher.schema';
+import { Teacher, TeacherDocument } from '../../schemas/teacher.schema';
 
 @Injectable()
 export class BatchDataService {
@@ -14,8 +14,12 @@ export class BatchDataService {
     @InjectModel(Teacher.name) private teacherModel: Model<Teacher>,
   ) {}
 
-  async getBatches(): Promise<BatchDocument[]> {
-    return this.batchModel.find().populate('course').populate('teacher').exec();
+  async getBatches() {
+    return this.batchModel
+      .find()
+      .populate<{ course: Course }>('course')
+      .populate<{ teacher: TeacherDocument }>('teacher')
+      .exec();
   }
 
   async createBatch(
@@ -88,9 +92,7 @@ export class BatchDataService {
     return this.batchModel.findByIdAndDelete(id).exec();
   }
 
-  async getLatestBatchForCourse(
-    courseId: string,
-  ): Promise<BatchDocument | null> {
+  async getLatestBatchForCourse(courseId: string) {
     return this.batchModel
       .findOne({ course: courseId })
       .sort({ startDate: -1 })

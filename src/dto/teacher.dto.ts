@@ -1,3 +1,4 @@
+import { Types } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 
@@ -33,11 +34,15 @@ export class CreateTeacherDto {
 }
 
 export class Teacher {
-  @ApiProperty()
-  _id: string;
+  @ApiProperty({
+    type: String,
+  })
+  _id: Types.ObjectId;
 
-  @ApiProperty()
-  user: string;
+  @ApiProperty({
+    type: String,
+  })
+  user: Types.ObjectId;
 
   @ApiProperty()
   qualification: string;
