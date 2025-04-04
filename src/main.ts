@@ -21,6 +21,9 @@ async function bootstrap() {
     }),
   );
 
+  // Set file size limit for uploads
+  // app.useBodyParser('json', { limit: '10mb' });
+  // app.useBodyParser('urlencoded', { limit: '10mb', extended: true });
   // Swagger setup
   const config = new DocumentBuilder()
     .setTitle('Upskillab.com Backend')

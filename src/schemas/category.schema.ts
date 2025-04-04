@@ -40,6 +40,12 @@ export class Category {
   @Prop({
     required: true,
   })
+  categoryLogo: string; // New field for logo URL
+
+  @ApiProperty()
+  @Prop({
+    required: true,
+  })
   categoryDescription: string;
 
   @ApiProperty()

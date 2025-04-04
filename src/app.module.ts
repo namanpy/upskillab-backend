@@ -10,10 +10,14 @@ import { BatchModule } from './api/batch/batch.module';
 import { CourseModule } from './api/course/course.module';
 import { AuthModule } from './api/auth/auth.module';
 import { UsersModule } from './api/user/users.module';
-
-import { FAQModule } from './api/faq/faq.module';
 import { ChapterModule } from './api/course/chapter/chapter.module';
 import { TopicModule } from './api/course/topic/topic.module';
+import { FAQModule } from './api/faq/faq.module';
+import { BannerModule } from './api/public/banner/banner.module';
+import { StatsModule } from './api/public/stats/stats.module';
+import { TeacherModule } from './api/teachers/teacher.module';
+import { PremiumLearningExperienceModule } from './api/public/premium-learning-experience/premium-learning-experience.module'
+import { FileModule } from './api/file/file.module';
 //MongooseModule.forRoot('mongodb://localhost/nest')
 @Module({
   imports: [
@@ -31,6 +35,11 @@ import { TopicModule } from './api/course/topic/topic.module';
     AuthModule,
     UsersModule,
     FAQModule,
+    BannerModule,
+    StatsModule,
+    TeacherModule,
+    PremiumLearningExperienceModule,
+    FileModule,
   ],
   controllers: [AppController],
   providers: [AppService],
