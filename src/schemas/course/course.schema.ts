@@ -7,10 +7,29 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import mongoose, { HydratedDocument, Types } from 'mongoose';
-import { COURSE_MODE } from 'src/common/constants/course.constants';
+import {
+  COURSE_LEVELS,
+  COURSE_MODE,
+} from 'src/common/constants/course.constants';
 import { Category } from '../category.schema';
+import { Language } from '../language.schema';
 
 export type CourseDocuments = HydratedDocument<Course>;
+
+@Schema()
+class FAQ {
+  @ApiProperty()
+  @Prop({
+    required: true,
+  })
+  question: string;
+
+  @ApiProperty()
+  @Prop({
+    required: true,
+  })
+  answer: string;
+}
 
 @Schema()
 export class Course {
@@ -88,6 +107,17 @@ export class Course {
   @ApiProperty()
   @Prop({
     required: true,
+    enum: Object.keys(COURSE_LEVELS),
+  })
+  courseLevel: string;
+
+  @ApiProperty()
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Language.name })
+  language: Types.ObjectId;
+
+  @ApiProperty()
+  @Prop({
+    required: true,
   })
   certificate: string;
 
@@ -97,6 +127,18 @@ export class Course {
     default: true,
   })
   active: boolean;
+
+  @ApiProperty({ type: [FAQ] })
+  @Prop({
+    type: [
+      {
+        question: { type: String, required: true },
+        answer: { type: String, required: true },
+      },
+    ],
+    default: [],
+  })
+  faqs: FAQ[];
 }
 
 export const CourseSchema = SchemaFactory.createForClass(Course);
