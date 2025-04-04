@@ -79,7 +79,9 @@ export class CourseLogicService {
     };
   }
 
-  async updateCourse(updateCourseDto: UpdateCourseRequestDto) {
+  async updateCourse(
+    updateCourseDto: UpdateCourseRequestDto & { courseId: string },
+  ) {
     const { courseId, chapters, ...courseData } = updateCourseDto;
 
     // Update course basic information
