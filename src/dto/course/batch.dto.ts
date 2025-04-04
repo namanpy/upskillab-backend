@@ -53,6 +53,9 @@ export class Batch {
   course: string | null;
 
   @ApiProperty()
+  startTime: number;
+
+  @ApiProperty()
   startDate: string;
 
   @ApiProperty()
@@ -62,7 +65,7 @@ export class Batch {
   remainingSeats: number;
 
   @ApiProperty()
-  duration: string;
+  duration: number;
 
   @ApiProperty({ type: String, nullable: true })
   teacher: string | null;

@@ -21,6 +21,10 @@ export class Batch {
   course: Course | Types.ObjectId;
 
   @ApiProperty()
+  @Prop({ required: true, min: 0, max: 24 })
+  startTime: number;
+
+  @ApiProperty()
   @Prop({ required: true })
   startDate: Date;
 
@@ -34,10 +38,14 @@ export class Batch {
 
   @ApiProperty()
   @Prop({ required: true })
-  duration: string;
+  duration: number;
 
   @ApiProperty()
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Teacher', required: true })
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Teacher',
+    required: true,
+  })
   teacher: Teacher | Types.ObjectId;
 
   @ApiProperty()
