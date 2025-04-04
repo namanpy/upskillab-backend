@@ -149,30 +149,6 @@ export class GetCourseDisplayRequestDto {
   limit?: number;
 
   @IsOptional()
-  @IsEnum(SortField)
-  @ApiPropertyOptional({
-    enum: SortField,
-    description: 'Field to sort by',
-  })
-  sortBy?: SortField;
-
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @ApiPropertyOptional({
-    enum: SortOrder,
-    description: 'Sort order (asc or desc)',
-    default: SortOrder.ASC,
-  })
-  sortOrder?: SortOrder = SortOrder.ASC;
-
-  @IsOptional()
-  @IsMongoId()
-  @ApiPropertyOptional({
-    description: 'Filter by category ID',
-  })
-  categoryId?: string;
-
-  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => SortOption)
