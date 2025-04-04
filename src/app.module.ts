@@ -36,7 +36,6 @@ import { TeacherModule } from './api/teachers/teacher.module';
     BannerModule,
     StatsModule,
     TeacherModule,
-    BatchModule,
   ],
   controllers: [AppController],
   providers: [AppService],

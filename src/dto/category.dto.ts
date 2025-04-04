@@ -26,6 +26,11 @@ export class CreateCategoryRequestDto {
   @ApiProperty()
   categoryImage: string;
 
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  categoryLogo: string;
+
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
@@ -95,6 +100,11 @@ export class UpdateCategoryRequestBodyDto {
   @ApiProperty()
   categoryImage: string;
 
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  categoryLogo?: string;
+
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
@@ -135,6 +145,9 @@ export class GetCategoryByCodeResponseDto {
 
   @ApiProperty()
   categoryImage: string;
+
+  @ApiProperty()
+  categoryLogo?: string;
 
   @ApiProperty()
   categoryDescription: string;
