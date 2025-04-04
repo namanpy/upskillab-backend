@@ -1,16 +1,26 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { BatchService } from './batch.logic';
+import { BatchLogicService } from './batch.logic';
+import { ApiResponse } from '@nestjs/swagger';
+import { GetBatchesRequestDTO, GetBatchResponseDTO } from 'src/dto/batch.dto';
 
 @Controller('batches')
 export class BatchController {
-  constructor(private readonly batchService: BatchService) {}
+  constructor(private readonly batchLogicService: BatchLogicService) {}
+
+  @ApiResponse({
+    status: 200,
+    description: 'Get upcoming batches',
+    type:[GetBatchResponseDTO],
+  })
 
   @Get('upcoming')
-  async getBatches(@Query('skip') skip: number, @Query('limit') limit: number) {
-    return this.batchService.getBatches(skip, limit);
+  async getBatches(
+    @Query() query: GetBatchesRequestDTO,
+  ): Promise< GetBatchResponseDTO[]> {
+    return await this.batchLogicService.getBatches(query.skip, query.limit);
   }
 }
-
+ 
 // To get upcoming batches
 
 // GET /batches/upcoming
