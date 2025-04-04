@@ -56,14 +56,36 @@ export class CourseLogicService {
     };
   }
 
+  // async getCourseDisplay(input: { skip?: number; limit?: number }) {
+  //   const { data, count } = await this.courseDataService.getCourse(input);
+
+  //   const formattedData = await Promise.all(
+  //     data.map(async (course) => {
+  //       const batch = await this.batchDataService.getLatestBatchForCourse({
+  //         courseId: course._id,
+  //       });
+
+  //       return {
+  //         ...course,
+  //         seatsAvailable: batch?.remainingSeats || 0,
+  //         courseRating: 4.8,
+  //       };
+  //     }),
+  //   );
+
+  //   return {
+  //     data: formattedData,
+  //     count,
+  //   };
+  // }
   async getCourseDisplay(input: { skip?: number; limit?: number }) {
     const { data, count } = await this.courseDataService.getCourse(input);
 
     const formattedData = await Promise.all(
       data.map(async (course) => {
-        const batch = await this.batchDataService.getLatestBatchForCourse({
-          courseId: course._id,
-        });
+        const batch = await this.batchDataService.getLatestBatchForCourse(
+          course._id.toString(), // Convert ObjectId to string
+        );
 
         return {
           ...course,
@@ -73,10 +95,7 @@ export class CourseLogicService {
       }),
     );
 
-    return {
-      data: formattedData,
-      count,
-    };
+    return { data: formattedData, count };
   }
 
   async updateCourse(
