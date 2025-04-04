@@ -25,12 +25,30 @@ export class CategoryDataService {
     return (await newCategory.save()).toObject();
   }
 
+  async getCategoryById(categoryId: string) {
+    const category = await this.categoryModel
+      .findById(categoryId)
+      .lean()
+      .exec();
+
+    if (!category) throw new CustomError(ERROR.CATEGORY_NOT_FOUND);
+
+    return category;
+  }
   async getCategory(
-    input: { featured?: boolean; skip?: number; limit?: number } = {},
+    input: {
+      searchString?: string;
+      featured?: boolean;
+      skip?: number;
+      limit?: number;
+    } = {},
   ) {
-    const { featured, skip = 0, limit = 0 } = input;
+    const { searchString, featured, skip = 0, limit = 0 } = input;
 
     const filter = {
+      ...(searchString && {
+        categoryName: { $regex: searchString, $options: 'i' },
+      }),
       ...(featured && { featured }),
     };
 
@@ -68,6 +86,17 @@ export class CategoryDataService {
         },
         { $set: update },
       )
+      .lean()
+      .exec();
+
+    if (!category) throw new CustomError(ERROR.CATEGORY_NOT_FOUND);
+
+    return category;
+  }
+
+  async getCategoryByCode(categoryCode: string) {
+    const category = await this.categoryModel
+      .findOne({ categoryCode })
       .lean()
       .exec();
 

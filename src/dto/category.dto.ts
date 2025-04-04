@@ -49,6 +49,11 @@ export class CreateCategoryResponseDto {
 
 export class GetCategoryRequestDto {
   @IsOptional()
+  @IsString()
+  @ApiPropertyOptional()
+  searchString?: string;
+
+  @IsOptional()
   @IsBoolean()
   @ApiPropertyOptional()
   featured?: boolean;
@@ -106,4 +111,37 @@ export class UpdateCategoryRequestBodyDto {
 export class UpdateCategoryResponseDto {
   @ApiProperty()
   isSuccess: boolean;
+}
+
+export class GetCategoryByCodeParamDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'Category code',
+    example: 'WEB-DEV',
+  })
+  categoryCode: string;
+}
+
+export class GetCategoryByCodeResponseDto {
+  @ApiProperty()
+  _id: string;
+
+  @ApiProperty()
+  categoryName: string;
+
+  @ApiProperty()
+  categoryCode: string;
+
+  @ApiProperty()
+  categoryImage: string;
+
+  @ApiProperty()
+  categoryDescription: string;
+
+  @ApiProperty()
+  featured: boolean;
+
+  @ApiProperty()
+  active: boolean;
 }

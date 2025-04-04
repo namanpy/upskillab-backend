@@ -12,7 +12,14 @@ async function bootstrap() {
   // CORS enabled
   app.enableCors();
   // Validation
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+    }),
+  );
 
   // Set file size limit for uploads
   // app.useBodyParser('json', { limit: '10mb' });

@@ -13,6 +13,11 @@ import {
   UpdateCategoryResponseDto,
 } from 'src/dto/category.dto';
 
+import {
+  GetCategoryByCodeParamDto,
+  GetCategoryByCodeResponseDto,
+} from 'src/dto/category.dto';
+
 @Controller('category')
 export class CategoryController {
   constructor(private categoryLogicService: CategoryLogicService) {}
@@ -76,5 +81,24 @@ export class CategoryController {
       ...param,
       ...body,
     });
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'Get category by code',
+    type: GetCategoryByCodeResponseDto,
+  })
+  @ApiResponse({
+    status: ERROR.CATEGORY_NOT_FOUND.code,
+    description: ERROR.CATEGORY_NOT_FOUND.message,
+    example: ERROR.CATEGORY_NOT_FOUND,
+  })
+  @Get('code/:categoryCode')
+  async getCategoryByCode(
+    @Param() param: GetCategoryByCodeParamDto,
+  ): Promise<GetCategoryByCodeResponseDto> {
+    return await this.categoryLogicService.getCategoryByCode(
+      param.categoryCode,
+    );
   }
 }

@@ -1,46 +1,139 @@
-import { IsOptional, IsInt, Min } from 'class-validator';
+import { IsOptional, IsInt, Min, IsEnum, IsMongoId } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Course } from 'src/schemas/course/course.schema';
+
 import { Category } from 'src/schemas/category.schema';
 import { COURSE_MODE } from 'src/common/constants/course.constants';
 import { Types } from 'mongoose';
+import {
+  IsString,
+  IsNotEmpty,
+  IsBoolean,
+  IsArray,
+  IsNumber,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+import { ChapterDto } from './chapter.dto';
 
-// export class CreateCourseRequestDto {
-//   @IsString()
-//   @IsNotEmpty()
-//   @ApiProperty()
-//   courseName: string;
+class FaqDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  question: string;
 
-//   @IsString()
-//   @IsNotEmpty()
-//   @ApiProperty()
-//   courseCode: string;
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  answer: string;
+}
 
-//   @IsString()
-//   @IsNotEmpty()
-//   @ApiProperty()
-//   courseImage: string;
+export class CreateCourseRequestDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  courseName: string;
 
-//   @IsString()
-//   @IsNotEmpty()
-//   @ApiProperty()
-//   courseDescription: string;
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  category: string;
 
-//   @IsBoolean()
-//   @ApiProperty()
-//   featured: boolean;
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  categoryName: string;
 
-//   @IsBoolean()
-//   @IsOptional()
-//   @ApiProperty({
-//     required: false,
-//   })
-//   active: boolean = true;
-// }
-// export class CreateCourseResponseDto {
-//   @ApiProperty()
-//   isSuccess: boolean;
-// }
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  courseCode: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  courseImage: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  courseMode: string;
+
+  @ApiProperty()
+  @IsNumber()
+  @Min(0)
+  @IsNotEmpty()
+  courseDuration: number;
+
+  @ApiProperty()
+  @IsInt()
+  @IsNotEmpty()
+  originalPrice: number;
+
+  @ApiProperty()
+  @IsInt()
+  @IsNotEmpty()
+  discountedPrice: number;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  youtubeUrl: string | null = null;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  brochure: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  certificate: string;
+
+  @ApiProperty()
+  @IsBoolean()
+  active: boolean;
+
+  @ApiProperty({ type: [ChapterDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ChapterDto)
+  chapters: ChapterDto[];
+
+  @ApiProperty({ type: [FaqDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => FaqDto)
+  faqs: FaqDto[];
+}
+export class CreateCourseResponseDto {
+  @ApiProperty()
+  isSuccess: boolean;
+}
+
+enum SortField {
+  COURSE_NAME = 'courseName',
+  CATEGORY = 'category',
+  MODE = 'courseMode',
+  DURATION = 'courseDuration',
+  ORIGINAL_PRICE = 'originalPrice',
+  DISCOUNTED_PRICE = 'discountedPrice',
+  ACTIVE = 'active',
+}
+
+enum SortOrder {
+  ASC = 'asc',
+  DESC = 'desc',
+}
+
+class SortOption {
+  @ApiProperty({ enum: SortField })
+  @IsEnum(SortField)
+  field: SortField;
+
+  @ApiProperty({ enum: SortOrder, default: SortOrder.ASC })
+  @IsEnum(SortOrder)
+  order: SortOrder = SortOrder.ASC;
+}
 
 export class GetCourseDisplayRequestDto {
   @IsOptional()
@@ -54,6 +147,32 @@ export class GetCourseDisplayRequestDto {
   @Min(0)
   @ApiPropertyOptional()
   limit?: number;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => SortOption)
+  @ApiPropertyOptional({
+    type: [SortOption],
+    description: 'Array of sort options',
+  })
+  sort?: SortOption[];
+
+  @IsOptional()
+  @IsArray()
+  @IsMongoId({ each: true })
+  @ApiPropertyOptional({
+    type: [String],
+    description: 'Filter by multiple category IDs',
+  })
+  categoryIds?: string[];
+
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({
+    description: 'Search courses by name or code',
+  })
+  search?: string;
 }
 
 class CourseDisplay {
@@ -77,7 +196,7 @@ class CourseDisplay {
   courseImage: string;
 
   @ApiProperty()
-  courseMode: keyof typeof COURSE_MODE;
+  courseMode: string;
 
   @ApiProperty()
   courseDuration: number;
@@ -88,7 +207,7 @@ class CourseDisplay {
   @ApiProperty()
   discountedPrice: number;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   youtubeUrl: string | null;
 
   @ApiProperty()
@@ -113,38 +232,151 @@ export class GetCourseDisplayResponseDto {
   count: number;
 }
 
-// export class UpdateCourseRequestParamsDto {
-//   @IsMongoId()
-//   courseId: string;
-// }
-// export class UpdateCourseRequestBodyDto {
-//   @IsString()
-//   @ApiProperty()
-//   courseName: string;
+export class UpdateCourseRequestParamDto {
+  @ApiProperty()
+  @IsMongoId()
+  courseId: string;
+}
 
-//   @IsString()
-//   @ApiProperty()
-//   courseCode: string;
+export class UpdateCourseRequestDto {
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  courseName?: string;
 
-//   @IsString()
-//   @IsNotEmpty()
-//   @ApiProperty()
-//   courseImage: string;
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  category?: string;
 
-//   @IsString()
-//   @IsNotEmpty()
-//   @ApiProperty()
-//   courseDescription: string;
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  categoryName?: string;
 
-//   @IsBoolean()
-//   @ApiProperty()
-//   featured: boolean;
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  courseCode?: string;
 
-//   @IsBoolean()
-//   @ApiProperty()
-//   active: boolean;
-// }
-// export class UpdateCourseResponseDto {
-//   @ApiProperty()
-//   isSuccess: boolean;
-// }
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  courseImage?: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  courseMode?: string;
+
+  @ApiProperty()
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  courseDuration?: number;
+
+  @ApiProperty()
+  @IsInt()
+  @IsOptional()
+  originalPrice?: number;
+
+  @ApiProperty()
+  @IsInt()
+  @IsOptional()
+  discountedPrice?: number;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  youtubeUrl?: string | null;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  brochure?: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  certificate?: string;
+
+  @ApiProperty()
+  @IsBoolean()
+  @IsOptional()
+  active?: boolean;
+
+  @ApiProperty({ type: [ChapterDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ChapterDto)
+  @IsOptional()
+  chapters?: ChapterDto[];
+
+  @ApiProperty({ type: [FaqDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => FaqDto)
+  @IsOptional()
+  faqs?: FaqDto[];
+}
+
+export class UpdateCourseResponseDto {
+  @ApiProperty()
+  isSuccess: boolean;
+}
+
+export class GetCourseByCodeRequestDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  courseCode: string;
+}
+export class GetCourseByCodeResponseDto {
+  @ApiProperty()
+  _id: Types.ObjectId;
+
+  @ApiProperty()
+  courseName: string;
+
+  @ApiProperty()
+  category: string;
+
+  @ApiProperty()
+  categoryName: string;
+
+  @ApiProperty()
+  courseCode: string;
+
+  @ApiProperty()
+  courseImage: string;
+
+  @ApiProperty()
+  courseMode: string;
+
+  @ApiProperty()
+  courseDuration: number;
+
+  @ApiProperty()
+  originalPrice: number;
+
+  @ApiProperty()
+  discountedPrice: number;
+
+  @ApiProperty()
+  youtubeUrl: string | null;
+
+  @ApiProperty()
+  brochure: string;
+
+  @ApiProperty()
+  certificate: string;
+
+  @ApiProperty()
+  active: boolean;
+
+  @ApiProperty({ type: [ChapterDto] })
+  chapters: ChapterDto[];
+
+  @ApiProperty({ type: [FaqDto] })
+  faqs: FaqDto[];
+}

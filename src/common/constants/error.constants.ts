@@ -7,15 +7,44 @@ export const ERROR = {
     message: 'Unauthorized to perform this action',
   },
 
+  BAD_REQUEST: {
+    code: HttpStatus.BAD_REQUEST,
+    reference: 2,
+    message: 'Bad request',
+  },
+
+  INVALID_CREDENTIALS: {
+    code: HttpStatus.UNAUTHORIZED,
+    reference: 3,
+    message: 'Invalid username or password entered',
+  },
+
   CATEGORY_ALREADY_EXISTS: {
     code: HttpStatus.CONFLICT,
-    reference: 2,
+    reference: 4,
     message: 'Category already exists',
   },
 
   CATEGORY_NOT_FOUND: {
     code: HttpStatus.NOT_FOUND,
-    reference: 3,
+    reference: 5,
     message: 'Category not found',
+  },
+  USER_NOT_FOUND: {
+    code: HttpStatus.NOT_FOUND,
+    reference: 6,
+    message: 'User not found',
+  },
+
+  COURSE_ALREADY_EXISTS: {
+    code: HttpStatus.CONFLICT,
+    reference: 7,
+    message: 'Course already exists',
+  },
+
+  COURSE_NOT_FOUND: {
+    code: HttpStatus.NOT_FOUND,
+    reference: 8,
+    message: 'Course not found',
   },
 };

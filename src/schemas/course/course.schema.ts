@@ -11,7 +11,7 @@ import { COURSE_MODE } from 'src/common/constants/course.constants';
 import { Category } from '../category.schema';
 
 export type CourseDocuments = HydratedDocument<Course>;
-console.log(Category.name, '<==================');
+
 @Schema()
 export class Course {
   @ApiProperty({
@@ -48,7 +48,7 @@ export class Course {
     type: String,
     enum: Object.keys(COURSE_MODE),
   })
-  courseMode: keyof typeof COURSE_MODE;
+  courseMode: string;
 
   @ApiProperty()
   @Prop({

@@ -1,10 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { CustomError } from 'src/common/classes/error.class';
-import { ERROR } from 'src/common/constants/error.constants';
-
-import { Batch } from 'src/schemas/course/batch.schema';
+import { Batch, BatchDocuments } from 'src/schemas/course/batch.schema';
+import { Course } from 'src/schemas/course/course.schema';
 
 @Injectable()
 export class BatchDataService {
@@ -30,5 +28,28 @@ export class BatchDataService {
       .exec();
 
     return existingBatch;
+  }
+}
+@Injectable()
+export class BatchRepository {
+  constructor(@InjectModel(Batch.name) private batchModel: Model<BatchDocuments>) {}
+
+  async findBatches(skip: number, limit: number) {
+    const batches = await this.batchModel
+      .find()
+      .skip(skip)
+      .limit(limit)
+      .populate({
+        path: 'course',
+        select: '_id courseName',
+      })
+      .lean()
+      .exec();
+    return batches.map(batch => ({
+      ...batch,
+      courseId: batch.course?._id,
+      courseName: (batch.course as unknown as Course)?.courseName,
+      course: undefined,
+    }));
   }
 }
