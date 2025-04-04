@@ -93,4 +93,15 @@ export class CategoryDataService {
 
     return category;
   }
+
+  async getCategoryByCode(categoryCode: string) {
+    const category = await this.categoryModel
+      .findOne({ categoryCode })
+      .lean()
+      .exec();
+
+    if (!category) throw new CustomError(ERROR.CATEGORY_NOT_FOUND);
+
+    return category;
+  }
 }
