@@ -5,6 +5,7 @@ import {
   Chapter,
   ChapterDocument,
 } from '../../../schemas/course/chapter.schema';
+import { StringifyObjectId } from 'src/common/types/common.types';
 
 @Injectable()
 export class ChapterDataService {
@@ -12,31 +13,35 @@ export class ChapterDataService {
     @InjectModel(Chapter.name) private chapterModel: Model<ChapterDocument>,
   ) {}
 
-  async getChapters(courseId: string): Promise<ChapterDocument[]> {
-    return this.chapterModel.find({ courseId }).sort({ order: 1 }).exec();
+  async getChapters(courseId: string) {
+    return this.chapterModel
+      .find({ course: courseId })
+      .sort({ chapterNumber: 1 })
+      .lean()
+      .exec();
   }
 
   async createChapter(
-    createChapterDto: Omit<Chapter, '_id'>,
-  ): Promise<ChapterDocument> {
+    createChapterDto: Omit<StringifyObjectId<Chapter>, '_id'>,
+  ) {
     const newChapter = new this.chapterModel(createChapterDto);
     return newChapter.save();
   }
 
-  async getChapterById(id: string): Promise<ChapterDocument | null> {
-    return this.chapterModel.findById(id).exec();
+  async getChapterById(id: string) {
+    return this.chapterModel.findById(id).lean().exec();
   }
 
   async updateChapter(
     id: string,
-    updateChapterDto: Partial<ChapterDocument>,
-  ): Promise<ChapterDocument | null> {
+    updateChapterDto: Partial<StringifyObjectId<ChapterDocument>>,
+  ) {
     return this.chapterModel
       .findByIdAndUpdate(id, updateChapterDto, { new: true })
       .exec();
   }
 
-  async deleteChapter(id: string): Promise<ChapterDocument | null> {
+  async deleteChapter(id: string) {
     return this.chapterModel.findByIdAndDelete(id).exec();
   }
 }

@@ -8,6 +8,7 @@ import { BatchDataService } from '../batch/batch.data';
 import { BatchModule } from '../batch/batch.module';
 import { ChapterModule } from './chapter/chapter.module'; // Add this import
 import { TopicModule } from './topic/topic.module';
+import { CategoryModule } from '../category/category.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { TopicModule } from './topic/topic.module';
     BatchModule,
     ChapterModule,
     TopicModule,
+    CategoryModule,
   ],
   providers: [CourseDataService, CourseLogicService],
   controllers: [CourseController],
