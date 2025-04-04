@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsString,
@@ -7,10 +7,17 @@ import {
   ValidateNested,
   IsArray,
   IsBoolean,
+  IsOptional,
+  IsMongoId,
 } from 'class-validator';
 import { TopicDto } from './topic.dto';
 
 export class ChapterDto {
+  @ApiPropertyOptional()
+  @IsMongoId()
+  @IsOptional()
+  _id?: string;
+
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
