@@ -26,6 +26,7 @@ import { Type } from 'class-transformer';
 import { ChapterDto } from './chapter.dto';
 import { Constant } from '../common.dto';
 import { Language } from 'src/schemas/language.schema';
+import { Batch } from 'src/schemas/course/batch.schema';
 
 class FaqDto {
   @ApiProperty()
@@ -93,13 +94,13 @@ export class CreateCourseRequestDto {
 
   @ApiProperty()
   @IsString()
-  @IsNotEmpty()
-  brochure: string;
+  @IsOptional()
+  brochure?: string | null = null;
 
   @ApiProperty()
   @IsString()
-  @IsNotEmpty()
-  certificate: string;
+  @IsOptional()
+  certificate?: string | null = null;
 
   @ApiProperty()
   @IsString()
@@ -253,10 +254,10 @@ class CourseDisplay {
   youtubeUrl: string | null;
 
   @ApiProperty()
-  brochure: string;
+  brochure?: string;
 
   @ApiProperty()
-  certificate: string;
+  certificate?: string;
 
   @ApiProperty({
     type: Constant,
@@ -431,11 +432,11 @@ export class GetCourseByCodeResponseDto {
   @ApiProperty()
   youtubeUrl: string | null;
 
-  @ApiProperty()
-  brochure: string;
+  @ApiPropertyOptional()
+  brochure?: string;
 
-  @ApiProperty()
-  certificate: string;
+  @ApiPropertyOptional()
+  certificate?: string;
 
   @ApiProperty({
     type: Constant,
@@ -452,6 +453,9 @@ export class GetCourseByCodeResponseDto {
 
   @ApiProperty({ type: [ChapterDto] })
   chapters: ChapterDto[];
+
+  @ApiPropertyOptional({ type: Batch })
+  batch?: Batch;
 
   @ApiProperty({ type: [FaqDto] })
   faqs: FaqDto[];

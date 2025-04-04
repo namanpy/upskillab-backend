@@ -16,8 +16,12 @@ export class Teacher {
   _id: Types.ObjectId;
 
   @ApiProperty()
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
-  user: User | Types.ObjectId;
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: User.name,
+    required: true,
+  })
+  user: Types.ObjectId;
 
   @ApiProperty()
   @Prop({ required: true })
