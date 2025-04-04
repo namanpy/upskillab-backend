@@ -233,7 +233,6 @@ export class CourseLogicService {
       categoryName: category.categoryName,
       language,
       chapters: chaptersWithTopics,
-      faqs: [],
     };
   }
 }
