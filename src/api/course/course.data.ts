@@ -8,6 +8,7 @@ import { CustomError } from 'src/common/classes/error.class';
 import { ERROR } from 'src/common/constants/error.constants';
 import { GetCourseDisplayRequestDto } from 'src/dto/course/course.dto';
 import { StringifyObjectId } from 'src/common/types/common.types';
+import { Language } from 'src/schemas/language.schema';
 
 @Injectable()
 export class CourseDataService {
@@ -27,7 +28,15 @@ export class CourseDataService {
   }
 
   async getCourse(input: GetCourseDisplayRequestDto = {}) {
-    const { skip = 0, limit = 0, sort = [], categoryIds = [], search } = input;
+    const {
+      skip = 0,
+      limit = 0,
+      sort = [],
+      categoryIds = [],
+      languageIds = [],
+      courseLevels = [],
+      search,
+    } = input;
 
     // Build query
     const query = this.courseModel.find();
@@ -45,6 +54,16 @@ export class CourseDataService {
       query.where('category').in(categoryIds);
     }
 
+    // Apply language filter if provided
+    if (languageIds.length > 0) {
+      query.where('language').in(languageIds);
+    }
+
+    // Apply course level filter if provided
+    if (courseLevels.length > 0) {
+      query.where('courseLevel').in(courseLevels);
+    }
+
     // Apply multiple sort fields if provided
     if (sort.length > 0) {
       const sortConfig = sort.reduce(
@@ -57,6 +76,13 @@ export class CourseDataService {
       query.sort(sortConfig);
     }
 
+    // Build count query conditions
+    const countConditions: any = {};
+    if (categoryIds.length > 0) countConditions.category = { $in: categoryIds };
+    if (languageIds.length > 0) countConditions.language = { $in: languageIds };
+    if (courseLevels.length > 0)
+      countConditions.courseLevel = { $in: courseLevels };
+
     return {
       data: await query
         .skip(skip)
@@ -64,18 +90,24 @@ export class CourseDataService {
           category:
             | Category
             | (undefined extends Course['category'] ? undefined : never);
-        }>({
-          path: 'category',
-        })
+
+          language:
+            | Language
+            | (undefined extends Course['language'] ? undefined : never);
+        }>([
+          {
+            path: 'category',
+          },
+          {
+            path: 'language',
+          },
+        ])
         .limit(limit)
         .lean()
         .exec(),
-      count: await this.courseModel.countDocuments(
-        categoryIds.length > 0 ? { category: { $in: categoryIds } } : {},
-      ),
+      count: await this.courseModel.countDocuments(countConditions),
     };
   }
-
   async updateCourse(
     courseId: string,
     updateData: Partial<StringifyObjectId<Course>>,

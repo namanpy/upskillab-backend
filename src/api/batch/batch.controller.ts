@@ -10,9 +10,14 @@ import {
   UseInterceptors,
   BadRequestException,
   UsePipes,
+  Query,
 } from '@nestjs/common';
 import { BatchLogicService } from './batch.logic';
-import { CreateBatchDto } from '../../dto/course/batch.dto';
+import {
+  CreateBatchDto,
+  GetUpcomingBatchesRequestDTO,
+  GetUpcomingBatchesResponseDTO,
+} from '../../dto/course/batch.dto';
 import { GetBatchesResponseDTO } from '../../dto/course/batch.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -38,6 +43,18 @@ export class BatchController {
   }
 
   @ApiResponse({
+    status: 200,
+    description: 'Get all batches',
+    type: [GetUpcomingBatchesResponseDTO],
+  })
+  @Get('upcoming')
+  async geUpcomingBatches(
+    @Query() query: GetUpcomingBatchesRequestDTO,
+  ): Promise<GetUpcomingBatchesResponseDTO[]> {
+    return this.batchLogicService.getUpcomingBatches(query);
+  }
+
+  @ApiResponse({
     status: 201,
     description: 'Create a new batch with image upload',
   })
@@ -54,10 +71,16 @@ export class BatchController {
 
     const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
     if (!allowedMimeTypes.includes(file.mimetype)) {
-      throw new BadRequestException('Only JPEG, PNG, and GIF images are allowed');
+      throw new BadRequestException(
+        'Only JPEG, PNG, and GIF images are allowed',
+      );
     }
 
-    const imageUrl = await this.imageUploaderService.uploadImage(file, 'batches', Date.now().toString());
+    const imageUrl = await this.imageUploaderService.uploadImage(
+      file,
+      'batches',
+      Date.now().toString(),
+    );
     const batchData = { ...createBatchDto, imageUrl };
 
     return await this.batchLogicService.createBatch(batchData);

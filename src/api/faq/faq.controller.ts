@@ -1,12 +1,12 @@
 import {
-    Controller,
-    Get,
-    Post,
-    Put,
-    Delete,
-    Body,
-    Param,
-  } from '@nestjs/common';
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+} from '@nestjs/common';
 import { FAQLogicService } from './faq.logic';
 import { CreateFAQDto, GetFAQsResponseDTO } from '../../dto/home/faq.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';

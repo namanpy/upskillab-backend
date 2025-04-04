@@ -1,8 +1,18 @@
-import { IsOptional, IsInt, Min, IsEnum, IsMongoId } from 'class-validator';
+import {
+  IsOptional,
+  IsInt,
+  Min,
+  IsEnum,
+  IsMongoId,
+  IsIn,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 import { Category } from 'src/schemas/category.schema';
-import { COURSE_MODE } from 'src/common/constants/course.constants';
+import {
+  COURSE_LEVELS,
+  COURSE_MODE,
+} from 'src/common/constants/course.constants';
 import { Types } from 'mongoose';
 import {
   IsString,
@@ -14,6 +24,8 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ChapterDto } from './chapter.dto';
+import { Constant } from '../common.dto';
+import { Language } from 'src/schemas/language.schema';
 
 class FaqDto {
   @ApiProperty()
@@ -88,6 +100,17 @@ export class CreateCourseRequestDto {
   @IsString()
   @IsNotEmpty()
   certificate: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  courseLevel: string;
+
+  @ApiProperty()
+  @IsMongoId()
+  @IsString()
+  @IsNotEmpty()
+  language: string;
 
   @ApiProperty()
   @IsBoolean()
@@ -168,6 +191,25 @@ export class GetCourseDisplayRequestDto {
   categoryIds?: string[];
 
   @IsOptional()
+  @IsArray()
+  @IsMongoId({ each: true })
+  @ApiPropertyOptional({
+    type: [String],
+    description: 'Filter by multiple category IDs',
+  })
+  languageIds?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @IsIn(Object.keys(COURSE_LEVELS), { each: true })
+  @ApiPropertyOptional({
+    type: [String],
+    description: 'Filter by course levels',
+  })
+  courseLevels?: string[];
+
+  @IsOptional()
   @IsString()
   @ApiPropertyOptional({
     description: 'Search courses by name or code',
@@ -216,11 +258,24 @@ class CourseDisplay {
   @ApiProperty()
   certificate: string;
 
+  @ApiProperty({
+    type: Constant,
+  })
+  courseLevel: Constant;
+
+  @ApiProperty({
+    type: Language,
+  })
+  language: Language;
+
   @ApiProperty()
   active: boolean;
 
   @ApiProperty()
   seatsAvailable: number;
+
+  @ApiProperty()
+  studentsEnrolled: number;
 
   @ApiProperty()
   courseRating: number;
@@ -301,6 +356,17 @@ export class UpdateCourseRequestDto {
   certificate?: string;
 
   @ApiProperty()
+  @IsString()
+  @IsOptional()
+  courseLevel?: string;
+
+  @ApiProperty()
+  @IsMongoId()
+  @IsString()
+  @IsOptional()
+  language?: string;
+
+  @ApiProperty()
   @IsBoolean()
   @IsOptional()
   active?: boolean;
@@ -370,6 +436,16 @@ export class GetCourseByCodeResponseDto {
 
   @ApiProperty()
   certificate: string;
+
+  @ApiProperty({
+    type: Constant,
+  })
+  courseLevel: Constant;
+
+  @ApiProperty({
+    type: Language,
+  })
+  language: Language;
 
   @ApiProperty()
   active: boolean;
