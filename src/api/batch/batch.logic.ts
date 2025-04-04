@@ -31,6 +31,7 @@ export class BatchLogicService {
     const batches = await this.batchDataService.getUpcomingBatches(input);
     return batches.map((batch) => ({
       ...batch,
+      durationInDays: batch.duration,
       courseId: batch.course._id,
       batchId: batch._id,
       courseName: batch.course.courseName,
