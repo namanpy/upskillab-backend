@@ -15,6 +15,13 @@ export class Topic {
   topicName: string;
 
   @ApiProperty({
+    description: 'The order number of the topic within the chapter',
+    example: 1,
+  })
+  @Prop({ required: true })
+  topicNumber: number;
+
+  @ApiProperty({
     description: 'Reference to the chapter this topic belongs to',
     example: 'chapter_id_here',
   })

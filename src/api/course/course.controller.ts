@@ -6,10 +6,15 @@ import { ERROR } from 'src/common/constants/error.constants';
 import {
   CreateCourseRequestDto,
   CreateCourseResponseDto,
+  GetCourseByCodeRequestDto,
+  GetCourseByCodeResponseDto,
   //   CreateCourseRequestDto,
   //   CreateCourseResponseDto,
   GetCourseDisplayRequestDto,
   GetCourseDisplayResponseDto,
+  UpdateCourseRequestDto,
+  UpdateCourseRequestParamDto,
+  UpdateCourseResponseDto,
   //   UpdateCourseRequestBodyDto,
   //   UpdateCourseRequestParamsDto,
   //   UpdateCourseResponseDto,
@@ -51,6 +56,18 @@ export class CourseController {
     return await this.courseLogicService.getCourseDisplay(query);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'Get courses for display',
+    type: GetCourseDisplayResponseDto,
+  })
+  @Post('/display')
+  async postCourseDisplay(
+    @Body() body: GetCourseDisplayRequestDto,
+  ): Promise<GetCourseDisplayResponseDto> {
+    return await this.courseLogicService.getCourseDisplay(body);
+  }
+
   //   @ApiBody({
   //     type: UpdateCourseRequestBodyDto,
   //   })
@@ -69,14 +86,36 @@ export class CourseController {
   //     description: ERROR.COURSE_ALREADY_EXISTS.message,
   //     example: ERROR.COURSE_ALREADY_EXISTS,
   //   })
-  //   @Put(':courseId')
-  //   async updateCourse(
-  //     @Param() param: UpdateCourseRequestParamsDto,
-  //     @Body() body: UpdateCourseRequestBodyDto,
-  //   ): Promise<UpdateCourseResponseDto> {
-  //     return await this.courseLogicService.updateCourse({
-  //       ...param,
-  //       ...body,
-  //     });
-  //   }
+  @Put(':courseId')
+  @ApiResponse({
+    status: 200,
+    description: 'Update course with chapters and topics',
+    type: UpdateCourseResponseDto,
+  })
+  async updateCourse(
+    @Param() params: UpdateCourseRequestParamDto,
+    @Body() updateCourseDto: UpdateCourseRequestDto,
+  ): Promise<UpdateCourseResponseDto> {
+    return await this.courseLogicService.updateCourse({
+      ...params,
+      ...updateCourseDto,
+    });
+  }
+
+  @Get('code/:courseCode')
+  @ApiResponse({
+    status: 200,
+    description: 'Get course by code',
+    type: CreateCourseRequestDto,
+  })
+  @ApiResponse({
+    status: ERROR.COURSE_NOT_FOUND.code,
+    description: ERROR.COURSE_NOT_FOUND.message,
+    example: ERROR.COURSE_NOT_FOUND,
+  })
+  async getCourseByCode(
+    @Param() params: GetCourseByCodeRequestDto,
+  ): Promise<GetCourseByCodeResponseDto> {
+    return await this.courseLogicService.getCourseByCode(params.courseCode);
+  }
 }
