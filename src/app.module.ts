@@ -17,6 +17,7 @@ import { BannerModule } from './api/public/banner/banner.module';
 import { StatsModule } from './api/public/stats/stats.module';
 import { TeacherModule } from './api/teachers/teacher.module';
 import { PremiumLearningExperienceModule } from './api/public/premium-learning-experience/premium-learning-experience.module'
+import { FileModule } from './api/file/file.module';
 //MongooseModule.forRoot('mongodb://localhost/nest')
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { PremiumLearningExperienceModule } from './api/public/premium-learning-e
     StatsModule,
     TeacherModule,
     PremiumLearningExperienceModule,
+    FileModule,
   ],
   controllers: [AppController],
   providers: [AppService],
