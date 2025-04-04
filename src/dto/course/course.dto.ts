@@ -256,13 +256,13 @@ export class GetCourseDisplayResponseDto {
   count: number;
 }
 
-export class UpdateCourseRequestDto {
+export class UpdateCourseRequestParamDto {
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
   @IsMongoId()
   courseId: string;
+}
 
+export class UpdateCourseRequestDto {
   @ApiProperty()
   @IsString()
   @IsOptional()

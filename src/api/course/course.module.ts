@@ -4,7 +4,6 @@ import { CourseLogicService } from './course.logic';
 import { CourseDataService } from './course.data';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Course, CourseSchema } from 'src/schemas/course/course.schema';
-import { BatchDataService } from '../batch/batch.data';
 import { BatchModule } from '../batch/batch.module';
 import { ChapterModule } from './chapter/chapter.module'; // Add this import
 import { TopicModule } from './topic/topic.module';

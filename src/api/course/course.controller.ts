@@ -13,6 +13,7 @@ import {
   GetCourseDisplayRequestDto,
   GetCourseDisplayResponseDto,
   UpdateCourseRequestDto,
+  UpdateCourseRequestParamDto,
   UpdateCourseResponseDto,
   //   UpdateCourseRequestBodyDto,
   //   UpdateCourseRequestParamsDto,
@@ -80,11 +81,13 @@ export class CourseController {
     type: UpdateCourseResponseDto,
   })
   async updateCourse(
-    @Param('courseId') courseId: string,
+    @Param() params: UpdateCourseRequestParamDto,
     @Body() updateCourseDto: UpdateCourseRequestDto,
   ): Promise<UpdateCourseResponseDto> {
-    updateCourseDto.courseId = courseId;
-    return await this.courseLogicService.updateCourse(updateCourseDto);
+    return await this.courseLogicService.updateCourse({
+      ...params,
+      ...updateCourseDto,
+    });
   }
 
   @Get('code/:courseCode')
