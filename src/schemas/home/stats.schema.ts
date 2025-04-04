@@ -2,13 +2,13 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { HydratedDocument, Types } from 'mongoose';
 
-export type BannerDocument = HydratedDocument<Banner> & {
+export type StatsDocument = HydratedDocument<Stats> & {
   createdAt: Date;
   updatedAt: Date;
 };
 
 @Schema({ timestamps: true })
-export class Banner {
+export class Stats {
   @ApiProperty({
     type: String,
   })
@@ -16,19 +16,19 @@ export class Banner {
 
   @ApiProperty()
   @Prop({ required: true })
-  title: string;
+  count: string;
 
   @ApiProperty()
   @Prop({ required: true })
-  description: string;
+  label: string;
 
   @ApiProperty()
   @Prop({ required: true })
   imageUrl: string;
 
   @ApiProperty()
-  @Prop({ default: false })
+  @Prop({ default: true })
   active: boolean;
 }
 
-export const BannerSchema = SchemaFactory.createForClass(Banner);
+export const StatsSchema = SchemaFactory.createForClass(Stats);
