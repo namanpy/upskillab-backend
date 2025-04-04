@@ -80,6 +80,7 @@ export class CategoryController {
     return await this.categoryLogicService.updateCategory({
       ...param,
       ...body,
+      categoryLogo: body.categoryLogo ?? "",
     });
   }
 

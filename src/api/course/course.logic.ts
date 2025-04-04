@@ -71,9 +71,9 @@ export class CourseLogicService {
 
     const formattedData = await Promise.all(
       data.map(async (course) => {
-        const batch = await this.batchDataService.getLatestBatchForCourse({
-          courseId: course._id,
-        });
+        const batch = await this.batchDataService.getLatestBatchForCourse(
+          course._id.toString(), // Convert ObjectId to string
+        );
 
         return {
           ...course,
@@ -85,10 +85,7 @@ export class CourseLogicService {
       }),
     );
 
-    return {
-      data: formattedData,
-      count,
-    };
+    return { data: formattedData, count };
   }
 
   async updateCourse(
