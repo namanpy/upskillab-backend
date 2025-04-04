@@ -12,7 +12,7 @@ export class TeacherLogicService {
     const teachers = await this.teacherDataService.getTeachers();
     return {
       teachers: teachers.map((teacher) => ({
-        _id: teacher._id.toString(),
+        _id: teacher._id,
         user: teacher.user ? (teacher.user as any)._id.toString() : null,
         qualification: teacher.qualification,
         expertise: teacher.expertise,
@@ -26,7 +26,8 @@ export class TeacherLogicService {
   }
 
   async createTeacher(createTeacherDto: CreateTeacherDto) {
-    const teacher = await this.teacherDataService.createTeacher(createTeacherDto);
+    const teacher =
+      await this.teacherDataService.createTeacher(createTeacherDto);
     return {
       teacher: {
         _id: teacher._id.toString(),
@@ -63,7 +64,10 @@ export class TeacherLogicService {
   }
 
   async updateTeacher(id: string, updateTeacherDto: Partial<CreateTeacherDto>) {
-    const teacher = await this.teacherDataService.updateTeacher(id, updateTeacherDto);
+    const teacher = await this.teacherDataService.updateTeacher(
+      id,
+      updateTeacherDto,
+    );
     if (!teacher) {
       throw new NotFoundException(`Teacher with ID ${id} not found`);
     }
