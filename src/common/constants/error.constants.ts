@@ -41,4 +41,10 @@ export const ERROR = {
     reference: 7,
     message: 'Course already exists',
   },
+
+  COURSE_NOT_FOUND: {
+    code: HttpStatus.NOT_FOUND,
+    reference: 8,
+    message: 'Course not found',
+  },
 };

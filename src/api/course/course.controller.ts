@@ -6,10 +6,14 @@ import { ERROR } from 'src/common/constants/error.constants';
 import {
   CreateCourseRequestDto,
   CreateCourseResponseDto,
+  GetCourseByCodeRequestDto,
+  GetCourseByCodeResponseDto,
   //   CreateCourseRequestDto,
   //   CreateCourseResponseDto,
   GetCourseDisplayRequestDto,
   GetCourseDisplayResponseDto,
+  UpdateCourseRequestDto,
+  UpdateCourseResponseDto,
   //   UpdateCourseRequestBodyDto,
   //   UpdateCourseRequestParamsDto,
   //   UpdateCourseResponseDto,
@@ -46,9 +50,9 @@ export class CourseController {
   })
   @Get('/display')
   async getCourseDisplay(
-    @Query() query: GetCourseDisplayRequestDto,
+    @Body() body: GetCourseDisplayRequestDto,
   ): Promise<GetCourseDisplayResponseDto> {
-    return await this.courseLogicService.getCourseDisplay(query);
+    return await this.courseLogicService.getCourseDisplay(body);
   }
 
   //   @ApiBody({
@@ -69,14 +73,34 @@ export class CourseController {
   //     description: ERROR.COURSE_ALREADY_EXISTS.message,
   //     example: ERROR.COURSE_ALREADY_EXISTS,
   //   })
-  //   @Put(':courseId')
-  //   async updateCourse(
-  //     @Param() param: UpdateCourseRequestParamsDto,
-  //     @Body() body: UpdateCourseRequestBodyDto,
-  //   ): Promise<UpdateCourseResponseDto> {
-  //     return await this.courseLogicService.updateCourse({
-  //       ...param,
-  //       ...body,
-  //     });
-  //   }
+  @Put(':courseId')
+  @ApiResponse({
+    status: 200,
+    description: 'Update course with chapters and topics',
+    type: UpdateCourseResponseDto,
+  })
+  async updateCourse(
+    @Param('courseId') courseId: string,
+    @Body() updateCourseDto: UpdateCourseRequestDto,
+  ): Promise<UpdateCourseResponseDto> {
+    updateCourseDto.courseId = courseId;
+    return await this.courseLogicService.updateCourse(updateCourseDto);
+  }
+
+  @Get('code/:courseCode')
+  @ApiResponse({
+    status: 200,
+    description: 'Get course by code',
+    type: CreateCourseRequestDto,
+  })
+  @ApiResponse({
+    status: ERROR.COURSE_NOT_FOUND.code,
+    description: ERROR.COURSE_NOT_FOUND.message,
+    example: ERROR.COURSE_NOT_FOUND,
+  })
+  async getCourseByCode(
+    @Param() params: GetCourseByCodeRequestDto,
+  ): Promise<GetCourseByCodeResponseDto> {
+    return await this.courseLogicService.getCourseByCode(params.courseCode);
+  }
 }

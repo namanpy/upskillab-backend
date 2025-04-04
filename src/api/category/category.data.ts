@@ -25,6 +25,16 @@ export class CategoryDataService {
     return (await newCategory.save()).toObject();
   }
 
+  async getCategoryById(categoryId: string) {
+    const category = await this.categoryModel
+      .findById(categoryId)
+      .lean()
+      .exec();
+
+    if (!category) throw new CustomError(ERROR.CATEGORY_NOT_FOUND);
+
+    return category;
+  }
   async getCategory(
     input: {
       searchString?: string;
