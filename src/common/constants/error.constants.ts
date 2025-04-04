@@ -47,4 +47,14 @@ export const ERROR = {
     reference: 8,
     message: 'Course not found',
   },
+  LANGUAGE_ALREADY_EXISTS: {
+    code: 409,
+    reference: 9,
+    message: 'Language with this code already exists',
+  },
+  LANGUAGE_NOT_FOUND: {
+    code: 404,
+    reference: 10,
+    message: 'Language not found',
+  },
 };

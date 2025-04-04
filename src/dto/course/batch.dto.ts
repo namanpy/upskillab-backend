@@ -1,5 +1,13 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsNumber, IsBoolean, IsDateString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsString,
+  IsNotEmpty,
+  IsNumber,
+  IsBoolean,
+  IsDateString,
+  IsOptional,
+} from 'class-validator';
+import { Types } from 'mongoose';
 
 export class CreateBatchDto {
   @ApiProperty()
@@ -75,4 +83,52 @@ export class Batch {
 export class GetBatchesResponseDTO {
   @ApiProperty({ type: [Batch] })
   batches: Batch[];
+}
+
+export class GetUpcomingBatchesRequestDTO {
+  @ApiPropertyOptional()
+  @IsNumber()
+  @IsOptional()
+  skip: number;
+
+  @ApiPropertyOptional()
+  @IsNumber()
+  @IsOptional()
+  limit: number;
+}
+
+export class GetUpcomingBatchesResponseDTO {
+  @ApiProperty({
+    type: 'string',
+  })
+  courseId: Types.ObjectId;
+
+  @ApiProperty({
+    type: 'string',
+  })
+  batchId: Types.ObjectId;
+
+  @ApiProperty()
+  startDate: Date;
+
+  @ApiProperty()
+  courseName: string;
+
+  @ApiProperty()
+  fees: number;
+
+  @ApiProperty()
+  durationInDays: number;
+
+  @ApiProperty()
+  remainingSeats: number;
+
+  @ApiProperty()
+  totalSeats: number;
+
+  @ApiProperty()
+  startTime: number;
+
+  @ApiProperty()
+  classMode: string;
 }

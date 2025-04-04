@@ -27,6 +27,18 @@ export class BatchLogicService {
     };
   }
 
+  async getUpcomingBatches(input: { skip: number; limit: number }) {
+    const batches = await this.batchDataService.getUpcomingBatches(input);
+    return batches.map((batch) => ({
+      ...batch,
+      courseId: batch.course._id,
+      batchId: batch._id,
+      courseName: batch.course.courseName,
+      fees: batch.course.discountedPrice,
+      classMode: batch.course.courseMode,
+    }));
+  }
+
   async createBatch(createBatchDto: CreateBatchDto & { imageUrl: string }) {
     const batch = await this.batchDataService.createBatch(createBatchDto);
     return {
@@ -68,7 +80,10 @@ export class BatchLogicService {
     };
   }
 
-  async updateBatch(id: string, updateBatchDto: Partial<CreateBatchDto & { imageUrl: string }>) {
+  async updateBatch(
+    id: string,
+    updateBatchDto: Partial<CreateBatchDto & { imageUrl: string }>,
+  ) {
     const batch = await this.batchDataService.updateBatch(id, updateBatchDto);
     if (!batch) {
       throw new NotFoundException(`Batch with ID ${id} not found`);

@@ -8,6 +8,7 @@ import { BatchModule } from '../batch/batch.module';
 import { ChapterModule } from './chapter/chapter.module'; // Add this import
 import { TopicModule } from './topic/topic.module';
 import { CategoryModule } from '../category/category.module';
+import { LanguageModule } from '../language/language.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { CategoryModule } from '../category/category.module';
     ChapterModule,
     TopicModule,
     CategoryModule,
+    LanguageModule,
   ],
   providers: [CourseDataService, CourseLogicService],
   controllers: [CourseController],

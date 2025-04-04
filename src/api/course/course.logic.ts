@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { CourseDataService } from './course.data';
 import { BatchDataService } from '../batch/batch.data';
-import { CreateCourseRequestDto } from 'src/dto/course/course.dto';
+import {
+  CreateCourseRequestDto,
+  GetCourseDisplayRequestDto,
+} from 'src/dto/course/course.dto';
 import { TopicDataService } from './topic/topic.data';
 import { ChapterDataService } from './chapter/chapter.data';
 import { Types } from 'mongoose';
@@ -9,6 +12,8 @@ import { UpdateCourseRequestDto } from 'src/dto/course/course.dto';
 import { CustomError } from 'src/common/classes/error.class';
 import { ERROR } from 'src/common/constants/error.constants';
 import { CategoryDataService } from '../category/category.data';
+import { LanguageDataService } from '../language/language.data';
+import { COURSE_LEVELS } from 'src/common/constants/course.constants';
 
 @Injectable()
 export class CourseLogicService {
@@ -18,6 +23,7 @@ export class CourseLogicService {
     private chapterDataService: ChapterDataService,
     private batchDataService: BatchDataService,
     private categoryDataService: CategoryDataService,
+    private languageDataService: LanguageDataService, // Add this
   ) {}
 
   async createCourse(createCourseDto: CreateCourseRequestDto) {
@@ -26,9 +32,13 @@ export class CourseLogicService {
       createCourseDto.category,
     );
 
+    // Check if language exists
+    await this.languageDataService.getLanguageById(createCourseDto.language);
+
     // Create the course first
     const course = await this.courseDataService.createCourse({
       ...createCourseDto,
+      language: Types.ObjectId.createFromHexString(createCourseDto.language),
       category: Types.ObjectId.createFromHexString(createCourseDto.category),
     });
 
@@ -56,29 +66,7 @@ export class CourseLogicService {
     };
   }
 
-  // async getCourseDisplay(input: { skip?: number; limit?: number }) {
-  //   const { data, count } = await this.courseDataService.getCourse(input);
-
-  //   const formattedData = await Promise.all(
-  //     data.map(async (course) => {
-  //       const batch = await this.batchDataService.getLatestBatchForCourse({
-  //         courseId: course._id,
-  //       });
-
-  //       return {
-  //         ...course,
-  //         seatsAvailable: batch?.remainingSeats || 0,
-  //         courseRating: 4.8,
-  //       };
-  //     }),
-  //   );
-
-  //   return {
-  //     data: formattedData,
-  //     count,
-  //   };
-  // }
-  async getCourseDisplay(input: { skip?: number; limit?: number }) {
+  async getCourseDisplay(input: GetCourseDisplayRequestDto) {
     const { data, count } = await this.courseDataService.getCourse(input);
 
     const formattedData = await Promise.all(
@@ -89,7 +77,9 @@ export class CourseLogicService {
 
         return {
           ...course,
+          courseLevel: COURSE_LEVELS[course.courseLevel],
           seatsAvailable: batch?.remainingSeats || 0,
+          studentsEnrolled: 5000,
           courseRating: 4.8,
         };
       }),
@@ -102,6 +92,11 @@ export class CourseLogicService {
     updateCourseDto: UpdateCourseRequestDto & { courseId: string },
   ) {
     const { courseId, chapters, ...courseData } = updateCourseDto;
+
+    // Check if language exists when it's being updated
+    if (courseData.language) {
+      await this.languageDataService.getLanguageById(courseData.language);
+    }
 
     // Update course basic information
     const updatedCourse = await this.courseDataService.updateCourse(
@@ -205,6 +200,10 @@ export class CourseLogicService {
       course.category.toString(),
     );
 
+    const language = await this.languageDataService.getLanguageById(
+      course.language.toString(),
+    );
+
     const chaptersWithTopics = await Promise.all(
       chapters.map(async (chapter) => {
         const topics = await this.topicDataService.getTopics(
@@ -226,10 +225,11 @@ export class CourseLogicService {
 
     return {
       ...course,
+      courseLevel: COURSE_LEVELS[course.courseLevel],
       category: category._id.toString(),
       categoryName: category.categoryName,
+      language,
       chapters: chaptersWithTopics,
-      faqs: [],
     };
   }
 }

@@ -15,22 +15,28 @@ export class BatchDataService {
   ) {}
 
   async getBatches(): Promise<BatchDocument[]> {
-    return this.batchModel
-      .find()
-      .populate('course')
-      .populate('teacher')
-      .exec();
+    return this.batchModel.find().populate('course').populate('teacher').exec();
   }
 
-  async createBatch(createBatchDto: CreateBatchDto & { imageUrl: string }): Promise<BatchDocument> {
-    const course = await this.courseModel.findById(createBatchDto.course).exec();
+  async createBatch(
+    createBatchDto: CreateBatchDto & { imageUrl: string },
+  ): Promise<BatchDocument> {
+    const course = await this.courseModel
+      .findById(createBatchDto.course)
+      .exec();
     if (!course) {
-      throw new BadRequestException(`Course with ID ${createBatchDto.course} not found`);
+      throw new BadRequestException(
+        `Course with ID ${createBatchDto.course} not found`,
+      );
     }
 
-    const teacher = await this.teacherModel.findById(createBatchDto.teacher).exec();
+    const teacher = await this.teacherModel
+      .findById(createBatchDto.teacher)
+      .exec();
     if (!teacher) {
-      throw new BadRequestException(`Teacher with ID ${createBatchDto.teacher} not found`);
+      throw new BadRequestException(
+        `Teacher with ID ${createBatchDto.teacher} not found`,
+      );
     }
 
     const newBatch = new this.batchModel(createBatchDto);
@@ -50,16 +56,24 @@ export class BatchDataService {
     updateBatchDto: Partial<CreateBatchDto & { imageUrl: string }>,
   ): Promise<BatchDocument | null> {
     if (updateBatchDto.course) {
-      const course = await this.courseModel.findById(updateBatchDto.course).exec();
+      const course = await this.courseModel
+        .findById(updateBatchDto.course)
+        .exec();
       if (!course) {
-        throw new BadRequestException(`Course with ID ${updateBatchDto.course} not found`);
+        throw new BadRequestException(
+          `Course with ID ${updateBatchDto.course} not found`,
+        );
       }
     }
 
     if (updateBatchDto.teacher) {
-      const teacher = await this.teacherModel.findById(updateBatchDto.teacher).exec();
+      const teacher = await this.teacherModel
+        .findById(updateBatchDto.teacher)
+        .exec();
       if (!teacher) {
-        throw new BadRequestException(`Teacher with ID ${updateBatchDto.teacher} not found`);
+        throw new BadRequestException(
+          `Teacher with ID ${updateBatchDto.teacher} not found`,
+        );
       }
     }
 
@@ -74,12 +88,32 @@ export class BatchDataService {
     return this.batchModel.findByIdAndDelete(id).exec();
   }
 
-  async getLatestBatchForCourse(courseId: string): Promise<BatchDocument | null> {
+  async getLatestBatchForCourse(
+    courseId: string,
+  ): Promise<BatchDocument | null> {
     return this.batchModel
       .findOne({ course: courseId })
       .sort({ startDate: -1 })
       .populate('course')
       .populate('teacher')
       .exec();
+  }
+
+  async getUpcomingBatches(input: { skip: number; limit: number }) {
+    const { skip, limit } = input;
+    const batches = await this.batchModel
+      .find()
+      .skip(skip)
+      .limit(limit)
+      .populate<{
+        course:
+          | Course
+          | (undefined extends Batch['course'] ? undefined : never);
+      }>({
+        path: 'course',
+      })
+      .lean()
+      .exec();
+    return batches;
   }
 }
