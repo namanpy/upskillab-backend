@@ -51,9 +51,9 @@ export class CourseController {
   })
   @Get('/display')
   async getCourseDisplay(
-    @Body() body: GetCourseDisplayRequestDto,
+    @Query() query: GetCourseDisplayRequestDto,
   ): Promise<GetCourseDisplayResponseDto> {
-    return await this.courseLogicService.getCourseDisplay(body);
+    return await this.courseLogicService.getCourseDisplay(query);
   }
 
   //   @ApiBody({
