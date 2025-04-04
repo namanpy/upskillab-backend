@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { CategoryDataService } from './category.data';
 import { Category } from 'src/schemas/category.schema';
+import { CustomError } from 'src/common/classes/error.class';
+import { ERROR } from 'src/common/constants/error.constants';
 
 @Injectable()
 export class CategoryLogicService {
@@ -41,5 +43,13 @@ export class CategoryLogicService {
     return {
       isSuccess: true,
     };
+  }
+
+  async getCategoryByCode(categoryCode: string) {
+    const category =
+      await this.categoryDataService.getCategoryByCode(categoryCode);
+    if (!category) throw new CustomError(ERROR.CATEGORY_NOT_FOUND);
+
+    return { ...category, _id: category._id.toString() };
   }
 }

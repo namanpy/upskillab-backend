@@ -1,19 +1,62 @@
-// import { Controller, Get, Post, Body, Param } from '@nestjs/common';
-// import { TestimonialLogicService } from 'src/api/testimonials/testimonial.logic';
-// import { GetTestimonialsResponseDTO } from '../../dto/testimonial.dto';
-// import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Param, Query, Put } from '@nestjs/common';
+import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { UsersLogicService } from './users.logic';
+import {
+  GetUserRequestDTO,
+  GetUserResponseDTO,
+  UpdateUserRequestDTO,
+  UpdateUserResponseDTO,
+} from 'src/dto/user.dto';
 
-// @Controller('users')
-// export class UsersController {
-//   constructor(private usersLogicService: TestimonialLogicService) {}
+@Controller('users')
+export class UsersController {
+  constructor(private usersLogicService: UsersLogicService) {}
 
-//   @ApiResponse({
-//     status: 200,
-//     description: 'Get testimonials',
-//     type: GetTestimonialsResponseDTO,
-//   })
-//   @Get('')
-//   async getUsers() {
-//     // TODO : - By Swapnil Pandy
-//   }
-// }
+  @ApiTags('Users')
+  @ApiResponse({
+    status: 200,
+    description: 'Get Users',
+    type: GetUserResponseDTO,
+  })
+  @Get('')
+  async users(@Query() inputs: GetUserRequestDTO): Promise<GetUserResponseDTO> {
+    console.log('searchString', inputs.searchString);
+
+    return await this.usersLogicService.findbyUsernameorEmailorMobile({
+      searchString: inputs.searchString,
+    });
+  }
+  @ApiTags('Users')
+  @ApiResponse({
+    status: 200,
+    description: 'Update user details',
+    type: UpdateUserResponseDTO,
+  })
+  @Put(':_id')
+  async updateUser(
+    @Body() updateData: UpdateUserRequestDTO,
+    @Param('_id') _id: string,
+  ): Promise<UpdateUserResponseDTO> {
+    const { username, email, mobileNumber } = updateData;
+
+    const result = await this.usersLogicService.updateUserDetails({
+      _id,
+      username,
+      email,
+      mobileNumber,
+    });
+    return result as UpdateUserResponseDTO;
+  }
+  @ApiResponse({
+    status: 200,
+    description: 'User login',
+  })
+  @Post('login')
+  async loginUser(@Body() loginDto: { username: string; password: string }) {
+    // TODO: Implement login logic
+    return {
+      message: 'Login successful',
+      username: loginDto.username,
+    };
+  }
+}

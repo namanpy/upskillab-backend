@@ -8,6 +8,10 @@ import { DemoSessionModule } from './api/demosessions/demosession.module';
 import { CategoryModule } from './api/category/category.module';
 import { BatchModule } from './api/batch/batch.module';
 import { CourseModule } from './api/course/course.module';
+import { AuthModule } from './api/auth/auth.module';
+import { UsersModule } from './api/user/users.module';
+import { ChapterModule } from './api/course/chapter/chapter.module';
+import { TopicModule } from './api/course/topic/topic.module';
 import { FAQModule } from './api/faq/faq.module';
 import { BannerModule } from './api/public/banner/banner.module';
 import { StatsModule } from './api/public/stats/stats.module';
@@ -23,6 +27,10 @@ import { StatsModule } from './api/public/stats/stats.module';
     CategoryModule,
     BatchModule,
     CourseModule,
+    ChapterModule,
+    TopicModule,
+    AuthModule,
+    UsersModule,
     FAQModule,
     BannerModule,
     StatsModule,
