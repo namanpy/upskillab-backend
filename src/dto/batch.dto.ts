@@ -1,55 +1,53 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNumber, IsDate } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNumber, IsOptional } from 'class-validator';
+import { Types } from 'mongoose';
 
 export class GetBatchesRequestDTO {
  
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsNumber()
+  @IsOptional()
   skip: number;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsNumber()
+  @IsOptional()
   limit: number;
 }
 
 export class GetBatchResponseDTO{
-  @ApiProperty()
-  @IsString()
-  courseId: string;
 
-  @IsString()
-  @ApiProperty()
-  batchId: string;
+  @ApiProperty({
+    type: 'string'
+  })
+  courseId: Types.ObjectId;
+
+  @ApiProperty({
+    type: 'string'
+  })
+  batchId: Types.ObjectId;
 
   @ApiProperty()
-  @IsDate()
   startDate: Date;
 
   @ApiProperty()
-  @IsString()
   courseName: string;
 
   @ApiProperty()
-  @IsNumber()
   fees: number;
 
   @ApiProperty()
-  @IsNumber()
   durationInDays: number;
 
   @ApiProperty()
-  @IsNumber()
   remainingSeats: number;
 
   @ApiProperty() 
-  @IsNumber()
   totalSeats: number;
 
   @ApiProperty()
-  @IsDate()
-  startTime: Date;
+  startTime: number;
 
   @ApiProperty()
-  @IsString()
   classMode: string;
 }
