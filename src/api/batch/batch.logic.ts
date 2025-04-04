@@ -1,12 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { BatchRepository } from './batch.data';
+import { BatchDataService} from './batch.data';
 
 @Injectable()
-export class BatchService {
+export class BatchLogicService {
   batchDataService: any;
-  constructor(private readonly batchRepository: BatchRepository) {}
+  constructor(private readonly batchRepository: BatchDataService) {}
 
   async getBatches(skip: number, limit: number) {
-    return this.batchRepository.findBatches(skip, limit);
+    const batches = await this.batchRepository.findBatches(skip, limit);{
+      return batches.map(batch => ({
+        ...batch,
+        courseId: batch.course._id,
+        batchId: batch._id,
+        courseName: batch.course.courseName,
+        fees: batch.course.discountedPrice,
+        classMode: batch.course.courseMode,
+    }));
   }
+}
 }
