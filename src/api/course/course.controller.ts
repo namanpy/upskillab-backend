@@ -56,6 +56,18 @@ export class CourseController {
     return await this.courseLogicService.getCourseDisplay(query);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'Get courses for display',
+    type: GetCourseDisplayResponseDto,
+  })
+  @Post('/display')
+  async postCourseDisplay(
+    @Body() body: GetCourseDisplayRequestDto,
+  ): Promise<GetCourseDisplayResponseDto> {
+    return await this.courseLogicService.getCourseDisplay(body);
+  }
+
   //   @ApiBody({
   //     type: UpdateCourseRequestBodyDto,
   //   })
