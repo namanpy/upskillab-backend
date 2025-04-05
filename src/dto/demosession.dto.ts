@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsEmail, IsEnum } from 'class-validator';
+import { IsString, IsNotEmpty, IsEnum } from 'class-validator';
 
 export class CreateDemoSessionDto {
   @ApiProperty()
@@ -8,7 +8,7 @@ export class CreateDemoSessionDto {
   fullName: string;
 
   @ApiProperty()
-  @IsEmail()
+  @IsString()
   @IsNotEmpty()
   email: string;
 
@@ -17,10 +17,15 @@ export class CreateDemoSessionDto {
   @IsNotEmpty()
   phoneNumber: string;
 
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  course: string; // Added course field
+
   @ApiProperty({ enum: ['Fresher', 'Working Professional'] })
   @IsEnum(['Fresher', 'Working Professional'])
   @IsNotEmpty()
-  course: string;
+  experience: string; // Added experience field with enum
 }
 
 export class DemoSession {
@@ -37,7 +42,10 @@ export class DemoSession {
   phoneNumber: string;
 
   @ApiProperty()
-  course: string;
+  course: string; // Added course field
+
+  @ApiProperty({ enum: ['Fresher', 'Working Professional'] })
+  experience: string; // Added experience field with enum
 
   @ApiProperty()
   createdAt: Date;

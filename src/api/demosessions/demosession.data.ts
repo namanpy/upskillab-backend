@@ -6,9 +6,7 @@ import { CreateDemoSessionDto } from '../../dto/demosession.dto';
 
 @Injectable()
 export class DemoSessionDataService {
-  constructor(
-    @InjectModel(DemoSession.name) private demoSessionModel: Model<DemoSessionDocument>,
-  ) {}
+  constructor(@InjectModel(DemoSession.name) private demoSessionModel: Model<DemoSessionDocument>) {}
 
   async getDemoSessions(): Promise<DemoSessionDocument[]> {
     return this.demoSessionModel.find().exec();
@@ -23,13 +21,8 @@ export class DemoSessionDataService {
     return this.demoSessionModel.findById(id).exec();
   }
 
-  async updateDemoSession(
-    id: string,
-    updateDemoSessionDto: Partial<CreateDemoSessionDto>,
-  ): Promise<DemoSessionDocument | null> {
-    return this.demoSessionModel
-      .findByIdAndUpdate(id, updateDemoSessionDto, { new: true })
-      .exec();
+  async updateDemoSession(id: string, updateDemoSessionDto: Partial<CreateDemoSessionDto>): Promise<DemoSessionDocument | null> {
+    return this.demoSessionModel.findByIdAndUpdate(id, updateDemoSessionDto, { new: true }).exec();
   }
 
   async deleteDemoSession(id: string): Promise<DemoSessionDocument | null> {
