@@ -21,8 +21,9 @@ import { FileModule } from './api/file/file.module';
 import { Banner3Module } from './api/public/banner3/banner3.module';
 import { Banner4Module } from './api/public/banner4/banner4.module';
 import { ContactUsModule } from './api/public/contact-us/contact-us.module';
-import { PaymentController } from './api/payment/payment.controller';
-import { RegistrationController } from './api/registration/registration.controller';
+import { PaymentModule } from './api/payment/payment.module';
+import { RegistrationModule } from './api/registration/registration.module';
+
 // import { ConfigModule } from '@nestjs/config';
 //MongooseModule.forRoot('mongodb://localhost/nest')
 @Module({
@@ -49,8 +50,8 @@ import { RegistrationController } from './api/registration/registration.controll
     Banner3Module,
     Banner4Module,
     ContactUsModule,
-    PaymentController,
-    RegistrationController,
+    PaymentModule,
+    RegistrationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
