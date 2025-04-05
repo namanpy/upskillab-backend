@@ -12,13 +12,14 @@ export class BatchLogicService {
     const batches = await this.batchDataService.getBatches();
     return {
       batches: batches.map((batch) => ({
-        _id: batch._id.toString(),
-        course: batch.course ? (batch.course as any)._id.toString() : null,
-        startDate: batch.startDate.toISOString(),
+        _id: batch._id,
+        course: batch.course,
+        startTime: batch.startTime,
+        startDate: batch.startDate,
         totalSeats: batch.totalSeats,
         remainingSeats: batch.remainingSeats,
         duration: batch.duration,
-        teacher: batch.teacher ? (batch.teacher as any)._id.toString() : null,
+        teacher: batch.teacher,
         imageUrl: batch.imageUrl,
         active: batch.active,
         createdAt: batch.createdAt,

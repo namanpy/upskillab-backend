@@ -17,8 +17,12 @@ export class Batch {
   _id: Types.ObjectId;
 
   @ApiProperty()
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Course', required: true })
-  course: Course | Types.ObjectId;
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: Course.name,
+    required: true,
+  })
+  course: Types.ObjectId;
 
   @ApiProperty()
   @Prop({ required: true, min: 0, max: 24 })
@@ -43,10 +47,10 @@ export class Batch {
   @ApiProperty()
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Teacher',
+    ref: Teacher.name,
     required: true,
   })
-  teacher: Teacher | Types.ObjectId;
+  teacher: Types.ObjectId;
 
   @ApiProperty()
   @Prop({ required: true })
