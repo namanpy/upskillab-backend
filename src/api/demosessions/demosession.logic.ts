@@ -1,83 +1,60 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DemoSessionDataService } from './demosession.data';
-import { CreateDemoSessionDto } from '../../dto/demosession.dto';
-import { GetDemoSessionsResponseDTO } from '../../dto/demosession.dto';
+import { CreateDemoSessionDto, GetDemoSessionsResponseDTO, DemoSession } from '../../dto/demosession.dto';
+import { DemoSessionDocument } from '../../schemas/demosession.schema';
+import { mapToDto, mapToDtoArray } from '../../common/utils/map-to-dto.util';
 
 @Injectable()
 export class DemoSessionLogicService {
   constructor(private demoSessionDataService: DemoSessionDataService) {}
 
+  private mapToDto(demoSession: DemoSessionDocument): DemoSession {
+    return mapToDto<DemoSession, DemoSessionDocument>(demoSession);
+  }
+
+  private mapToDtoArray(demoSessions: DemoSessionDocument[]): DemoSession[] {
+    return mapToDtoArray<DemoSession, DemoSessionDocument>(demoSessions);
+  }
+
   async getDemoSessions(): Promise<GetDemoSessionsResponseDTO> {
     const demoSessions = await this.demoSessionDataService.getDemoSessions();
     return {
-      demoSessions: demoSessions.map((session) => ({
-        _id: session._id.toString(),
-        fullName: session.fullName,
-        email: session.email,
-        phoneNumber: session.phoneNumber,
-        course: session.course,
-        createdAt: session.createdAt,
-        updatedAt: session.updatedAt,
-      })),
+      demoSessions: this.mapToDtoArray(demoSessions),
     };
   }
 
   async createDemoSession(createDemoSessionDto: CreateDemoSessionDto) {
-    const session = await this.demoSessionDataService.createDemoSession(createDemoSessionDto);
+    const demoSession = await this.demoSessionDataService.createDemoSession(createDemoSessionDto);
     return {
-      demoSession: {
-        _id: session._id.toString(),
-        fullName: session.fullName,
-        email: session.email,
-        phoneNumber: session.phoneNumber,
-        course: session.course,
-        createdAt: session.createdAt,
-        updatedAt: session.updatedAt,
-      },
+      demoSession: this.mapToDto(demoSession),
     };
   }
 
   async getDemoSessionById(id: string) {
-    const session = await this.demoSessionDataService.getDemoSessionById(id);
-    if (!session) {
-      throw new NotFoundException(`Demo session with ID ${id} not found`);
+    const demoSession = await this.demoSessionDataService.getDemoSessionById(id);
+    if (!demoSession) {
+      throw new NotFoundException(`DemoSession with ID ${id} not found`);
     }
     return {
-      demoSession: {
-        _id: session._id.toString(),
-        fullName: session.fullName,
-        email: session.email,
-        phoneNumber: session.phoneNumber,
-        course: session.course,
-        createdAt: session.createdAt,
-        updatedAt: session.updatedAt,
-      },
+      demoSession: this.mapToDto(demoSession),
     };
   }
 
   async updateDemoSession(id: string, updateDemoSessionDto: Partial<CreateDemoSessionDto>) {
-    const session = await this.demoSessionDataService.updateDemoSession(id, updateDemoSessionDto);
-    if (!session) {
-      throw new NotFoundException(`Demo session with ID ${id} not found`);
+    const demoSession = await this.demoSessionDataService.updateDemoSession(id, updateDemoSessionDto);
+    if (!demoSession) {
+      throw new NotFoundException(`DemoSession with ID ${id} not found`);
     }
     return {
-      demoSession: {
-        _id: session._id.toString(),
-        fullName: session.fullName,
-        email: session.email,
-        phoneNumber: session.phoneNumber,
-        course: session.course,
-        createdAt: session.createdAt,
-        updatedAt: session.updatedAt,
-      },
+      demoSession: this.mapToDto(demoSession),
     };
   }
 
   async deleteDemoSession(id: string) {
-    const session = await this.demoSessionDataService.deleteDemoSession(id);
-    if (!session) {
-      throw new NotFoundException(`Demo session with ID ${id} not found`);
+    const demoSession = await this.demoSessionDataService.deleteDemoSession(id);
+    if (!demoSession) {
+      throw new NotFoundException(`DemoSession with ID ${id} not found`);
     }
-    return { message: 'Demo session deleted successfully' };
+    return { message: 'DemoSession deleted successfully' };
   }
 }
