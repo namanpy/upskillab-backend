@@ -36,6 +36,30 @@ export class Story {
   @ApiProperty()
   @Prop({ required: true })
   companyLogoUrl: string;
+
+  @ApiProperty()
+  @Prop({ required: true })
+  role: string; // New field
+
+  @ApiProperty()
+  @Prop({ required: true })
+  companyName: string; // New field
+
+  @ApiProperty()
+  @Prop({ required: true })
+  before: string; // New field
+
+  @ApiProperty()
+  @Prop({ required: true })
+  after: string; // New field
+
+  @ApiProperty({ type: [String] })
+  @Prop({ type: [String], required: true })
+  skills: string[]; // New field, array of strings
+
+  @ApiProperty()
+  @Prop({ default: false })
+  wallOfFame: boolean; // New field, defaults to false
 }
 
 export const StorySchema = SchemaFactory.createForClass(Story);
