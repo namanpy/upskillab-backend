@@ -5,7 +5,7 @@
  */
 
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import mongoose, { HydratedDocument, Types } from 'mongoose';
 import {
   COURSE_LEVELS,
@@ -98,11 +98,11 @@ export class Course {
   })
   youtubeUrl: string | null;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @Prop({
-    required: true,
+    required: false,
   })
-  brochure: string;
+  brochure?: string;
 
   @ApiProperty()
   @Prop({
@@ -115,11 +115,11 @@ export class Course {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Language.name })
   language: Types.ObjectId;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @Prop({
-    required: true,
+    required: false,
   })
-  certificate: string;
+  certificate?: string;
 
   @ApiProperty()
   @Prop({
