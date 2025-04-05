@@ -21,6 +21,7 @@ import { FileModule } from './api/file/file.module';
 import { Banner3Module } from './api/public/banner3/banner3.module';
 import { Banner4Module } from './api/public/banner4/banner4.module';
 import { ContactUsModule } from './api/public/contact-us/contact-us.module';
+import { HiringPartnerModule } from './api/public/hiring-partner/hiring-partner.module';
 // import { ConfigModule } from '@nestjs/config';
 //MongooseModule.forRoot('mongodb://localhost/nest')
 @Module({
@@ -47,6 +48,7 @@ import { ContactUsModule } from './api/public/contact-us/contact-us.module';
     Banner3Module,
     Banner4Module,
     ContactUsModule,
+    HiringPartnerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
