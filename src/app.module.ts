@@ -23,6 +23,7 @@ import { Banner4Module } from './api/public/banner4/banner4.module';
 import { ContactUsModule } from './api/public/contact-us/contact-us.module';
 import { PaymentModule } from './api/payment/payment.module';
 import { RegistrationModule } from './api/registration/registration.module';
+import { ConfigModule } from '@nestjs/config';
 
 // import { ConfigModule } from '@nestjs/config';
 //MongooseModule.forRoot('mongodb://localhost/nest')
@@ -31,6 +32,7 @@ import { RegistrationModule } from './api/registration/registration.module';
     MongooseModule.forRoot(
       'mongodb+srv://namanpy:namanpy@namanpy.fr257.mongodb.net/?retryWrites=true&w=majority&appName=namanpy',
     ),
+    ConfigModule.forRoot({ isGlobal: true }),
     StoriesModule,
     TestimonialModule,
     DemoSessionModule,

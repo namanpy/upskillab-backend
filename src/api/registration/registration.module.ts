@@ -6,10 +6,11 @@ import { CashfreeService } from '../payment/cashfree.logic';
 import { UsersModule } from '../user/users.module';
 import { RegistrationController } from './registration.controller';
 import { RegistrationLogicService } from './registration.logic';
+import { PaymentModule } from '../payment/payment.module';
 
 @Module({
-  imports: [UsersModule, OrderModule, BatchModule],
+  imports: [UsersModule, OrderModule, BatchModule, PaymentModule],
   controllers: [RegistrationController],
-  providers: [RegistrationLogicService, CashfreeService],
+  providers: [RegistrationLogicService],
 })
 export class RegistrationModule {}
