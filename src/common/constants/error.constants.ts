@@ -1,4 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
+import { ref } from 'process';
 
 export const ERROR = {
   UNAUTHORIZED: {
@@ -56,5 +57,40 @@ export const ERROR = {
     code: 404,
     reference: 10,
     message: 'Language not found',
+  },
+  ORDER_NOT_FOUND: {
+    reference: 11,
+    code: 404,
+    message: 'Order not found',
+  },
+  PAYMENT_NOT_FOUND: {
+    code: 404,
+    reference: 12,
+    message: 'Payment not found',
+  },
+  BATCH_NOT_FOUND: {
+    code: 400,
+    reference: 13,
+    message: 'Batch not found',
+  },
+  BATCH_NOT_ACTIVE: {
+    code: 400,
+    reference: 14,
+    message: 'Batch is not active',
+  },
+  BATCH_FULL: {
+    code: 400,
+    reference: 15,
+    message: 'Batch is full',
+  },
+  USER_ALREADY_EXISTS: {
+    code: HttpStatus.CONFLICT,
+    reference: 16,
+    message: 'User already exists',
+  },
+  ALREADY_REGISTERED_FOR_COURSE: {
+    code: HttpStatus.CONFLICT,
+    reference: 17,
+    message: 'Already registered for course',
   },
 };

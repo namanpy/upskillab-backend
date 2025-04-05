@@ -20,7 +20,7 @@ export class AuthLogicService {
       identifier,
     });
 
-    if (await bcrypt.compare(password, user.password)) {
+    if (user.password && (await bcrypt.compare(password, user.password))) {
       const authToken = await this.jwtService.signAsync({
         userId: user._id,
         email: user.email,

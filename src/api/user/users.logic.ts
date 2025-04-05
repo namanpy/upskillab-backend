@@ -9,13 +9,19 @@ export class UsersLogicService {
   async findbyUsernameorEmailorMobile(inputs: { searchString: string }) {
     const { searchString } = inputs;
     return {
-      users: await this.usersDataService.findbyUsernameorEmailorMobile(searchString),
+      users:
+        await this.usersDataService.findbyUsernameorEmailorMobile(searchString),
     };
   }
 
-  async updateUserDetails(inputs: { _id: string; username?: string; email?: string; mobileNumber?: string }) {
+  async updateUserDetails(inputs: {
+    _id: string;
+    username?: string;
+    email?: string;
+    mobileNumber?: string;
+  }) {
     const { _id, username, email, mobileNumber } = inputs;
-    
+
     return {
       user: await this.usersDataService.updateUserDetails({
         _id,
@@ -24,6 +30,5 @@ export class UsersLogicService {
         mobileNumber,
       }),
     };
-
   }
 }

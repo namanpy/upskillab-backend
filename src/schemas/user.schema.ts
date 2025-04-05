@@ -13,16 +13,15 @@ export class User {
 
   @ApiPropertyOptional({
     type: String,
-
   })
   @Prop({
     type: String,
     validate: function (this, value: string) {
       this.mobileNumber && this.email ? false : true;
     },
-    default: true,
+    required: true,
   })
-  email: string | null;
+  email: string;
 
   @ApiPropertyOptional({
     type: String,
@@ -32,9 +31,8 @@ export class User {
     validate: function (this, value: string) {
       this.mobileNumber && this.email ? false : true;
     },
-    default: true,
   })
-  mobileNumber: string | null;
+  mobileNumber?: string;
 
   @ApiProperty({
     required: true,
@@ -43,10 +41,10 @@ export class User {
   username: string;
 
   @Prop({
-    required: true,
+    required: false,
     select: false,
   })
-  password: string;
+  password?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
