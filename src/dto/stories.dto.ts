@@ -44,6 +44,21 @@ export class CreateStoryDto {
   skills: string[]; // New field, array of strings
 
   @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  duration: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  batch_Year: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  salaryIncrease: string;
+
+  @ApiProperty()
   @IsBoolean()
   wallOfFame: boolean; // New field
 }
@@ -81,6 +96,15 @@ export class Story {
 
   @ApiProperty({ type: [String] })
   skills: string[]; // New field
+
+  @ApiProperty()
+  duration: string;
+
+  @ApiProperty()
+  batch_Year: string;
+
+  @ApiProperty()
+  salaryIncrease: string;
 
   @ApiProperty()
   wallOfFame: boolean; // New field

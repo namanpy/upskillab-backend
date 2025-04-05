@@ -8,6 +8,11 @@ export class CreateBanner3Dto {
   title: string;
 
   @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  descriptions: string;
+
+  @ApiProperty()
   @IsBoolean()
   active: boolean;
 }
@@ -18,6 +23,9 @@ export class Banner3 {
 
   @ApiProperty()
   title: string;
+
+  @ApiProperty()
+  descriptions: string;
 
   @ApiProperty()
   imageUrl: string;
