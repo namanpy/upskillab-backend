@@ -47,11 +47,17 @@ export class BatchDataService {
     return newBatch.save();
   }
 
-  async getBatchById(id: string): Promise<BatchDocument | null> {
+  async getBatchById(id: string) {
     return this.batchModel
       .findById(id)
-      .populate('course')
-      .populate('teacher')
+      .populate<{
+        course:
+          | Course
+          | (undefined extends Batch['course'] ? undefined : never);
+        teacher:
+          | TeacherDocument
+          | (undefined extends Batch['teacher'] ? undefined : never);
+      }>(['course', 'teacher'])
       .exec();
   }
 
