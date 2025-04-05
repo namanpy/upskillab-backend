@@ -1,17 +1,11 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { PaymentDataService } from './payment.data';
-import { OrderDataService } from '../order/order.data';
-import { ORDER_STATUS } from 'src/common/constants/order.constants';
-import { PAYMENT_STATUS } from 'src/common/constants/payment.constants';
+import { PaymentLogicService } from './payment.logic';
 
 @ApiTags('payments')
 @Controller('payment')
 export class PaymentController {
-  constructor(
-    private paymentDataService: PaymentDataService,
-    private orderDataService: OrderDataService,
-  ) {}
+  constructor(private paymentLogicService: PaymentLogicService) {}
 
   @Post('cashfree/callback')
   async handleCashfreeWebhook(
@@ -24,7 +18,18 @@ export class PaymentController {
           order_currency: string;
           order_tags: null;
         };
+        payment: {
+          payment_status: string;
+          payment_message: string;
+        };
       };
     },
-  ) {}
+  ) {
+    try {
+      return await this.paymentLogicService.handleCashfreeWebhook(webhookData);
+    } catch (error) {
+      console.error('Webhook processing error:', error);
+      return { success: false, message: 'Failed to process webhook' };
+    }
+  }
 }
