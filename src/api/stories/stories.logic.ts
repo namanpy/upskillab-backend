@@ -1,41 +1,32 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { StoriesDataService } from './stories.data';
-import { CreateStoryDto } from '../../dto/stories.dto';
-import { GetStoriesResponseDTO } from '../../dto/stories.dto';
+import { CreateStoryDto, GetStoriesResponseDTO, Story } from '../../dto/stories.dto';
+import { StoryDocument } from '../../schemas/stories.schema';
+import { mapToDto, mapToDtoArray } from '../../common/utils/map-to-dto.util';
 
 @Injectable()
 export class StoriesLogicService {
   constructor(private storiesDataService: StoriesDataService) {}
 
+  private mapToDto(story: StoryDocument): Story {
+    return mapToDto<Story, StoryDocument>(story);
+  }
+
+  private mapToDtoArray(stories: StoryDocument[]): Story[] {
+    return mapToDtoArray<Story, StoryDocument>(stories);
+  }
+
   async getStories(): Promise<GetStoriesResponseDTO> {
     const stories = await this.storiesDataService.getStories();
     return {
-      stories: stories.map((story) => ({
-        _id: story._id.toString(),
-        name: story.name,
-        jobTitle: story.jobTitle,
-        userImageUrl: story.userImageUrl,
-        description: story.description,
-        companyLogoUrl: story.companyLogoUrl,
-        createdAt: story.createdAt,
-        updatedAt: story.updatedAt,
-      })),
+      stories: this.mapToDtoArray(stories),
     };
   }
 
-  async createStory(createStoryDto: CreateStoryDto) {
+  async createStory(createStoryDto: CreateStoryDto & { userImageUrl: string; companyLogoUrl: string }) {
     const story = await this.storiesDataService.createStory(createStoryDto);
     return {
-      story: {
-        _id: story._id.toString(),
-        name: story.name,
-        jobTitle: story.jobTitle,
-        userImageUrl: story.userImageUrl,
-        description: story.description,
-        companyLogoUrl: story.companyLogoUrl,
-        createdAt: story.createdAt,
-        updatedAt: story.updatedAt,
-      },
+      story: this.mapToDto(story),
     };
   }
 
@@ -45,35 +36,17 @@ export class StoriesLogicService {
       throw new NotFoundException(`Story with ID ${id} not found`);
     }
     return {
-      story: {
-        _id: story._id.toString(),
-        name: story.name,
-        jobTitle: story.jobTitle,
-        userImageUrl: story.userImageUrl,
-        description: story.description,
-        companyLogoUrl: story.companyLogoUrl,
-        createdAt: story.createdAt,
-        updatedAt: story.updatedAt,
-      },
+      story: this.mapToDto(story),
     };
   }
 
-  async updateStory(id: string, updateStoryDto: Partial<CreateStoryDto>) {
+  async updateStory(id: string, updateStoryDto: Partial<CreateStoryDto & { userImageUrl: string; companyLogoUrl: string }>) {
     const story = await this.storiesDataService.updateStory(id, updateStoryDto);
     if (!story) {
       throw new NotFoundException(`Story with ID ${id} not found`);
     }
     return {
-      story: {
-        _id: story._id.toString(),
-        name: story.name,
-        jobTitle: story.jobTitle,
-        userImageUrl: story.userImageUrl,
-        description: story.description,
-        companyLogoUrl: story.companyLogoUrl,
-        createdAt: story.createdAt,
-        updatedAt: story.updatedAt,
-      },
+      story: this.mapToDto(story),
     };
   }
 
