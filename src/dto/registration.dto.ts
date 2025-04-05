@@ -1,0 +1,48 @@
+import { Types } from 'mongoose';
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsEmail,
+  IsMongoId,
+  IsNotEmpty,
+  IsString,
+  Length,
+  Matches,
+} from 'class-validator';
+import { Batch } from 'src/schemas/course/batch.schema';
+
+export class BatchRegistrationRequestDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  name: string;
+
+  @IsEmail()
+  @IsNotEmpty()
+  @ApiProperty()
+  email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  @Matches(/^\d+$/, { message: 'Phone number must contain only digits' })
+  @Length(10, 10)
+  phone: string;
+
+  @IsMongoId()
+  @IsNotEmpty()
+  @ApiProperty()
+  batchId: string;
+}
+
+export class BatchRegistrationResponseDto {
+  @ApiProperty({ type: String })
+  orderId: Types.ObjectId;
+
+  @ApiProperty({
+    type: String,
+  })
+  paymentSessionId: string;
+}

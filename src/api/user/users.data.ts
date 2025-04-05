@@ -8,6 +8,23 @@ import { ERROR } from 'src/common/constants/error.constants';
 @Injectable()
 export class UserDataService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+
+  async createUser(userData: {
+    username: string;
+    email: string;
+    password?: string;
+  }) {
+    const existingUser = await this.userModel.findOne({
+      email: userData.email,
+    });
+
+    if (existingUser) {
+      throw new CustomError(ERROR.USER_ALREADY_EXISTS);
+    }
+
+    const newUser = new this.userModel(userData);
+    return newUser.save().then((d) => d.toObject({}));
+  }
   async getUserByEmailOrPhone({ identifier }: { identifier: string }) {
     const user = await this.userModel
       .findOne({
