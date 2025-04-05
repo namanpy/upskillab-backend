@@ -20,6 +20,8 @@ import { PremiumLearningExperienceModule } from './api/public/premium-learning-e
 import { FileModule } from './api/file/file.module';
 import { Banner3Module } from './api/public/banner3/banner3.module';
 import { Banner4Module } from './api/public/banner4/banner4.module';
+import { ContactUsModule } from './api/public/contact-us/contact-us.module';
+// import { ConfigModule } from '@nestjs/config';
 //MongooseModule.forRoot('mongodb://localhost/nest')
 @Module({
   imports: [
@@ -44,6 +46,7 @@ import { Banner4Module } from './api/public/banner4/banner4.module';
     FileModule,
     Banner3Module,
     Banner4Module,
+    ContactUsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
