@@ -30,8 +30,12 @@ export class DemoSession {
   phoneNumber: string;
 
   @ApiProperty()
+  @Prop({ required: true })
+  course: string; // Kept as a regular string field
+
+  @ApiProperty({ enum: ['Fresher', 'Working Professional'] })
   @Prop({ required: true, enum: ['Fresher', 'Working Professional'] })
-  course: string;
+  experience: string; // Added as an enum field
 }
 
 export const DemoSessionSchema = SchemaFactory.createForClass(DemoSession);
