@@ -11,6 +11,11 @@ export class CreateBannerDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  subtitle: string; // Added subtitle field
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   description: string;
 
   @ApiProperty({ type: Boolean })
@@ -25,6 +30,9 @@ export class Banner {
 
   @ApiProperty()
   title: string;
+
+  @ApiProperty()
+  subtitle: string; // Added subtitle field
 
   @ApiProperty()
   description: string;
