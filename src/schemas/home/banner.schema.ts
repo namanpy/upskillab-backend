@@ -20,6 +20,10 @@ export class Banner {
 
   @ApiProperty()
   @Prop({ required: true })
+  subtitle: string; // Added subtitle field
+
+  @ApiProperty()
+  @Prop({ required: true })
   description: string;
 
   @ApiProperty()

@@ -6,15 +6,13 @@ import { CreateBannerDto } from '../../../dto/home/banner.dto';
 
 @Injectable()
 export class BannerDataService {
-  constructor(
-    @InjectModel(Banner.name) private bannerModel: Model<BannerDocument>,
-  ) {}
+  constructor(@InjectModel(Banner.name) private bannerModel: Model<BannerDocument>) {}
 
   async getBanners(): Promise<BannerDocument[]> {
     return this.bannerModel.find().exec();
   }
 
-  async createBanner(createBannerDto: CreateBannerDto): Promise<BannerDocument> {
+  async createBanner(createBannerDto: CreateBannerDto & { imageUrl: string }): Promise<BannerDocument> {
     const newBanner = new this.bannerModel(createBannerDto);
     return newBanner.save();
   }
@@ -23,13 +21,8 @@ export class BannerDataService {
     return this.bannerModel.findById(id).exec();
   }
 
-  async updateBanner(
-    id: string,
-    updateBannerDto: Partial<CreateBannerDto>,
-  ): Promise<BannerDocument | null> {
-    return this.bannerModel
-      .findByIdAndUpdate(id, updateBannerDto, { new: true })
-      .exec();
+  async updateBanner(id: string, updateBannerDto: Partial<CreateBannerDto & { imageUrl: string }>): Promise<BannerDocument | null> {
+    return this.bannerModel.findByIdAndUpdate(id, updateBannerDto, { new: true }).exec();
   }
 
   async deleteBanner(id: string): Promise<BannerDocument | null> {
