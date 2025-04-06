@@ -58,12 +58,12 @@ export class RegistrationLogicService {
     const userId = user._id;
 
     // Check if user has already registered for the cours
-    const existingOrdere = await this.orderDataService.checkExistingOrder(
+    const existingOrder = await this.orderDataService.checkExistingOrder(
       userId,
       courseId,
     );
 
-    if (existingOrdere) {
+    if (existingOrder && existingOrder.status === ORDER_STATUS.COMPLETED.code) {
       throw new CustomError(ERROR.ALREADY_REGISTERED_FOR_COURSE);
     }
     // Create order
