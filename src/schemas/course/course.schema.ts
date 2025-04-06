@@ -139,6 +139,34 @@ export class Course {
     default: [],
   })
   faqs: FAQ[];
+
+  @ApiProperty()
+  @Prop({
+    required: true,
+  })
+  shortDescription: string;
+
+  @ApiProperty({ type: [String] })
+  @Prop({
+    type: [String],
+    required: true,
+    default: [],
+  })
+  tags: string[];
+
+  @ApiProperty()
+  @Prop({
+    required: true,
+  })
+  programDetails: string;
+
+  @ApiProperty({ type: [String] })
+  @Prop({
+    type: [String],
+    required: true,
+    default: [],
+  })
+  targetAudience: string[];
 }
 
 export const CourseSchema = SchemaFactory.createForClass(Course);

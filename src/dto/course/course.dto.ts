@@ -128,6 +128,27 @@ export class CreateCourseRequestDto {
   @ValidateNested({ each: true })
   @Type(() => FaqDto)
   faqs: FaqDto[];
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  shortDescription: string;
+
+  @ApiProperty({ type: [String] })
+  @IsArray()
+  @IsString({ each: true })
+  @IsNotEmpty()
+  tags: string[];
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  programDetails: string;
+
+  @ApiProperty({ type: [String] })
+  @IsArray()
+  @IsString({ each: true })
+  @IsNotEmpty()
+  targetAudience: string[];
 }
 export class CreateCourseResponseDto {
   @ApiProperty()
@@ -280,6 +301,18 @@ class CourseDisplay {
 
   @ApiProperty()
   courseRating: number;
+
+  @ApiProperty()
+  shortDescription: string;
+
+  @ApiProperty({ type: [String] })
+  tags: string[];
+
+  @ApiProperty()
+  programDetails: string;
+
+  @ApiProperty({ type: [String] })
+  targetAudience: string[];
 }
 export class GetCourseDisplayResponseDto {
   @ApiProperty({ type: [CourseDisplay] })
@@ -385,6 +418,28 @@ export class UpdateCourseRequestDto {
   @Type(() => FaqDto)
   @IsOptional()
   faqs?: FaqDto[];
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  shortDescription?: string;
+
+  @ApiProperty({ type: [String] })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  tags?: string[];
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  programDetails?: string;
+
+  @ApiProperty({ type: [String] })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  targetAudience?: string[];
 }
 
 export class UpdateCourseResponseDto {
@@ -459,4 +514,16 @@ export class GetCourseByCodeResponseDto {
 
   @ApiProperty({ type: [FaqDto] })
   faqs: FaqDto[];
+
+  @ApiProperty()
+  shortDescription: string;
+
+  @ApiProperty({ type: [String] })
+  tags: string[];
+
+  @ApiProperty()
+  programDetails: string;
+
+  @ApiProperty({ type: [String] })
+  targetAudience: string[];
 }
