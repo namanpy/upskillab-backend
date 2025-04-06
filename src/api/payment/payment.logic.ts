@@ -65,7 +65,7 @@ export class PaymentLogicService {
     }
 
     // Update order status
-    await this.orderDataService.updateOrder(payment.order.toString(), {
+    await this.orderDataService.updateOrder(payment.order._id.toString(), {
       status: orderStatus,
       amountPaid: payment.amount,
     });
