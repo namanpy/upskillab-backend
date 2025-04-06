@@ -1,34 +1,26 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsBoolean } from 'class-validator';
 
-export class CreateBanner3Dto {
+export class CreateHiringPartnerDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  title: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  descriptions: string;
+  name: string;
 
   @ApiProperty()
   @IsBoolean()
   active: boolean;
 }
 
-export class Banner3 {
+export class HiringPartner {
   @ApiProperty()
   _id: string;
 
   @ApiProperty()
-  title: string;
+  logo: string;
 
   @ApiProperty()
-  descriptions: string;
-
-  @ApiProperty()
-  imageUrl: string;
+  name: string;
 
   @ApiProperty()
   active: boolean;
@@ -40,7 +32,7 @@ export class Banner3 {
   updatedAt: Date;
 }
 
-export class GetBanner3sResponseDTO {
-  @ApiProperty({ type: [Banner3] })
-  banner3s: Banner3[];
+export class GetHiringPartnersResponseDTO {
+  @ApiProperty({ type: [HiringPartner] })
+  hiringPartners: HiringPartner[];
 }

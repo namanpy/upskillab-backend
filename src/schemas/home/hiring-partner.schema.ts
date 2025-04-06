@@ -2,13 +2,13 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { HydratedDocument, Types } from 'mongoose';
 
-export type Banner3Document = HydratedDocument<Banner3> & {
+export type HiringPartnerDocument = HydratedDocument<HiringPartner> & {
   createdAt: Date;
   updatedAt: Date;
 };
 
 @Schema({ timestamps: true })
-export class Banner3 {
+export class HiringPartner {
   @ApiProperty({
     type: String,
   })
@@ -16,19 +16,15 @@ export class Banner3 {
 
   @ApiProperty()
   @Prop({ required: true })
-  title: string;
+  logo: string; // URL of the partner's logo
 
   @ApiProperty()
   @Prop({ required: true })
-  imageUrl: string;
-
-  @ApiProperty()
-  @Prop({ required: true })
-  descriptions: string;
+  name: string; // Name of the hiring partner
 
   @ApiProperty()
   @Prop({ default: true })
-  active: boolean;
+  active: boolean; // Active status, defaults to true
 }
 
-export const Banner3Schema = SchemaFactory.createForClass(Banner3);
+export const HiringPartnerSchema = SchemaFactory.createForClass(HiringPartner);

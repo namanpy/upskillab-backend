@@ -58,6 +58,18 @@ export class Story {
   skills: string[]; // New field, array of strings
 
   @ApiProperty()
+  @Prop({ required: true })
+  duration: string;
+
+  @ApiProperty()
+  @Prop({ required: true })
+  batch_Year: string;
+
+  @ApiProperty()
+  @Prop({ required: true })
+  salaryIncrease: string;
+  
+  @ApiProperty()
   @Prop({ default: false })
   wallOfFame: boolean; // New field, defaults to false
 }
