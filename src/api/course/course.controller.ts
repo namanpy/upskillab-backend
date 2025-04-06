@@ -106,7 +106,7 @@ export class CourseController {
   @ApiResponse({
     status: 200,
     description: 'Get course by code',
-    type: CreateCourseRequestDto,
+    type: GetCourseByCodeResponseDto,
   })
   @ApiResponse({
     status: ERROR.COURSE_NOT_FOUND.code,
