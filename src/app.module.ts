@@ -24,6 +24,7 @@ import { ContactUsModule } from './api/public/contact-us/contact-us.module';
 import { PaymentModule } from './api/payment/payment.module';
 import { RegistrationModule } from './api/registration/registration.module';
 import { ConfigModule } from '@nestjs/config';
+import { SendGridModule } from './common/services/sendgrid.module';
 
 // import { ConfigModule } from '@nestjs/config';
 //MongooseModule.forRoot('mongodb://localhost/nest')
@@ -54,6 +55,7 @@ import { ConfigModule } from '@nestjs/config';
     ContactUsModule,
     PaymentModule,
     RegistrationModule,
+    SendGridModule,
   ],
   controllers: [AppController],
   providers: [AppService],
