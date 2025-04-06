@@ -12,6 +12,7 @@ export class UserDataService {
   async createUser(userData: {
     username: string;
     email: string;
+    userType: string;
     password?: string;
   }) {
     const existingUser = await this.userModel.findOne({

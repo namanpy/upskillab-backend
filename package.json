@@ -29,6 +29,7 @@
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.0.7",
+    "@sendgrid/mail": "^8.1.4",
     "aws-sdk": "^2.1692.0",
     "bcrypt": "^5.1.1",
     "cashfree-pg": "^5.0.3",
