@@ -19,8 +19,8 @@ export class CashfreeService {
     private configService: ConfigService,
     private paymentDataService: PaymentDataService,
   ) {
-    const apiKey = this.configService.get<string>('CASHFREE_API_KEY');
-    const apiSecret = this.configService.get<string>('CASHFREE_API_SECRET');
+    const apiKey = this.configService.get<string>('CASHFREE_APP_ID');
+    const apiSecret = this.configService.get<string>('CASHFREE_SECRET_KEY');
 
     this.returnUrl = this.configService.get<string>('CASHFREE_RETURN_URL');
     const notifyUrl = this.configService.get<string>('CASHFREE_NOTIFY_URL');
@@ -49,7 +49,7 @@ export class CashfreeService {
       const response = await this.cashfree.PGCreateOrder({
         order_amount: 1,
         order_currency: 'INR',
-        order_id: 'order_34692745',
+        order_id: orderId.toString(),
         order_meta: {
           return_url: this.returnUrl,
           notify_url: this.notifyUrl,
@@ -79,6 +79,7 @@ export class CashfreeService {
         payment,
       };
     } catch (error) {
+      console.log(error);
       throw new Error('Failed to create payment link');
     }
   }

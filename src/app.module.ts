@@ -24,7 +24,6 @@ import { ContactUsModule } from './api/public/contact-us/contact-us.module';
 import { PaymentModule } from './api/payment/payment.module';
 import { RegistrationModule } from './api/registration/registration.module';
 import { ConfigModule } from '@nestjs/config';
-import { HiringPartnerModule } from './api/public/hiring-partner/hiring-partner.module';
 
 // import { ConfigModule } from '@nestjs/config';
 //MongooseModule.forRoot('mongodb://localhost/nest')
@@ -55,7 +54,6 @@ import { HiringPartnerModule } from './api/public/hiring-partner/hiring-partner.
     ContactUsModule,
     PaymentModule,
     RegistrationModule,
-    HiringPartnerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
