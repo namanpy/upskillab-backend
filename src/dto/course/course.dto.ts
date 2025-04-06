@@ -453,6 +453,22 @@ export class GetCourseByCodeRequestDto {
   @IsNotEmpty()
   courseCode: string;
 }
+
+export class SessionDto {
+  @ApiProperty()
+  title: string;
+
+  @ApiProperty({ type: [String] })
+  topics: string[];
+}
+
+export class WeekDto {
+  @ApiProperty()
+  week: string;
+
+  @ApiProperty({ type: [SessionDto] })
+  sessions: SessionDto[];
+}
 export class GetCourseByCodeResponseDto {
   @ApiProperty()
   _id: Types.ObjectId;
@@ -526,4 +542,7 @@ export class GetCourseByCodeResponseDto {
 
   @ApiProperty({ type: [String] })
   targetAudience: string[];
+
+  @ApiProperty({ type: [WeekDto] })
+  weeks: WeekDto[];
 }
