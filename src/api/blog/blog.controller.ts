@@ -16,7 +16,7 @@ export class BlogController {
   @ApiResponse({ status: 200, description: 'Get all approved blogs', type: GetBlogsResponseDTO })
   @Get('')
   async getBlogs(@Query('all') all?: string) {
-    const approvedOnly = all !== 'true'; // Show all if ?all=true, otherwise only approved
+    const approvedOnly = all !== 'true';
     return await this.blogLogicService.getBlogs(approvedOnly);
   }
 
@@ -54,7 +54,10 @@ export class BlogController {
 
   @ApiResponse({ status: 200, description: 'Approve or reject a blog by ID' })
   @Put(':id/approve')
-  async approveBlog(@Param('id') id: string, @Body('approved') approved: boolean) {
+  async approveBlog(@Param('id') id: string, @Body() { approved }: { approved: boolean }) {
+    if (approved === undefined) {
+      throw new BadRequestException('approved field is required');
+    }
     return await this.blogLogicService.approveBlog(id, approved);
   }
 }
