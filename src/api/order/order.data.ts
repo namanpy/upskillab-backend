@@ -106,6 +106,6 @@ export class OrderDataService {
       ])
       .exec();
 
-    return existingOrder.length > 0;
+    return existingOrder.length ? existingOrder[0] : undefined;
   }
 }
