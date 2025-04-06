@@ -7,12 +7,14 @@ import { PaymentController } from './payment.controller';
 import { CashfreeService } from './cashfree.logic';
 import { PaymentLogicService } from './payment.logic';
 import { ConfigModule } from '@nestjs/config';
+import { BatchModule } from '../batch/batch.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Payment.name, schema: PaymentSchema }]),
     OrderModule,
     ConfigModule,
+    BatchModule,
   ],
   controllers: [PaymentController],
   providers: [PaymentDataService, CashfreeService, PaymentLogicService],

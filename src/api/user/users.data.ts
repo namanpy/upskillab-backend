@@ -12,6 +12,7 @@ export class UserDataService {
   async createUser(userData: {
     username: string;
     email: string;
+    userType: string;
     password?: string;
   }) {
     const existingUser = await this.userModel.findOne({
@@ -36,6 +37,12 @@ export class UserDataService {
     if (!user) throw new CustomError(ERROR.USER_NOT_FOUND);
     return user;
   }
+
+  async getUserByEmail({ email }: { email: string }) {
+    const user = await this.userModel.findOne({ email }).lean().exec();
+    return user;
+  }
+
   async getUserById(id: string) {
     const user = await this.userModel.findById(id).lean().exec();
     if (!user) throw new CustomError(ERROR.USER_NOT_FOUND);

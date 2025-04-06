@@ -8,6 +8,8 @@ import { CustomError } from 'src/common/classes/error.class';
 import { ERROR } from 'src/common/constants/error.constants';
 import { ORDER_STATUS } from 'src/common/constants/order.constants';
 import { BatchRegistrationRequestDto } from 'src/dto/registration.dto';
+import { SendGridService } from 'src/common/services/sendgrid.service';
+import { USER_TYPES } from 'src/common/constants/user.constants';
 
 @Injectable()
 export class RegistrationLogicService {
@@ -16,6 +18,7 @@ export class RegistrationLogicService {
     private orderDataService: OrderDataService,
     private batchDataService: BatchDataService,
     private cashfreeService: CashfreeService,
+    private sendGridService: SendGridService,
   ) {}
 
   async registerForBatch(registrationData: BatchRegistrationRequestDto) {
@@ -33,14 +36,21 @@ export class RegistrationLogicService {
     }
 
     // Create or get user
-    let user = await this.userDataService.getUserByEmailOrPhone({
-      identifier: registrationData.email,
+    let user = await this.userDataService.getUserByEmail({
+      email: registrationData.email,
     });
 
     if (!user) {
       user = await this.userDataService.createUser({
         email: registrationData.email,
         username: `user_${Math.random().toString(36).substring(2, 10)}`,
+        userType: USER_TYPES.STUDENT,
+      });
+
+      // Send welcome email
+      await this.sendGridService.sendWelcomeEmail({
+        to: user.email,
+        name: registrationData.name,
       });
     }
 

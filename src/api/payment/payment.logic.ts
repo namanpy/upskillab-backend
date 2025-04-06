@@ -7,13 +7,16 @@ import {
   CASHFREE_PAYMENT_STATUS,
   PAYMENT_STATUS,
 } from 'src/common/constants/payment.constants';
+import { BatchDataService } from '../batch/batch.data';
+import { SendGridService } from 'src/common/services/sendgrid.service';
 
 @Injectable()
 export class PaymentLogicService {
   constructor(
-    private paymentDataService: PaymentDataService,
+    private batchDataService: BatchDataService,
     private orderDataService: OrderDataService,
     private cashfreeService: CashfreeService,
+    private sendGridService: SendGridService,
   ) {}
 
   async handleCashfreeWebhook(webhookData: {
@@ -36,6 +39,14 @@ export class PaymentLogicService {
 
     const { status } = payment;
 
+    const order = await this.orderDataService.getOrderById(
+      payment.order._id.toString(),
+    );
+
+    const batch = await this.batchDataService.getBatchById(
+      order.batch._id.toString(),
+    );
+
     // Map Cashfree status to internal payment status
     let orderStatus: string;
 
@@ -54,9 +65,17 @@ export class PaymentLogicService {
     }
 
     // Update order status
-    await this.orderDataService.updateOrder(payment.order.toString(), {
+    await this.orderDataService.updateOrder(payment.order._id.toString(), {
       status: orderStatus,
       amountPaid: payment.amount,
+    });
+
+    await this.sendGridService.sendPaymentConfirmation({
+      to: payment.user.email,
+      name: payment.user.username,
+      courseName: batch?.course.courseName || 'Unknown',
+      amount: payment.amount,
+      orderId: order._id.toString(),
     });
 
     return { success: true, message: 'Webhook processed successfully' };
