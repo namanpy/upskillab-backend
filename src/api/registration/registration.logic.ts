@@ -33,8 +33,8 @@ export class RegistrationLogicService {
     }
 
     // Create or get user
-    let user = await this.userDataService.getUserByEmailOrPhone({
-      identifier: registrationData.email,
+    let user = await this.userDataService.getUserByEmail({
+      email: registrationData.email,
     });
 
     if (!user) {
