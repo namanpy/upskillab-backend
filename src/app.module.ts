@@ -26,6 +26,7 @@ import { RegistrationModule } from './api/registration/registration.module';
 import { ConfigModule } from '@nestjs/config';
 import { HiringPartnerModule } from './api/public/hiring-partner/hiring-partner.module';
 import { BlogModule } from './api/blog/blog.module';
+import { YoutubeModule } from './api/public/youtube/youtube.module';
 // import { ConfigModule } from '@nestjs/config';
 //MongooseModule.forRoot('mongodb://localhost/nest')
 @Module({
@@ -57,6 +58,7 @@ import { BlogModule } from './api/blog/blog.module';
     RegistrationModule,
     HiringPartnerModule,
     BlogModule,
+    YoutubeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
