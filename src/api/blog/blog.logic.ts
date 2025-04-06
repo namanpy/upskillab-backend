@@ -20,24 +20,62 @@ export class BlogLogicService {
 
   private mapToDto(blog: BlogDocument): Blog {
     const docObject = blog.toObject();
-    const student = docObject.studentId as PopulatedStudent | Types.ObjectId; // Handle both populated and unpopulated cases
+    let studentIdValue: string | undefined;
+    let studentName: string | undefined;
+
+    // Handle different cases for studentId
+    if (docObject.studentId === undefined || docObject.studentId === null) {
+      studentIdValue = undefined; // Allow undefined for optional studentId
+      studentName = undefined;
+    } else if (docObject.studentId instanceof Types.ObjectId) {
+      studentIdValue = docObject.studentId.toHexString(); // Convert ObjectId to string
+      studentName = undefined; // Not populated yet
+    } else if (typeof docObject.studentId === 'string') {
+      studentIdValue = docObject.studentId; // Use the string ID from DTO
+      studentName = undefined; // Not populated yet
+    } else {
+      // Handle populated student case
+      const student = docObject.studentId as PopulatedStudent;
+      studentIdValue = student._id.toHexString(); // Convert populated _id to string
+      studentName = student.fullName;
+    }
+
     return mapToDto<Blog, BlogDocument>(blog, (doc) => ({
       ...docObject,
       _id: doc._id.toHexString(), // Convert ObjectId to string
-      studentId: doc.studentId instanceof Types.ObjectId ? doc.studentId.toHexString() : (doc.studentId as PopulatedStudent)._id.toHexString(), // Convert to string
-      studentName: student instanceof Types.ObjectId ? undefined : (student as PopulatedStudent).fullName, // Safely extract fullName
+      studentId: studentIdValue, // Assign the determined studentId (can be undefined)
+      studentName, // Assign the determined studentName
     }));
   }
 
   private mapToDtoArray(blogs: BlogDocument[]): Blog[] {
     return mapToDtoArray<Blog, BlogDocument>(blogs, (doc) => {
       const docObject = doc.toObject();
-      const student = docObject.studentId as PopulatedStudent | Types.ObjectId;
+      let studentIdValue: string | undefined;
+      let studentName: string | undefined;
+
+      // Handle different cases for studentId
+      if (docObject.studentId === undefined || docObject.studentId === null) {
+        studentIdValue = undefined; // Allow undefined for optional studentId
+        studentName = undefined;
+      } else if (docObject.studentId instanceof Types.ObjectId) {
+        studentIdValue = docObject.studentId.toHexString(); // Convert ObjectId to string
+        studentName = undefined; // Not populated yet
+      } else if (typeof docObject.studentId === 'string') {
+        studentIdValue = docObject.studentId; // Use the string ID from DTO
+        studentName = undefined; // Not populated yet
+      } else {
+        // Handle populated student case
+        const student = docObject.studentId as PopulatedStudent;
+        studentIdValue = student._id.toHexString(); // Convert populated _id to string
+        studentName = student.fullName;
+      }
+
       return {
         ...docObject,
         _id: doc._id.toHexString(), // Convert ObjectId to string
-        studentId: doc.studentId instanceof Types.ObjectId ? doc.studentId.toHexString() : (doc.studentId as PopulatedStudent)._id.toHexString(), // Convert to string
-        studentName: student instanceof Types.ObjectId ? undefined : (student as PopulatedStudent).fullName, // Safely extract fullName
+        studentId: studentIdValue, // Assign the determined studentId (can be undefined)
+        studentName, // Assign the determined studentName
       };
     });
   }
