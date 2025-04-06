@@ -8,6 +8,7 @@ import { CashfreeService } from './cashfree.logic';
 import { PaymentLogicService } from './payment.logic';
 import { ConfigModule } from '@nestjs/config';
 import { BatchModule } from '../batch/batch.module';
+import { SendGridModule } from 'src/common/services/sendgrid.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { BatchModule } from '../batch/batch.module';
     OrderModule,
     ConfigModule,
     BatchModule,
+    SendGridModule,
   ],
   controllers: [PaymentController],
   providers: [PaymentDataService, CashfreeService, PaymentLogicService],
