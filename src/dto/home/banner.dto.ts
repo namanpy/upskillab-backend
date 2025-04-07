@@ -18,10 +18,10 @@ export class CreateBannerDto {
   @IsNotEmpty()
   description: string;
 
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  youtubeUrl: string;
+  // @ApiProperty()
+  // @IsString()
+  // @IsNotEmpty()
+  // youtubeUrl: string;
 
   @ApiProperty({ type: Boolean })
   @Transform(({ value }) => value === 'true' || value === true)
@@ -45,8 +45,8 @@ export class Banner {
   @ApiProperty()
   imageUrl: string;
 
-  @ApiProperty()
-  youtubeUrl: string;
+  // @ApiProperty()
+  // youtubeUrl: string;
 
   @ApiProperty()
   active: boolean;
