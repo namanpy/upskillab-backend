@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsArray, IsBoolean } from 'class-validator';
+import { IsString, IsNotEmpty, IsArray, IsBoolean, IsNumber } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateStoryDto {
   @ApiProperty()
@@ -20,47 +21,48 @@ export class CreateStoryDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  role: string; // New field
+  role: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  companyName: string; // New field
+  companyName: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  before: string; // New field
+  before: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  after: string; // New field
+  after: string;
 
   @ApiProperty({ type: [String] })
   @IsArray()
   @IsString({ each: true })
   @IsNotEmpty({ each: true })
-  skills: string[]; // New field, array of strings
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  duration: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  batch_Year: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  salaryIncrease: string;
+  @Transform(({ value }) => (typeof value === 'string' ? JSON.parse(value) : value))
+  skills: string[];
 
   @ApiProperty()
   @IsBoolean()
-  wallOfFame: boolean; // New field
+  wallOfFame: boolean;
+
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  salaryIncrease: number; // New field
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  batch_Year: string; // New field
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  duration: string; // New field
 }
 
 export class Story {
@@ -83,31 +85,31 @@ export class Story {
   companyLogoUrl: string;
 
   @ApiProperty()
-  role: string; // New field
+  role: string;
 
   @ApiProperty()
-  companyName: string; // New field
+  companyName: string;
 
   @ApiProperty()
-  before: string; // New field
+  before: string;
 
   @ApiProperty()
-  after: string; // New field
+  after: string;
 
   @ApiProperty({ type: [String] })
-  skills: string[]; // New field
+  skills: string[];
 
   @ApiProperty()
-  duration: string;
+  wallOfFame: boolean;
 
   @ApiProperty()
-  batch_Year: string;
+  salaryIncrease: number; // New field
 
   @ApiProperty()
-  salaryIncrease: string;
+  batch_Year: string; // New field
 
   @ApiProperty()
-  wallOfFame: boolean; // New field
+  duration: string; // New field
 
   @ApiProperty()
   createdAt: Date;
