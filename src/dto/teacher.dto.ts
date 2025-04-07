@@ -50,6 +50,9 @@ export class Teacher {
   user: Types.ObjectId;
 
   @ApiProperty()
+  name: string;
+
+  @ApiProperty()
   qualification: string;
 
   @ApiProperty()

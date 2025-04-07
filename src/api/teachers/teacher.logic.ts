@@ -15,6 +15,7 @@ export class TeacherLogicService {
     return {
       teachers: teachers.map((teacher) => ({
         _id: teacher._id,
+        name: teacher.name,
         user: teacher.user ? (teacher.user as any)._id.toString() : null,
         qualification: teacher.qualification,
         expertise: teacher.expertise,
