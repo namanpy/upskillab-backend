@@ -13,7 +13,15 @@ export class TeacherDataService {
   ) {}
 
   async getTeachers(input: GetTeacherRequestDTO) {
-    return this.teacherModel.find().populate<{ user: User }>('user').exec();
+    const { search, skip = 0, limit = 0 } = input;
+    return this.teacherModel
+      .find({
+        ...(search && { search }),
+      })
+      .skip(skip)
+      .limit(limit)
+      .populate<{ user: User }>('user')
+      .exec();
   }
 
   async createTeacher(
