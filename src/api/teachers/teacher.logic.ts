@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { TeacherDataService } from './teacher.data';
-import { CreateTeacherDto } from '../../dto/teacher.dto';
+import { CreateTeacherDto, GetTeacherRequestDTO } from '../../dto/teacher.dto';
 import { GetTeachersResponseDTO } from '../../dto/teacher.dto';
 // import { TeacherDocument } from '../../schemas/teacher.schema';
 
@@ -8,8 +8,10 @@ import { GetTeachersResponseDTO } from '../../dto/teacher.dto';
 export class TeacherLogicService {
   constructor(private teacherDataService: TeacherDataService) {}
 
-  async getTeachers(): Promise<GetTeachersResponseDTO> {
-    const teachers = await this.teacherDataService.getTeachers();
+  async getTeachers(
+    input: GetTeacherRequestDTO,
+  ): Promise<GetTeachersResponseDTO> {
+    const teachers = await this.teacherDataService.getTeachers(input);
     return {
       teachers: teachers.map((teacher) => ({
         _id: teacher._id,
