@@ -82,6 +82,7 @@ export class CourseLogicService {
         return {
           ...course,
           courseLevel: COURSE_LEVELS[course.courseLevel],
+
           seatsAvailable: batch?.remainingSeats || 0,
           studentsEnrolled: 5000,
           courseRating: 4.8,
@@ -231,6 +232,31 @@ export class CourseLogicService {
       course._id.toString(),
     );
 
+    // Format chapters and topics into weeks and sessions
+    const formattedWeeks = chaptersWithTopics.reduce(
+      (weeks, chapter, chapterIndex) => {
+        const weekNumber = chapter.week;
+
+        const weekExists = weeks.find((w) => w.week === `Week ${weekNumber}`);
+
+        const session = {
+          title: `Session ${chapter.session}: ${chapter.name}`,
+          topics: chapter.topics.map((topic) => topic.topicName),
+        };
+
+        if (weekExists) {
+          weekExists.sessions.push(session);
+        } else {
+          weeks.push({
+            week: `Week ${weekNumber}`,
+            sessions: [session],
+          });
+        }
+
+        return weeks;
+      },
+      [] as { week: string; sessions: { title: string; topics: string[] }[] }[],
+    );
     return {
       ...course,
       courseLevel: COURSE_LEVELS[course.courseLevel],
@@ -239,6 +265,7 @@ export class CourseLogicService {
       batch: batch ? batch : undefined,
       language,
       chapters: chaptersWithTopics,
+      weeks: formattedWeeks,
     };
   }
 }
