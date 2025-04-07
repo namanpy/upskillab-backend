@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UploadedFiles, UseInterceptors, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UploadedFiles, UseInterceptors, BadRequestException, UsePipes, ValidationPipe } from '@nestjs/common';
 import { StoriesLogicService } from './stories.logic';
 import { CreateStoryDto, GetStoriesResponseDTO } from '../../dto/stories.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ImageUploaderService } from '../../common/services/image-uploader.service';
 
 @ApiTags('stories')
@@ -21,15 +21,21 @@ export class StoriesController {
 
   @ApiResponse({ status: 201, description: 'Create a new story with image uploads' })
   @Post('')
-  @UseInterceptors(FilesInterceptor('images', 2)) // Allow up to 2 files
-  async createStory(@Body() createStoryDto: CreateStoryDto, @UploadedFiles() files: Express.Multer.File[]) {
-    if (!files || files.length < 2) {
-      throw new BadRequestException('Both user image and company logo are required');
+  @UseInterceptors(FileFieldsInterceptor([
+    { name: 'userImage', maxCount: 1 },
+    { name: 'companyLogoImage', maxCount: 1 },
+  ]))
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  async createStory(
+    @Body() createStoryDto: CreateStoryDto,
+    @UploadedFiles() files: { userImage?: Express.Multer.File[]; companyLogoImage?: Express.Multer.File[] },
+  ) {
+    if (!files.userImage || !files.companyLogoImage) {
+      throw new BadRequestException('Both userImage and companyLogoImage are required');
     }
 
-    const [userImage, companyLogo] = files;
-    const userImageUrl = await this.imageUploaderService.uploadImage(userImage, 'stories/users', Date.now().toString());
-    const companyLogoUrl = await this.imageUploaderService.uploadImage(companyLogo, 'stories/companies', Date.now().toString());
+    const userImageUrl = await this.imageUploaderService.uploadImage(files.userImage[0], 'stories/users', Date.now().toString());
+    const companyLogoUrl = await this.imageUploaderService.uploadImage(files.companyLogoImage[0], 'stories/companies', Date.now().toString());
 
     const storyData = { ...createStoryDto, userImageUrl, companyLogoUrl };
 
