@@ -7,9 +7,10 @@ import {
   Body,
   Param,
   BadRequestException,
+  Query,
 } from '@nestjs/common';
 import { TeacherLogicService } from './teacher.logic';
-import { CreateTeacherDto } from '../../dto/teacher.dto';
+import { CreateTeacherDto, GetTeacherRequestDTO } from '../../dto/teacher.dto';
 import { GetTeachersResponseDTO } from '../../dto/teacher.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -24,8 +25,10 @@ export class TeacherController {
     type: GetTeachersResponseDTO,
   })
   @Get('')
-  async getTeachers(): Promise<GetTeachersResponseDTO> {
-    return await this.teacherLogicService.getTeachers();
+  async getTeachers(
+    @Query() query: GetTeacherRequestDTO,
+  ): Promise<GetTeachersResponseDTO> {
+    return await this.teacherLogicService.getTeachers(query);
   }
 
   @ApiResponse({

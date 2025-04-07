@@ -66,6 +66,20 @@ export class Teacher {
   updatedAt: Date;
 }
 
+export class GetTeacherRequestDTO {
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  skip?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  limit?: number;
+}
 export class GetTeachersResponseDTO {
   @ApiProperty({ type: [Teacher] })
   teachers: Teacher[];

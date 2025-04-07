@@ -2,7 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Teacher, TeacherDocument } from '../../schemas/teacher.schema';
-import { CreateTeacherDto } from '../../dto/teacher.dto';
+import { CreateTeacherDto, GetTeacherRequestDTO } from '../../dto/teacher.dto';
 import { User } from '../../schemas/user.schema';
 
 @Injectable()
@@ -12,15 +12,19 @@ export class TeacherDataService {
     @InjectModel(User.name) private userModel: Model<User>,
   ) {}
 
-  async getTeachers(): Promise<TeacherDocument[]> {
-    return this.teacherModel.find().populate('user').exec();
+  async getTeachers(input: GetTeacherRequestDTO) {
+    return this.teacherModel.find().populate<{ user: User }>('user').exec();
   }
 
-  async createTeacher(createTeacherDto: CreateTeacherDto): Promise<TeacherDocument> {
+  async createTeacher(
+    createTeacherDto: CreateTeacherDto,
+  ): Promise<TeacherDocument> {
     // Validate user exists
     const user = await this.userModel.findById(createTeacherDto.user).exec();
     if (!user) {
-      throw new BadRequestException(`User with ID ${createTeacherDto.user} not found`);
+      throw new BadRequestException(
+        `User with ID ${createTeacherDto.user} not found`,
+      );
     }
 
     const newTeacher = new this.teacherModel(createTeacherDto);
@@ -38,7 +42,9 @@ export class TeacherDataService {
     if (updateTeacherDto.user) {
       const user = await this.userModel.findById(updateTeacherDto.user).exec();
       if (!user) {
-        throw new BadRequestException(`User with ID ${updateTeacherDto.user} not found`);
+        throw new BadRequestException(
+          `User with ID ${updateTeacherDto.user} not found`,
+        );
       }
     }
 
