@@ -16,7 +16,7 @@ export class TeacherDataService {
     const { search, skip = 0, limit = 0 } = input;
     return this.teacherModel
       .find({
-        ...(search && { search }),
+        ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
       })
       .skip(skip)
       .limit(limit)
