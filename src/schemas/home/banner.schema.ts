@@ -30,9 +30,9 @@ export class Banner {
   @Prop({ required: true })
   imageUrl: string;
 
-  @ApiProperty()
-  @Prop({ required: true })
-  youtubeUrl: string;
+  // @ApiProperty()
+  // @Prop({ required: true })
+  // youtubeUrl: string;
 
   @ApiProperty()
   @Prop({ default: false })
