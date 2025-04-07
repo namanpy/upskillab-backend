@@ -16,6 +16,11 @@ export class CreateTeacherDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  name: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   expertise: string;
 
   @ApiProperty()
