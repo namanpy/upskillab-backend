@@ -72,7 +72,9 @@ export class BatchLogicService {
       batch: {
         _id: batch._id.toString(),
         course: batch.course ? batch.course : null,
+        batchCode: batch.batchCode,
         startDate: batch.startDate.toISOString(),
+        startTime: batch.startTime,
         totalSeats: batch.totalSeats,
         remainingSeats: batch.remainingSeats,
         duration: batch.duration,
