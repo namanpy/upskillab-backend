@@ -68,12 +68,12 @@ export class BatchLogicService {
     return {
       batch: {
         _id: batch._id.toString(),
-        course: batch.course ? (batch.course as any)._id.toString() : null,
+        course: batch.course ? batch.course : null,
         startDate: batch.startDate.toISOString(),
         totalSeats: batch.totalSeats,
         remainingSeats: batch.remainingSeats,
         duration: batch.duration,
-        teacher: batch.teacher ? (batch.teacher as any)._id.toString() : null,
+        teacher: batch.teacher ? batch.teacher : null,
         imageUrl: batch.imageUrl,
         active: batch.active,
         createdAt: batch.createdAt,
