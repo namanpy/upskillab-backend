@@ -17,6 +17,10 @@ export class Batch {
   _id: Types.ObjectId;
 
   @ApiProperty()
+  @Prop({ required: true, unique: true })
+  batchCode: string;
+
+  @ApiProperty()
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: Course.name,
