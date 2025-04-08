@@ -19,6 +19,11 @@ export class CreateBatchDto {
   course: string;
 
   @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  batchCode: string;
+
+  @ApiProperty()
   @IsDateString()
   @IsNotEmpty()
   startDate: string;
@@ -67,6 +72,9 @@ export class BatchResponse {
 
   @ApiProperty({ type: Course, nullable: true })
   course: Course;
+
+  @ApiProperty()
+  batchCode: string;
 
   @ApiProperty()
   startTime: string;
@@ -121,6 +129,11 @@ export class GetUpcomingBatchesResponseDTO {
     type: 'string',
   })
   courseId: Types.ObjectId;
+
+  @ApiProperty({
+    type: 'string',
+  })
+  batchCode: string;
 
   @ApiProperty({
     type: 'string',

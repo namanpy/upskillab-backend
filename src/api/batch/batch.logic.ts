@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { BatchDataService } from './batch.data';
 import { CreateBatchDto } from '../../dto/course/batch.dto';
 import { GetBatchesResponseDTO } from '../../dto/course/batch.dto';
+import { Course } from 'src/schemas/course/course.schema';
 // import { BatchDocument } from '../../schemas/batch.schema';
 
 @Injectable()
@@ -14,6 +15,7 @@ export class BatchLogicService {
       batches: batches.map((batch) => ({
         _id: batch._id,
         course: batch.course,
+        batchCode: batch.batchCode,
         startTime: batch.startTime,
         startDate: batch.startDate,
         totalSeats: batch.totalSeats,
@@ -47,6 +49,7 @@ export class BatchLogicService {
       batch: {
         _id: batch._id.toString(),
         course: batch.course ? (batch.course as any)._id.toString() : null,
+        batchCode: batch.batchCode,
         startDate: batch.startDate.toISOString(),
         totalSeats: batch.totalSeats,
         remainingSeats: batch.remainingSeats,
