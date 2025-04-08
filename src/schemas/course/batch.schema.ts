@@ -24,9 +24,15 @@ export class Batch {
   })
   course: Types.ObjectId;
 
-  @ApiProperty()
-  @Prop({ required: true, min: 0, max: 24 })
-  startTime: number;
+  @ApiProperty({
+    description: 'Start time in 24-hour format (hh:mm)',
+    example: '14:30',
+  })
+  @Prop({
+    required: true,
+    match: /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/, // Validates time format hh:mm
+  })
+  startTime: string;
 
   @ApiProperty()
   @Prop({ required: true })

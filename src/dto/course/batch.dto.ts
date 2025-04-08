@@ -6,6 +6,7 @@ import {
   IsBoolean,
   IsDateString,
   IsOptional,
+  Matches,
 } from 'class-validator';
 import { Types } from 'mongoose';
 import { Course } from 'src/schemas/course/course.schema';
@@ -21,6 +22,17 @@ export class CreateBatchDto {
   @IsDateString()
   @IsNotEmpty()
   startDate: string;
+
+  @ApiProperty({
+    description: 'Start time in HH:mm format',
+    example: '09:30',
+  })
+  @IsString()
+  @IsNotEmpty()
+  @Matches(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/, {
+    message: 'Start time must be in HH:mm format (e.g., 09:30)',
+  })
+  startTime: string;
 
   @ApiProperty()
   @IsNumber()
@@ -57,7 +69,7 @@ export class BatchResponse {
   course: Course;
 
   @ApiProperty()
-  startTime: number;
+  startTime: string;
 
   @ApiProperty()
   startDate: Date;
@@ -134,7 +146,7 @@ export class GetUpcomingBatchesResponseDTO {
   totalSeats: number;
 
   @ApiProperty()
-  startTime: number;
+  startTime: string;
 
   @ApiProperty()
   classMode: string;
