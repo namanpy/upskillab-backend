@@ -1,12 +1,15 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UploadedFile, UseInterceptors, BadRequestException } from '@nestjs/common';
+// 
+
+
+import { Controller, Get, Post, Put, Patch, Delete, Body, Param, UploadedFile, UseInterceptors, BadRequestException } from '@nestjs/common';
 import { BannerLogicService } from './banner.logic';
 import { CreateBannerDto, GetBannersResponseDTO } from '../../../dto/home/banner.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageUploaderService } from '../../../common/services/image-uploader.service';
 
-@ApiTags('banners') // Updated tag to plural
-@Controller('banners') // Changed from 'banner' to 'banners'
+@ApiTags('banners') // Assuming you prefer 'banners' as the route
+@Controller('banners')
 export class BannerController {
   constructor(
     private bannerLogicService: BannerLogicService,
@@ -28,7 +31,7 @@ export class BannerController {
     }
 
     const imageUrl = await this.imageUploaderService.uploadImage(file, 'banners', Date.now().toString());
-    const bannerData = { ...createBannerDto, imageUrl }; // subtitle is included in createBannerDto
+    const bannerData = { ...createBannerDto, imageUrl };
 
     return await this.bannerLogicService.createBanner(bannerData);
   }
@@ -39,10 +42,40 @@ export class BannerController {
     return await this.bannerLogicService.getBannerById(id);
   }
 
-  @ApiResponse({ status: 200, description: 'Update a banner by ID' })
+  @ApiResponse({ status: 200, description: 'Update a banner fully by ID (all fields required)' })
   @Put(':id')
-  async updateBanner(@Param('id') id: string, @Body() updateBannerDto: Partial<CreateBannerDto>) {
-    return await this.bannerLogicService.updateBanner(id, updateBannerDto);
+  @UseInterceptors(FileInterceptor('image'))
+  async updateBanner(
+    @Param('id') id: string,
+    @Body() updateBannerDto: CreateBannerDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new BadRequestException('Image file is required for full update');
+    }
+
+    const imageUrl = await this.imageUploaderService.uploadImage(file, 'banners', `${id}-${Date.now()}`);
+    const bannerData = { ...updateBannerDto, imageUrl };
+
+    return await this.bannerLogicService.updateBanner(id, bannerData);
+  }
+
+  @ApiResponse({ status: 200, description: 'Partially update a banner by ID (fields optional)' })
+  @Patch(':id')
+  @UseInterceptors(FileInterceptor('image'))
+  async patchBanner(
+    @Param('id') id: string,
+    @Body() updateBannerDto: Partial<CreateBannerDto>,
+    @UploadedFile() file?: Express.Multer.File, // Optional file
+  ) {
+    let bannerData: Partial<CreateBannerDto & { imageUrl: string }> = { ...updateBannerDto };
+
+    if (file) {
+      const imageUrl = await this.imageUploaderService.uploadImage(file, 'banners', `${id}-${Date.now()}`);
+      bannerData = { ...bannerData, imageUrl };
+    }
+
+    return await this.bannerLogicService.updateBanner(id, bannerData);
   }
 
   @ApiResponse({ status: 200, description: 'Delete a banner by ID' })
