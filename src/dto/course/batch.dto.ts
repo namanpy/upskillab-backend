@@ -45,9 +45,9 @@ export class CreateBatchDto {
   remainingSeats: number;
 
   @ApiProperty()
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  duration: string;
+  duration: number;
 
   @ApiProperty()
   @IsString()
