@@ -45,7 +45,7 @@ export interface OrderResponse {
   createdAt: Date;
   updatedAt: Date;
   user: OrderUser;
-  student: OrderStudent;
+  student?: OrderStudent;
   batch: OrderBatch;
 }
 
