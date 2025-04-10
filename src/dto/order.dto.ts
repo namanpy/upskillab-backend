@@ -172,13 +172,10 @@ export class OrderBatchDto {
   _id: string;
 
   @ApiProperty({ description: 'Batch name' })
-  name: string;
+  batchCode: string;
 
   @ApiProperty({ description: 'Start date' })
   startDate: Date;
-
-  @ApiProperty({ description: 'End date' })
-  endDate: Date;
 }
 
 export class GetOrdersResponseDto {
