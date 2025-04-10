@@ -32,9 +32,8 @@ export interface OrderStudent {
 
 export interface OrderBatch {
   _id: Types.ObjectId;
-  name: string;
+  batchCode: string;
   startDate: Date;
-  endDate: Date;
 }
 
 export interface OrderResponse {
