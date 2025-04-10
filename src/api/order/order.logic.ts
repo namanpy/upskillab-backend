@@ -69,6 +69,10 @@ export class OrderLogicService {
           ...order.batch,
           _id: order.batch._id.toString(),
         },
+        student: {
+          ...order.student,
+          _id: order.student._id.toString(),
+        },
       })),
       total,
     };
