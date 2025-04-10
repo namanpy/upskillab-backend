@@ -1,4 +1,11 @@
-import { Controller, Post, UploadedFiles, UseInterceptors, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  UploadedFiles,
+  UseInterceptors,
+  BadRequestException,
+  Query,
+} from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { FileUploaderService } from '../../common/services/file-uploader.service';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -15,12 +22,19 @@ export class FileController {
   })
   @Post('')
   @UseInterceptors(FilesInterceptor('files'))
-  async uploadFiles(@UploadedFiles() files: Express.Multer.File[]) {
+  async uploadFiles(
+    @Query() input: { attachment?: boolean; attachmentName?: string },
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
     if (!files || files.length === 0) {
       throw new BadRequestException('At least one file is required');
     }
 
-    const uploadedFiles = await this.fileUploaderService.uploadFiles(files, 'files');
+    const uploadedFiles = await this.fileUploaderService.uploadFiles(
+      files,
+      'files',
+      input,
+    );
 
     return {
       files: uploadedFiles,

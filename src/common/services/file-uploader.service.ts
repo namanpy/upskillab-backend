@@ -14,7 +14,16 @@ export class FileUploaderService {
     });
   }
 
-  private async uploadSingleFile(file: Express.Multer.File, folder: string, fileId: string): Promise<string> {
+  private async uploadSingleFile(
+    file: Express.Multer.File,
+    folder: string,
+    fileId: string,
+    options: {
+      mimeType?: string;
+      contentDisposition?: string;
+    } = {},
+  ): Promise<string> {
+    const { mimeType, contentDisposition } = options;
     const bucketName = this.configService.get<string>('AWS_S3_BUCKET');
     if (!bucketName) {
       throw new BadRequestException('S3 bucket name not configured');
@@ -22,37 +31,68 @@ export class FileUploaderService {
 
     const key = `${folder}/${fileId}-${file.originalname}`;
 
-    const params = {
+    const params: S3.Types.PutObjectRequest = {
       Bucket: bucketName,
       Key: key,
       Body: file.buffer,
       ContentType: file.mimetype,
-    //   ACL: 'public-read',
+      ...(mimeType && { MimeType: mimeType }),
+      ...(contentDisposition && { ContentDisposition: contentDisposition }),
+      //   ACL: 'public-read',
     };
 
     try {
       const data = await this.s3.upload(params).promise();
-      return data.Location || `https://${bucketName}.s3.${this.configService.get<string>('AWS_REGION')}.amazonaws.com/${key}`;
+      return (
+        data.Location ||
+        `https://${bucketName}.s3.${this.configService.get<string>('AWS_REGION')}.amazonaws.com/${key}`
+      );
     } catch (error) {
-      throw new BadRequestException(`Failed to upload file ${file.originalname}: ${error.message}`);
+      throw new BadRequestException(
+        `Failed to upload file ${file.originalname}: ${error.message}`,
+      );
     }
   }
 
-  async uploadFiles(files: Express.Multer.File[], folder: string): Promise<{ filename: string; fileId: string; fileUrl: string }[]> {
+  async uploadFiles(
+    files: Express.Multer.File[],
+    folder: string,
+    options: { attachment?: boolean; attachmentName?: string } = {},
+  ): Promise<{ filename: string; fileId: string; fileUrl: string }[]> {
+    const { attachment, attachmentName } = options;
+
     if (!files || files.length === 0) {
       throw new BadRequestException('At least one file is required');
     }
 
-    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
+    const allowedMimeTypes = [
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'application/pdf',
+    ];
 
     const uploadResults = await Promise.all(
       files.map(async (file) => {
         if (!allowedMimeTypes.includes(file.mimetype)) {
-          throw new BadRequestException(`File type ${file.originalname} (${file.mimetype}) not allowed. Only JPEG, PNG, GIF, and PDF are supported.`);
+          throw new BadRequestException(
+            `File type ${file.originalname} (${file.mimetype}) not allowed. Only JPEG, PNG, GIF, and PDF are supported.`,
+          );
         }
 
-        const fileId = Date.now().toString() + Math.random().toString(36).substring(2, 15);
-        const fileUrl = await this.uploadSingleFile(file, folder, fileId);
+        const fileId =
+          Date.now().toString() + Math.random().toString(36).substring(2, 15);
+        const fileUrl = await this.uploadSingleFile(
+          file,
+          folder,
+          fileId,
+          attachment && attachmentName
+            ? {
+                mimeType: file.mimetype,
+                contentDisposition: `attachment; filename="${attachmentName}"`,
+              }
+            : {},
+        );
 
         return {
           filename: file.originalname,
