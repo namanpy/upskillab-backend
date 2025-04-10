@@ -108,4 +108,86 @@ export class OrderDataService {
 
     return existingOrder.length ? existingOrder[0] : undefined;
   }
+
+  async getAllOrders(params: {
+    skip?: number;
+    limit?: number;
+    search?: string;
+    sortByDate?: 'asc' | 'desc';
+  }) {
+    const { skip = 0, limit = 10, search, sortByDate = 'desc' } = params;
+
+    const query = this.orderModel.aggregate([
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'user',
+          foreignField: '_id',
+          as: 'user',
+        },
+      },
+      {
+        $unwind: '$user',
+      },
+      {
+        $lookup: {
+          from: 'students',
+          localField: 'user._id',
+          foreignField: 'user',
+          as: 'student',
+        },
+      },
+      {
+        $unwind: {
+          path: '$student',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'batches',
+          localField: 'batch',
+          foreignField: '_id',
+          as: 'batch',
+        },
+      },
+      {
+        $unwind: '$batch',
+      },
+    ]);
+
+    if (search) {
+      query.append({
+        $match: {
+          $or: [
+            { 'user.username': { $regex: search, $options: 'i' } },
+            { 'student.fullName': { $regex: search, $options: 'i' } },
+          ],
+        },
+      });
+    }
+
+    const countQuery = query.pipeline();
+    const total = await this.orderModel.aggregate(countQuery).count('total');
+
+    query
+      .append({
+        $sort: {
+          createdAt: sortByDate === 'asc' ? 1 : -1,
+        },
+      })
+      .append({
+        $skip: skip,
+      })
+      .append({
+        $limit: limit,
+      });
+
+    const orders = await query.exec();
+
+    return {
+      orders,
+      total: total[0]?.total || 0,
+    };
+  }
 }

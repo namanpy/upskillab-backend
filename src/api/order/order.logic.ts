@@ -48,4 +48,29 @@ export class OrderLogicService {
       batch: order.batch._id.toString(),
     }));
   }
+
+  async getAllOrders(params: {
+    skip?: number;
+    limit?: number;
+    search?: string;
+    sortByDate?: 'asc' | 'desc';
+  }) {
+    const { orders, total } = await this.orderDataService.getAllOrders(params);
+
+    return {
+      orders: orders.map((order) => ({
+        ...order,
+        _id: order._id.toString(),
+        user: {
+          ...order.user,
+          _id: order.user._id.toString(),
+        },
+        batch: {
+          ...order.batch,
+          _id: order.batch._id.toString(),
+        },
+      })),
+      total,
+    };
+  }
 }

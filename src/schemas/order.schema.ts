@@ -33,7 +33,7 @@ export class Order extends MongooseDocument {
   amountPaid: number;
 
   @ApiProperty({
-    description: 'Amount paid by user',
+    description: 'Order status',
     type: String,
   })
   @Prop({ required: true, type: String, enum: Object.keys(ORDER_STATUS) })
