@@ -5,6 +5,7 @@ import {
   IsNotEmpty,
   IsEnum,
   IsMongoId,
+  IsOptional,
 } from 'class-validator';
 import { ORDER_STATUS } from 'src/common/constants/order.constants';
 import { STUDENT_TYPE } from 'src/common/constants/student.constants';
@@ -126,6 +127,7 @@ export class GetOrdersQueryDto {
     example: 'john',
   })
   @IsString()
+  @IsOptional()
   search?: string;
 
   @ApiPropertyOptional({
