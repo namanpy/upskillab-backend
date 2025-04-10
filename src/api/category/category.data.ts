@@ -74,7 +74,10 @@ export class CategoryDataService {
         categoryCode: update.categoryCode,
       });
 
-      if (existingCategory) {
+      if (
+        existingCategory &&
+        categoryId.toString() !== existingCategory._id.toString()
+      ) {
         throw new CustomError(ERROR.CATEGORY_ALREADY_EXISTS);
       }
     }
