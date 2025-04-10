@@ -84,9 +84,12 @@ export class CashfreeService {
     }
   }
 
-  async fetchOrderStatus(orderId: string) {
+  async fetchPaymentStatus(orderId: string, paymentId: string) {
     try {
-      const response = await this.cashfree.PGFetchOrder(orderId);
+      const response = await this.cashfree.PGOrderFetchPayment(
+        orderId,
+        paymentId,
+      );
 
       const orderData = response.data;
 
@@ -98,7 +101,7 @@ export class CashfreeService {
 
       // Map Cashfree status to internal payment status
       let paymentStatus;
-      switch (orderData.order_status) {
+      switch (orderData.payment_status) {
         case CASHFREE_PAYMENT_STATUS.SUCCESS.code:
           paymentStatus = PAYMENT_STATUS.COMPLETED.code;
           break;

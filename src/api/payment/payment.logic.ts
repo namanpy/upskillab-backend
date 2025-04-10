@@ -28,14 +28,19 @@ export class PaymentLogicService {
         order_tags: null;
       };
       payment: {
+        cf_payment_id: string;
         payment_status: string;
         payment_message: string;
       };
     };
   }) {
     const { order_id } = webhookData.data.order;
+    const { cf_payment_id } = webhookData.data.payment;
 
-    const payment = await this.cashfreeService.fetchOrderStatus(order_id);
+    const payment = await this.cashfreeService.fetchPaymentStatus(
+      order_id,
+      cf_payment_id,
+    );
 
     const { status } = payment;
 
