@@ -146,7 +146,7 @@ export class GetCategoryByCodeResponseDto {
   @ApiProperty()
   categoryImage: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   categoryLogo?: string;
 
   @ApiProperty()
