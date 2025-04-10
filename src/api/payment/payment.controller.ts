@@ -19,6 +19,7 @@ export class PaymentController {
           order_tags: null;
         };
         payment: {
+          cf_payment_id: string;
           payment_status: string;
           payment_message: string;
         };
