@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { StoriesController } from './stories.controller';
-import { StoriesLogicService } from './stories.logic';
-import { StoriesDataService } from './stories.data';
+import { StoryController } from './stories.controller'; // Fixed from StoriesController
+import { StoryLogicService } from './stories.logic'; // Fixed from StoriesLogicService
+import { StoryDataService } from './stories.data';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Story, StorySchema } from '../../schemas/stories.schema';
 import { ImageUploaderService } from '../../common/services/image-uploader.service';
@@ -12,7 +12,7 @@ import { ConfigModule } from '@nestjs/config';
     ConfigModule.forRoot(),
     MongooseModule.forFeature([{ name: Story.name, schema: StorySchema }]),
   ],
-  providers: [StoriesDataService, StoriesLogicService, ImageUploaderService],
-  controllers: [StoriesController],
+  providers: [StoryDataService, StoryLogicService, ImageUploaderService],
+  controllers: [StoryController],
 })
 export class StoriesModule {}
