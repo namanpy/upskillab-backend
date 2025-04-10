@@ -10,6 +10,8 @@ import { ORDER_STATUS } from 'src/common/constants/order.constants';
 import { BatchRegistrationRequestDto } from 'src/dto/registration.dto';
 import { SendGridService } from 'src/common/services/sendgrid.service';
 import { USER_TYPES } from 'src/common/constants/user.constants';
+import { StudentDataService } from '../student/student.data';
+import { STUDENT_TYPE } from 'src/common/constants/student.constants';
 
 @Injectable()
 export class RegistrationLogicService {
@@ -19,6 +21,7 @@ export class RegistrationLogicService {
     private batchDataService: BatchDataService,
     private cashfreeService: CashfreeService,
     private sendGridService: SendGridService,
+    private studentDataService: StudentDataService,
   ) {}
 
   async registerForBatch(registrationData: BatchRegistrationRequestDto) {
@@ -45,6 +48,12 @@ export class RegistrationLogicService {
         email: registrationData.email,
         username: `user_${Math.random().toString(36).substring(2, 10)}`,
         userType: USER_TYPES.STUDENT,
+      });
+
+      await this.studentDataService.createStudent({
+        user: user._id,
+        fullName: registrationData.name,
+        studentType: STUDENT_TYPE.REGULAR.code,
       });
 
       // Send welcome email
