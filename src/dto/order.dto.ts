@@ -7,6 +7,7 @@ import {
   IsMongoId,
 } from 'class-validator';
 import { ORDER_STATUS } from 'src/common/constants/order.constants';
+import { STUDENT_TYPE } from 'src/common/constants/student.constants';
 import { Batch } from 'src/schemas/course/batch.schema';
 import { User } from 'src/schemas/user.schema';
 
@@ -136,15 +137,62 @@ export class GetOrdersQueryDto {
   sortByDate?: 'asc' | 'desc' = 'desc';
 }
 
-export class GetOrdersResponseDto {
-  @ApiProperty({
-    type: [GetOrderResponseDto],
-  })
-  orders: GetOrderResponseDto[];
+export class OrderUserDto {
+  @ApiProperty({ description: 'User ID' })
+  _id: string;
 
-  @ApiProperty({
-    description: 'Total number of orders',
-    example: 100,
-  })
+  @ApiProperty({ description: 'User email' })
+  email: string;
+
+  @ApiProperty({ description: 'Username' })
+  username: string;
+
+  @ApiPropertyOptional({ description: 'Mobile number' })
+  mobileNumber?: string;
+}
+
+export class OrderStudentDto {
+  @ApiProperty({ description: 'Student ID' })
+  _id: string;
+
+  @ApiProperty({ description: 'Full name' })
+  fullName: string;
+
+  @ApiPropertyOptional({ description: 'College name' })
+  college?: string;
+
+  @ApiProperty({ description: 'Student type', enum: Object.keys(STUDENT_TYPE) })
+  studentType: string;
+}
+
+export class OrderBatchDto {
+  @ApiProperty({ description: 'Batch ID' })
+  _id: string;
+
+  @ApiProperty({ description: 'Batch name' })
+  name: string;
+
+  @ApiProperty({ description: 'Start date' })
+  startDate: Date;
+
+  @ApiProperty({ description: 'End date' })
+  endDate: Date;
+}
+
+export class GetOrdersResponseDto {
+  @ApiProperty({ type: [Object] })
+  orders: {
+    _id: string;
+    totalAmount: number;
+    amountPaid: number;
+    status: string;
+    createdAt: Date;
+    updatedAt: Date;
+    user: OrderUserDto;
+    student?: OrderStudentDto;
+    batch: OrderBatchDto;
+  }[];
+
+  @ApiProperty({ description: 'Total number of orders' })
   total: number;
 }

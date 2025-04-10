@@ -9,6 +9,51 @@ import { Batch } from 'src/schemas/course/batch.schema';
 import { MongooseDocument } from 'src/schemas/common.schema';
 import { Types } from 'mongoose';
 
+export interface GetAllOrdersParams {
+  skip?: number;
+  limit?: number;
+  search?: string;
+  sortByDate?: 'asc' | 'desc';
+}
+
+export interface OrderUser {
+  _id: Types.ObjectId;
+  email: string;
+  username: string;
+  mobileNumber: string;
+}
+
+export interface OrderStudent {
+  _id: Types.ObjectId;
+  fullName: string;
+  college: string;
+  studentType: string;
+}
+
+export interface OrderBatch {
+  _id: Types.ObjectId;
+  name: string;
+  startDate: Date;
+  endDate: Date;
+}
+
+export interface OrderResponse {
+  _id: Types.ObjectId;
+  totalAmount: number;
+  amountPaid: number;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  user: OrderUser;
+  student: OrderStudent;
+  batch: OrderBatch;
+}
+
+export interface GetAllOrdersResult {
+  orders: OrderResponse[];
+  total: number;
+}
+
 @Injectable()
 export class OrderDataService {
   constructor(@InjectModel(Order.name) private orderModel: Model<Order>) {}
@@ -109,12 +154,7 @@ export class OrderDataService {
     return existingOrder.length ? existingOrder[0] : undefined;
   }
 
-  async getAllOrders(params: {
-    skip?: number;
-    limit?: number;
-    search?: string;
-    sortByDate?: 'asc' | 'desc';
-  }) {
+  async getAllOrders(params: GetAllOrdersParams): Promise<GetAllOrdersResult> {
     const { skip = 0, limit = 10, search, sortByDate = 'desc' } = params;
 
     const query = this.orderModel.aggregate([
@@ -153,6 +193,28 @@ export class OrderDataService {
       },
       {
         $unwind: '$batch',
+      },
+      {
+        $project: {
+          _id: 1,
+          totalAmount: 1,
+          amountPaid: 1,
+          status: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          'user._id': 1,
+          'user.email': 1,
+          'user.username': 1,
+          'user.mobileNumber': 1,
+          'student._id': 1,
+          'student.fullName': 1,
+          'student.college': 1,
+          'student.studentType': 1,
+          'batch._id': 1,
+          'batch.name': 1,
+          'batch.startDate': 1,
+          'batch.endDate': 1,
+        },
       },
     ]);
 
