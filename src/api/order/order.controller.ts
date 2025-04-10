@@ -17,6 +17,8 @@ import {
   GetOrderResponseDto,
 } from '../../dto/order.dto';
 import { ERROR } from 'src/common/constants/error.constants';
+import { Query } from '@nestjs/common';
+import { GetOrdersQueryDto, GetOrdersResponseDto } from '../../dto/order.dto';
 
 @ApiTags('orders')
 @Controller('orders')
@@ -83,5 +85,21 @@ export class OrderController {
   })
   async getOrdersByUser(@Param('userId') userId: string) {
     return await this.orderLogicService.getOrdersByUser(userId);
+  }
+
+  @Get()
+  @ApiResponse({
+    status: 200,
+    type: GetOrdersResponseDto,
+  })
+  async getAllOrders(
+    @Query() query: GetOrdersQueryDto,
+  ): Promise<GetOrdersResponseDto> {
+    return await this.orderLogicService.getAllOrders({
+      skip: Number(query.skip),
+      limit: Number(query.limit),
+      search: query.search,
+      sortByDate: query.sortByDate,
+    });
   }
 }

@@ -104,3 +104,47 @@ export class GetOrderResponseDto {
   })
   batch: Batch;
 }
+
+export class GetOrdersQueryDto {
+  @ApiPropertyOptional({
+    description: 'Number of records to skip',
+    example: 0,
+  })
+  @IsNumber()
+  skip?: number = 0;
+
+  @ApiPropertyOptional({
+    description: 'Number of records to return',
+    example: 10,
+  })
+  @IsNumber()
+  limit?: number = 10;
+
+  @ApiPropertyOptional({
+    description: 'Search in username and student name',
+    example: 'john',
+  })
+  @IsString()
+  search?: string;
+
+  @ApiPropertyOptional({
+    description: 'Sort by date (asc/desc)',
+    example: 'desc',
+    enum: ['asc', 'desc'],
+  })
+  @IsString()
+  sortByDate?: 'asc' | 'desc' = 'desc';
+}
+
+export class GetOrdersResponseDto {
+  @ApiProperty({
+    type: [GetOrderResponseDto],
+  })
+  orders: GetOrderResponseDto[];
+
+  @ApiProperty({
+    description: 'Total number of orders',
+    example: 100,
+  })
+  total: number;
+}
