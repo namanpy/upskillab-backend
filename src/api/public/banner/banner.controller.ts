@@ -22,7 +22,7 @@ export class BannerController {
   @ApiResponse({ status: 201, description: 'Create a new banner with image upload' })
   @Post('')
   @UseInterceptors(FileInterceptor('image'))
-  async createBanner(@Body() createBannerDto: Partial<CreateBannerDto>, @UploadedFile() file: Express.Multer.File) {
+  async createBanner(@Body() createBannerDto: CreateBannerDto, @UploadedFile() file: Express.Multer.File) {
     if (!file) {
       throw new BadRequestException('Image file is required');
     }
