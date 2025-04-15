@@ -18,9 +18,9 @@ export class PremiumLearningExperience {
   @Prop({ required: true })
   title: string;
 
-  @ApiProperty()
-  @Prop({ required: true })
-  description: string;
+  // @ApiProperty()
+  // @Prop({ required: true })
+  // description: string;
 
   @ApiProperty()
   @Prop({ required: true })

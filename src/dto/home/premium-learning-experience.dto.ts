@@ -1,20 +1,42 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsBoolean } from 'class-validator';
+import { IsString, IsNotEmpty, IsBoolean, Validate, IsOptional } from 'class-validator';
+import WordCountValidator from '../../common/utils/word-count.validator';
 
 export class CreatePremiumLearningExperienceDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  @Validate(WordCountValidator, [6])
   title: string;
 
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  description: string; // Changed from string[] to string
+  // @ApiProperty()
+  // @IsString()
+  // @IsNotEmpty()
+  // @Validate(WordCountValidator, [20])
+  // description: string;
 
   @ApiProperty()
   @IsBoolean()
   active: boolean;
+}
+
+export class UpdatePremiumLearningExperienceDto {
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  @Validate(WordCountValidator, [6])
+  title?: string;
+
+  // @ApiProperty({ required: false })
+  // @IsString()
+  // @IsOptional()
+  // @Validate(WordCountValidator, [20])
+  // description?: string;
+
+  @ApiProperty({ required: false, type: Boolean })
+  @IsBoolean()
+  @IsOptional()
+  active?: boolean;
 }
 
 export class PremiumLearningExperience {
@@ -24,8 +46,8 @@ export class PremiumLearningExperience {
   @ApiProperty()
   title: string;
 
-  @ApiProperty()
-  description: string; // Changed from string[] to string
+  // @ApiProperty()
+  // description: string;
 
   @ApiProperty()
   imageUrl: string;

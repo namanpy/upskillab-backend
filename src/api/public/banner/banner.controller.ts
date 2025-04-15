@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Patch, Delete, Body, Param, UploadedFile, UseInterceptors, BadRequestException } from '@nestjs/common';
 import { BannerLogicService } from './banner.logic';
-import { CreateBannerDto, GetBannersResponseDTO } from '../../../dto/home/banner.dto';
+import { CreateBannerDto, UpdateBannerDto, GetBannersResponseDTO } from '../../../dto/home/banner.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageUploaderService } from '../../../common/services/image-uploader.service';
@@ -22,7 +22,7 @@ export class BannerController {
   @ApiResponse({ status: 201, description: 'Create a new banner with image upload' })
   @Post('')
   @UseInterceptors(FileInterceptor('image'))
-  async createBanner(@Body() createBannerDto: CreateBannerDto, @UploadedFile() file: Express.Multer.File) {
+  async createBanner(@Body() createBannerDto: Partial<CreateBannerDto>, @UploadedFile() file: Express.Multer.File) {
     if (!file) {
       throw new BadRequestException('Image file is required');
     }
@@ -30,7 +30,11 @@ export class BannerController {
     const imageUrl = await this.imageUploaderService.uploadImage(file, 'banners', Date.now().toString());
     const bannerData = { ...createBannerDto, imageUrl };
 
-    return await this.bannerLogicService.createBanner(bannerData);
+    const createdBanner = await this.bannerLogicService.createBanner(bannerData as CreateBannerDto & { imageUrl: string });
+    return {
+      ...createdBanner,
+      imageUrl, // Ensure imageUrl is returned
+    };
   }
 
   @ApiResponse({ status: 200, description: 'Get a single banner by ID' })
@@ -44,17 +48,28 @@ export class BannerController {
   @UseInterceptors(FileInterceptor('image'))
   async updateBanner(
     @Param('id') id: string,
-    @Body() updateBannerDto: Partial<CreateBannerDto>,
-    @UploadedFile() file?: Express.Multer.File, // Image is optional
+    @Body() updateBannerDto: UpdateBannerDto,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
-    let bannerData: Partial<CreateBannerDto & { imageUrl: string }> = { ...updateBannerDto };
+    let bannerData: Partial<UpdateBannerDto & { imageUrl?: string }> = { ...updateBannerDto };
 
+    let newImageUrl: string | undefined;
     if (file) {
-      const imageUrl = await this.imageUploaderService.uploadImage(file, 'banners', `${id}-${Date.now()}`);
-      bannerData = { ...bannerData, imageUrl };
+      newImageUrl = await this.imageUploaderService.uploadImage(file, 'banners', `${id}-${Date.now()}`);
+      bannerData = { ...bannerData, imageUrl: newImageUrl };
+    } else if (!bannerData.imageUrl) {
+      // If no new file and no imageUrl in body, keep existing
+      const existingBanner = await this.bannerLogicService.getBannerById(id);
+      if (existingBanner && existingBanner.banner.imageUrl) {
+        bannerData.imageUrl = existingBanner.banner.imageUrl;
+      }
     }
 
-    return await this.bannerLogicService.updateBanner(id, bannerData);
+    const updatedBanner = await this.bannerLogicService.updateBanner(id, bannerData);
+    return {
+      ...updatedBanner,
+      imageUrl: newImageUrl || updatedBanner.banner.imageUrl, // Return new or existing imageUrl
+    };
   }
 
   @ApiResponse({ status: 200, description: 'Partially update a banner by ID (fields optional)' })
@@ -62,17 +77,28 @@ export class BannerController {
   @UseInterceptors(FileInterceptor('image'))
   async patchBanner(
     @Param('id') id: string,
-    @Body() updateBannerDto: Partial<CreateBannerDto>,
-    @UploadedFile() file?: Express.Multer.File, // Image is optional
+    @Body() updateBannerDto: UpdateBannerDto,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
-    let bannerData: Partial<CreateBannerDto & { imageUrl: string }> = { ...updateBannerDto };
+    let bannerData: Partial<UpdateBannerDto & { imageUrl?: string }> = { ...updateBannerDto };
 
+    let newImageUrl: string | undefined;
     if (file) {
-      const imageUrl = await this.imageUploaderService.uploadImage(file, 'banners', `${id}-${Date.now()}`);
-      bannerData = { ...bannerData, imageUrl };
+      newImageUrl = await this.imageUploaderService.uploadImage(file, 'banners', `${id}-${Date.now()}`);
+      bannerData = { ...bannerData, imageUrl: newImageUrl };
+    } else if (!bannerData.imageUrl) {
+      // If no new file and no imageUrl in body, keep existing
+      const existingBanner = await this.bannerLogicService.getBannerById(id);
+      if (existingBanner && existingBanner.banner.imageUrl) {
+        bannerData.imageUrl = existingBanner.banner.imageUrl;
+      }
     }
 
-    return await this.bannerLogicService.updateBanner(id, bannerData);
+    const updatedBanner = await this.bannerLogicService.updateBanner(id, bannerData);
+    return {
+      ...updatedBanner,
+      imageUrl: newImageUrl || updatedBanner.banner.imageUrl, // Return new or existing imageUrl
+    };
   }
 
   @ApiResponse({ status: 200, description: 'Delete a banner by ID' })
