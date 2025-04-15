@@ -22,9 +22,9 @@ export class Banner3 {
   @Prop({ required: true })
   imageUrl: string;
 
-  @ApiProperty()
-  @Prop({ required: true })
-  descriptions: string;
+  // @ApiProperty()
+  // @Prop({ required: true })
+  // descriptions: string;
 
   @ApiProperty()
   @Prop({ default: true })

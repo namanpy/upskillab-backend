@@ -1,32 +1,67 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsBoolean } from 'class-validator';
+import { IsString, IsNotEmpty, IsBoolean, Validate, IsOptional } from 'class-validator';
 import { Transform } from 'class-transformer';
+import WordCountValidator from '../../common/utils/word-count.validator';
 
 export class CreateBannerDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  @Validate(WordCountValidator, [6])
   title: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  subtitle: string; // Added subtitle field
+  @Validate(WordCountValidator, [10])
+  subtitle: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  @Validate(WordCountValidator, [20])
   description: string;
 
-  // @ApiProperty()
-  // @IsString()
-  // @IsNotEmpty()
-  // youtubeUrl: string;
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  imageUrl: string;
 
   @ApiProperty({ type: Boolean })
   @Transform(({ value }) => value === 'true' || value === true)
   @IsBoolean()
-  active: boolean; // Will be handled as boolean, even if string "true"/"false" is sent
+  active: boolean;
+}
+
+export class UpdateBannerDto {
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  @Validate(WordCountValidator, [6])
+  title?: string;
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  @Validate(WordCountValidator, [10])
+  subtitle?: string;
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  @Validate(WordCountValidator, [20])
+  description?: string;
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  imageUrl?: string;
+
+  @ApiProperty({ required: false, type: Boolean })
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
+  @IsOptional()
+  active?: boolean;
 }
 
 export class Banner {
@@ -37,16 +72,13 @@ export class Banner {
   title: string;
 
   @ApiProperty()
-  subtitle: string; // Added subtitle field
+  subtitle: string;
 
   @ApiProperty()
   description: string;
 
   @ApiProperty()
   imageUrl: string;
-
-  // @ApiProperty()
-  // youtubeUrl: string;
 
   @ApiProperty()
   active: boolean;

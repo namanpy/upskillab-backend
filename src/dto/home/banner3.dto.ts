@@ -1,20 +1,40 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsBoolean } from 'class-validator';
+import { IsString, IsNotEmpty, IsBoolean, Validate, IsOptional } from 'class-validator';
+import WordCountValidator from '../../common/utils/word-count.validator';
 
 export class CreateBanner3Dto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  @Validate(WordCountValidator, [6])
   title: string;
 
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  descriptions: string;
+  // @ApiProperty()
+  // @IsString()
+  // @IsNotEmpty()
+  // descriptions: string;
 
   @ApiProperty()
   @IsBoolean()
   active: boolean;
+}
+
+export class UpdateBanner3Dto {
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  @Validate(WordCountValidator, [6])
+  title?: string;
+
+  // @ApiProperty({ required: false })
+  // @IsString()
+  // @IsOptional()
+  // descriptions?: string;
+
+  @ApiProperty({ required: false, type: Boolean })
+  @IsBoolean()
+  @IsOptional()
+  active?: boolean;
 }
 
 export class Banner3 {
@@ -24,8 +44,8 @@ export class Banner3 {
   @ApiProperty()
   title: string;
 
-  @ApiProperty()
-  descriptions: string;
+  // @ApiProperty()
+  // descriptions: string;
 
   @ApiProperty()
   imageUrl: string;

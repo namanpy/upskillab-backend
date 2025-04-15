@@ -20,6 +20,10 @@ export class Banner4 {
 
   @ApiProperty()
   @Prop({ required: true })
+  descriptions: string;
+
+  @ApiProperty()
+  @Prop({ required: true })
   imageUrl: string;
 
   @ApiProperty()
