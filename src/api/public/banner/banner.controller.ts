@@ -28,9 +28,9 @@ export class BannerController {
     }
 
     const imageUrl = await this.imageUploaderService.uploadImage(file, 'banners', Date.now().toString());
-    const bannerData = { ...createBannerDto, imageUrl };
+    const bannerData = { ...createBannerDto, imageUrl } as CreateBannerDto & { imageUrl: string };
 
-    const createdBanner = await this.bannerLogicService.createBanner(bannerData as CreateBannerDto & { imageUrl: string });
+    const createdBanner = await this.bannerLogicService.createBanner(bannerData);
     return {
       ...createdBanner,
       imageUrl, // Ensure imageUrl is returned
@@ -58,7 +58,6 @@ export class BannerController {
       newImageUrl = await this.imageUploaderService.uploadImage(file, 'banners', `${id}-${Date.now()}`);
       bannerData = { ...bannerData, imageUrl: newImageUrl };
     } else if (!bannerData.imageUrl) {
-      // If no new file and no imageUrl in body, keep existing
       const existingBanner = await this.bannerLogicService.getBannerById(id);
       if (existingBanner && existingBanner.banner.imageUrl) {
         bannerData.imageUrl = existingBanner.banner.imageUrl;
@@ -87,7 +86,6 @@ export class BannerController {
       newImageUrl = await this.imageUploaderService.uploadImage(file, 'banners', `${id}-${Date.now()}`);
       bannerData = { ...bannerData, imageUrl: newImageUrl };
     } else if (!bannerData.imageUrl) {
-      // If no new file and no imageUrl in body, keep existing
       const existingBanner = await this.bannerLogicService.getBannerById(id);
       if (existingBanner && existingBanner.banner.imageUrl) {
         bannerData.imageUrl = existingBanner.banner.imageUrl;

@@ -22,11 +22,6 @@ export class CreateBannerDto {
   @Validate(WordCountValidator, [20])
   description: string;
 
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  imageUrl: string;
-
   @ApiProperty({ type: Boolean })
   @Transform(({ value }) => value === 'true' || value === true)
   @IsBoolean()
