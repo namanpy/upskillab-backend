@@ -15,6 +15,10 @@ export class ContactUs {
   _id: Types.ObjectId;
 
   @ApiProperty()
+  @Prop()
+  sourse?: string;
+  
+  @ApiProperty()
   @Prop({ required: true })
   name: string;
 
