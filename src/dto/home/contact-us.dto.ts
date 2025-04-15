@@ -24,6 +24,11 @@ export class CreateContactUsDto {
 
   @ApiProperty()
   @IsString()
+  @IsOptional()
+  sourse: string;
+
+  @ApiProperty()
+  @IsString()
   @IsNotEmpty()
   message: string;
 }
@@ -43,6 +48,9 @@ export class ContactUs {
 
   @ApiProperty()
   subject: string;
+
+  @ApiProperty()
+  sourse: string;
 
   @ApiProperty()
   message: string;

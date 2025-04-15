@@ -33,8 +33,12 @@ export class DemoSession {
   @Prop({ required: true })
   course: string; // Kept as a regular string field
 
+  @ApiProperty()
+  @Prop()
+  sourse?: string;
+
   @ApiProperty({ enum: ['Fresher', 'Working Professional'] })
-  @Prop({ required: true, enum: ['Fresher', 'Working Professional'] })
+  @Prop({ enum: ['Fresher', 'Working Professional'] })
   experience: string; // Added as an enum field
 }
 
