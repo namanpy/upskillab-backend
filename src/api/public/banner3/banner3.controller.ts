@@ -5,8 +5,8 @@ import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageUploaderService } from '../../../common/services/image-uploader.service';
 
-@ApiTags('banner3s')
-@Controller('banner3s')
+@ApiTags('banner3')
+@Controller('banner3')
 export class Banner3Controller {
   constructor(
     private banner3LogicService: Banner3LogicService,
