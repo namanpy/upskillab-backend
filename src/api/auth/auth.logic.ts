@@ -1,16 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { SendGridService } from 'src/common/services/sendgrid.service';
 
 import { UserDataService } from '../user/users.data';
 import { CustomError } from 'src/common/classes/error.class';
 import { ERROR } from 'src/common/constants/error.constants';
+import { LoginAttemptDataService } from '../login-attempt/login-attempt.data';
 
 @Injectable()
 export class AuthLogicService {
+  loginAttemptService: any;
   constructor(
     private userDataService: UserDataService,
     private jwtService: JwtService,
+    private sendGridService: SendGridService,
+    private loginAttemptDataService: LoginAttemptDataService // Properly inject SendGridService
   ) {}
 
   async login(input: { identifier: string; password: string }) {
@@ -29,4 +34,34 @@ export class AuthLogicService {
       return { authToken };
     } else throw new CustomError(ERROR.INVALID_CREDENTIALS);
   }
+
+  // Generate OTP and send it
+  private generateOTP(): string {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  }
+
+  async sendOtpLogin(email: string) {
+    const user = await this.userDataService.getUserByEmailOrPhone({ identifier: email });
+
+    if (!user) {
+      throw new CustomError(ERROR.USER_NOT_FOUND);
+    }
+
+    const otp = this.generateOTP();
+
+    // Send OTP email
+    await this.sendGridService.sendEmail({
+      to: email,
+      subject: 'Your OTP Code',
+      html: `<p>Your OTP is <strong>${otp}</strong>. It will expire in 5 minutes.</p>`,
+    });
+
+    const attempt = await this.loginAttemptDataService.createLoginAttempt({
+      user: user._id.toString(),
+      otpCode: otp,
+    });
+
+    return { attemptId: attempt._id };
+  }
 }
+
