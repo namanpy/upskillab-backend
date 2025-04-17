@@ -29,7 +29,13 @@ export class CashfreeService {
 
     this.notifyUrl = notifyUrl;
 
-    this.cashfree = new Cashfree(CFEnvironment.SANDBOX, apiKey, apiSecret);
+    this.cashfree = new Cashfree(
+      process.env.NODE_ENV === 'production'
+        ? CFEnvironment.PRODUCTION
+        : CFEnvironment.SANDBOX,
+      apiKey,
+      apiSecret,
+    );
   }
 
   async createPayment(data: {
