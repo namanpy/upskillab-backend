@@ -23,7 +23,7 @@ export class SendGridService {
     from?: string;
   }) {
     try {
-      return;
+      
       const mail = {
         to: data.to,
         subject: data.subject,

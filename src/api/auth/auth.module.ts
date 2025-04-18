@@ -6,10 +6,14 @@ import { AuthLogicService } from './auth.logic';
 import { UsersModule } from '../user/users.module';
 import { LocalStrategy } from './strategy/local.strategy';
 import { JwtStrategy } from './strategy/jwt.strategy';
+import { SendGridModule } from 'src/common/services/sendgrid.module';
+import { LoginAttemptModule } from '../login-attempt/login-attempt.module';
 
 @Module({
   imports: [
     UsersModule,
+    SendGridModule,
+    LoginAttemptModule,
     JwtModule.register({
       secret: JWT_SECRET,
       signOptions: { expiresIn: '24h' },

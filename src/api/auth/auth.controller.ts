@@ -47,4 +47,14 @@ export class AuthController {
   getDetails(@Request() req) {
     return req.user;
   }
+
+   // New OTP login endpoint
+   @ApiResponse({
+    status: 200,
+    description: 'OTP Login',
+  })
+  @Post('/otp-login')
+  async otpLogin(@Body() body: { email: string }) {
+    return this.authLogicService.sendOtpLogin(body.email);
+  }
 }
