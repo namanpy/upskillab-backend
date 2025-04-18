@@ -53,7 +53,7 @@ export class CashfreeService {
 
     try {
       const response = await this.cashfree.PGCreateOrder({
-        order_amount: 1,
+        order_amount: amount,
         order_currency: 'INR',
         order_id: orderId.toString(),
         order_meta: {
