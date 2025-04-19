@@ -53,7 +53,7 @@ export class UpdateBannerDto {
   imageUrl?: string;
 
   @ApiProperty({ required: false, type: Boolean })
-  @Transform(({ value }) => value === 'true' || value === true)
+  // @Transform(({ value }) => value === 'true' || value === true)
   @IsBoolean()
   @IsOptional()
   active?: boolean;

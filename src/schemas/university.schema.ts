@@ -97,6 +97,10 @@ export class University {
   @ApiProperty()
   @Prop({ required: true })
   imageUrl: string;
+
+  @ApiProperty()
+  @Prop({ required: true })
+  logoUrl: string;
 }
 
 export const UniversitySchema = SchemaFactory.createForClass(University);

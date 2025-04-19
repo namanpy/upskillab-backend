@@ -42,6 +42,11 @@ export class CreateUniversityDto {
   @IsString()
   @IsNotEmpty()
   imageUrl: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  logoUrl: string;
 }
 
 export class University {
@@ -77,6 +82,9 @@ export class University {
 
   @ApiProperty()
   updatedAt: Date;
+
+  @ApiProperty()
+  logoUrl: string;
 }
 
 export class GetUniversitiesResponseDTO {
