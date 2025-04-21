@@ -15,7 +15,7 @@ export class AuthLogicService {
     private userDataService: UserDataService,
     private jwtService: JwtService,
     private sendGridService: SendGridService,
-    private loginAttemptDataService: LoginAttemptDataService // Properly inject SendGridService
+    private loginAttemptDataService: LoginAttemptDataService,
   ) {}
 
   async login(input: { identifier: string; password: string }) {
