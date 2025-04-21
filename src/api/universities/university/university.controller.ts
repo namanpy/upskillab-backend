@@ -97,10 +97,10 @@
 
 import { Controller, Get, Post, Put, Patch, Delete, Body, Param, UploadedFiles, UseInterceptors, BadRequestException } from '@nestjs/common';
 import { UniversityLogicService } from './university.logic';
-import { CreateUniversityDto } from '../../dto/university.dto';
+import { CreateUniversityDto } from '../../../dto/universities/university.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { ImageUploaderService } from '../../common/services/image-uploader.service';
+import { ImageUploaderService } from '../../../common/services/image-uploader.service';
 
 @ApiTags('universities')
 @Controller('universities')

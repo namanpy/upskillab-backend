@@ -3,8 +3,8 @@ import { UniversityController } from './university.controller';
 import { UniversityLogicService } from './university.logic';
 import { UniversityDataService } from './university.data';
 import { MongooseModule } from '@nestjs/mongoose';
-import { University, UniversitySchema } from '../../schemas/university.schema';
-import { ImageUploaderService } from '../../common/services/image-uploader.service';
+import { University, UniversitySchema } from '../../../schemas/universities/university.schema';
+import { ImageUploaderService } from '../../../common/services/image-uploader.service';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({

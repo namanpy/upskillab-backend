@@ -45,6 +45,10 @@ export class User {
     select: false,
   })
   password?: string;
+
+  @ApiProperty()
+  @Prop({ required: true, enum: ['admin', 'student', 'teacher'] })
+  role: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

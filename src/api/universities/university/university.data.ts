@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { University, UniversityDocument } from '../../schemas/university.schema';
-import { CreateUniversityDto } from '../../dto/university.dto';
+import { University, UniversityDocument } from '../../../schemas/universities/university.schema';
+import { CreateUniversityDto } from '../../../dto/universities/university.dto';
 
 @Injectable()
 export class UniversityDataService {

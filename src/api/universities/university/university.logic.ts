@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UniversityDataService } from './university.data';
-import { CreateUniversityDto, GetUniversitiesResponseDTO, University } from '../../dto/university.dto';
-import { UniversityDocument } from '../../schemas/university.schema';
-import { mapToDto, mapToDtoArray } from '../../common/utils/map-to-dto.util';
+import { CreateUniversityDto, GetUniversitiesResponseDTO, University } from '../../../dto/universities/university.dto';
+import { UniversityDocument } from '../../../schemas/universities/university.schema';
+import { mapToDto, mapToDtoArray } from '../../../common/utils/map-to-dto.util';
 
 @Injectable()
 export class UniversityLogicService {
