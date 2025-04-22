@@ -29,7 +29,8 @@ import { BlogModule } from './api/blog/blog.module';
 import { YoutubeModule } from './api/public/youtube/youtube.module';
 import { UniversityModule } from './api/universities/university/university.module';
 import { University2Module } from './api/universities/university2/university2.module';
-import { UniversityCourseModule } from './api/universities/university-course/university-course.module'
+import { UniversityCourseModule } from './api/universities/university-course/university-course.module';
+import { UniversityCourse2Module } from './api/universities/university-course-2/university-course-2.module';
 // import { ConfigModule } from '@nestjs/config';
 //MongooseModule.forRoot('mongodb://localhost/nest')
 @Module({
@@ -65,6 +66,7 @@ import { UniversityCourseModule } from './api/universities/university-course/uni
     UniversityModule,
     University2Module,
     UniversityCourseModule,
+    UniversityCourse2Module,
   ],
   controllers: [AppController],
   providers: [AppService],
