@@ -1,16 +1,10 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Request,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthLogicService } from './auth.logic';
 import { AuthLoginRequestDto, AuthLoginResponseDto } from 'src/dto/auth.dto';
+import { OtpLoginRequestDto, OtpLoginResponseDto } from 'src/dto/login-attempt.dto';
+import { verifyLoginAttemptRequestDto, verifyLoginAttemptResponseDto } from 'src/dto/verifyLoginAttempt.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -48,13 +42,31 @@ export class AuthController {
     return req.user;
   }
 
-   // New OTP login endpoint
-   @ApiResponse({
-    status: 200,
-    description: 'OTP Login',
+  // New OTP login endpoint
+  @ApiBody({
+   type: OtpLoginRequestDto,
+  })
+  @ApiResponse({
+    type: OtpLoginResponseDto,
+   status: 200,
+   description: 'OTP Login',
   })
   @Post('/otp-login')
-  async otpLogin(@Body() body: { email: string }) {
-    return this.authLogicService.sendOtpLogin(body.email);
+  async otpLogin(@Body() body: OtpLoginRequestDto) {
+   return this.authLogicService.sendOtpLogin(body.email);
+  }
+
+  @ApiBody({
+    type: verifyLoginAttemptRequestDto,
+   })
+   @ApiResponse({
+     type: verifyLoginAttemptResponseDto,
+    status: 200,
+    description: 'Verify OTP',
+   })
+  @Post('otp/enter')
+async enterOtp(@Body() body: verifyLoginAttemptRequestDto) {
+  return this.authLogicService.enterOtp(body);
   }
 }
+

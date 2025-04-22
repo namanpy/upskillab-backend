@@ -63,5 +63,19 @@ export class AuthLogicService {
 
     return { attemptId: attempt._id };
   }
+  async enterOtp({ otpCode, attemptId }: { otpCode: string; attemptId: string }) {
+    const attempt = await this.loginAttemptDataService.findAttemptById(attemptId);
+
+    if (!attempt) {
+      throw new Error('Login attempt not found');
+    }
+
+    if (attempt.otpCode === Number(otpCode)) {
+      return { success: true, message: 'OTP verified' };
+    }
+
+    return { success: false, message: 'Invalid OTP' };
+  }
 }
+
 
