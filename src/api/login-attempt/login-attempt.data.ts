@@ -16,4 +16,9 @@ export class LoginAttemptDataService {
     });
     return attempt.save();
   }
+
+  async findAttemptById(attemptId: string) {
+    return this.loginAttemptModel.findById(attemptId).exec();
+  }
+  
 }
