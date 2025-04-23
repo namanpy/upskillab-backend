@@ -22,15 +22,15 @@ import { ImageUploaderService } from '../../../common/services/image-uploader.se
 //   @ApiResponse({ status: 201, description: 'Create a new university course with image upload' })
 //   @Post('')
 //   @UseInterceptors(FileInterceptor('image'))
-//   async createUniversityCourse(@Body() createUniversityCourseDto: CreateUniversityCourse2Dto, @UploadedFile() file: Express.Multer.File) {
+//   async createUniversityCourse(@Body() createUniversityCourseDto: Partial<CreateUniversityCourse2Dto>, @UploadedFile() file: Express.Multer.File) {
 //     if (!file) {
 //       throw new BadRequestException('Image file is required');
 //     }
 
 //     const imageUrl = await this.imageUploaderService.uploadImage(file, 'universities', Date.now().toString());
-//     const courseData = { ...createUniversityCourseDto, imageUrl };
+//     const courseData = { ...createUniversityCourseDto, imageUrl } as CreateUniversityCourse2Dto & { imageUrl: string };
 
-//     return await this.universityCourse2LogicService.createUniversityCourse(courseData as CreateUniversityCourse2Dto & { imageUrl: string });
+//     return await this.universityCourse2LogicService.createUniversityCourse(courseData);
 //   }
 
 //   @ApiResponse({ status: 200, description: 'Get a single university course by ID' })
@@ -93,6 +93,13 @@ import { ImageUploaderService } from '../../../common/services/image-uploader.se
 // }
 
 
+// import { Controller, Get, Post, Put, Patch, Delete, Body, Param, UploadedFile, UseInterceptors, BadRequestException } from '@nestjs/common';
+// import { UniversityCourse2LogicService } from './university-course-2.logic';
+// import { CreateUniversityCourse2Dto, UpdateUniversityCourse2Dto, GetUniversityCourse2sResponseDTO } from '../../dto/university-course-2.dto';
+// import { ApiResponse, ApiTags } from '@nestjs/swagger';
+// import { FileInterceptor } from '@nestjs/platform-express';
+// import { ImageUploaderService } from '../../common/services/image-uploader.service';
+
 @ApiTags('university-course-2')
 @Controller('university-course-2')
 export class UniversityCourse2Controller {
@@ -110,13 +117,13 @@ export class UniversityCourse2Controller {
   @ApiResponse({ status: 201, description: 'Create a new university course with image upload' })
   @Post('')
   @UseInterceptors(FileInterceptor('image'))
-  async createUniversityCourse(@Body() createUniversityCourseDto: Partial<CreateUniversityCourse2Dto>, @UploadedFile() file: Express.Multer.File) {
+  async createUniversityCourse(@Body() createUniversityCourseDto: CreateUniversityCourse2Dto, @UploadedFile() file: Express.Multer.File) {
     if (!file) {
       throw new BadRequestException('Image file is required');
     }
 
     const imageUrl = await this.imageUploaderService.uploadImage(file, 'universities', Date.now().toString());
-    const courseData = { ...createUniversityCourseDto, imageUrl } as CreateUniversityCourse2Dto & { imageUrl: string };
+    const courseData = { ...createUniversityCourseDto, imageUrl };
 
     return await this.universityCourse2LogicService.createUniversityCourse(courseData);
   }
