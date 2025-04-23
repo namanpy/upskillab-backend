@@ -41,7 +41,9 @@ export class AuthLogicService {
   }
 
   async sendOtpLogin(email: string) {
-    const user = await this.userDataService.getUserByEmailOrPhone({ identifier: email });
+    const user = await this.userDataService.getUserByEmailOrPhone({
+      identifier: email,
+    });
 
     if (!user) {
       throw new CustomError(ERROR.USER_NOT_FOUND);
@@ -63,19 +65,25 @@ export class AuthLogicService {
 
     return { attemptId: attempt._id };
   }
-  async enterOtp({ otpCode, attemptId }: { otpCode: string; attemptId: string }) {
-    const attempt = await this.loginAttemptDataService.findAttemptById(attemptId);
+  async enterOtp({
+    otpCode,
+    attemptId,
+  }: {
+    otpCode: string;
+    attemptId: string;
+  }) {
+    const attempt =
+      await this.loginAttemptDataService.findAttemptById(attemptId);
 
     if (!attempt) {
-      throw new Error('Login attempt not found');
+      throw new CustomError(ERROR.LOGIN_ATTEMPT_NOT_FOUND);
     }
 
     if (attempt.otpCode === Number(otpCode)) {
+      // Delete the attempt after successful verification
       return { success: true, message: 'OTP verified' };
     }
 
-    return { success: false, message: 'Invalid OTP' };
+    throw new CustomError(ERROR.INVALID_OTP);
   }
 }
-
-

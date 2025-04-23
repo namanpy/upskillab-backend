@@ -93,4 +93,14 @@ export const ERROR = {
     reference: 17,
     message: 'Already registered for course',
   },
+  LOGIN_ATTEMPT_NOT_FOUND: {
+    code: HttpStatus.NOT_FOUND,
+    reference: 18,
+    message: 'Login attempt not found',
+  },
+  INVALID_OTP: {
+    code: HttpStatus.BAD_REQUEST,
+    reference: 19,
+    message: 'Invalid OTP',
+  },
 };
