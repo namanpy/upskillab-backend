@@ -20,5 +20,9 @@ export class LoginAttemptDataService {
   async findAttemptById(attemptId: string) {
     return this.loginAttemptModel.findById(attemptId).exec();
   }
+
+  async deleteAttemptById(attemptId: string) {
+    return this.loginAttemptModel.findByIdAndDelete(attemptId).exec();
+  }
   
 }

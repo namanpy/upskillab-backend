@@ -2,9 +2,7 @@ import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common'
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthLogicService } from './auth.logic';
-import { AuthLoginRequestDto, AuthLoginResponseDto } from 'src/dto/auth.dto';
-import { OtpLoginRequestDto, OtpLoginResponseDto } from 'src/dto/login-attempt.dto';
-import { verifyLoginAttemptRequestDto, verifyLoginAttemptResponseDto } from 'src/dto/verifyLoginAttempt.dto';
+import { AuthLoginRequestDto, AuthLoginResponseDto, OtpLoginRequestDto, OtpLoginResponseDto, verifyLoginAttemptRequestDto, verifyLoginAttemptResponseDto } from 'src/dto/auth.dto';
 
 @Controller('auth')
 export class AuthController {
