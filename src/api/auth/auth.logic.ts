@@ -80,7 +80,7 @@ export class AuthLogicService {
     }
 
     if (attempt.otpCode === Number(otpCode)) {
-      // Delete the attempt after successful verification
+      await this.loginAttemptDataService.deleteAttemptById(attemptId);
       return { success: true, message: 'OTP verified' };
     }
 
