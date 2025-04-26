@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiPropertyOptional, ApiProperty } from '@nestjs/swagger';
 import { HydratedDocument, Types } from 'mongoose';
+import { USER_TYPES } from 'src/common/constants/user.constants';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -47,8 +48,8 @@ export class User {
   password?: string;
 
   @ApiProperty()
-  @Prop({ required: true, enum: ['admin', 'student', 'teacher'] })
-  role: string;
+  @Prop({ required: true, enum: Object.values(USER_TYPES) })
+  userType: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

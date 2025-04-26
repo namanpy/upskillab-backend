@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import { OrderLogicService } from './order.logic';
@@ -19,6 +20,9 @@ import {
 import { ERROR } from 'src/common/constants/error.constants';
 import { Query } from '@nestjs/common';
 import { GetOrdersQueryDto, GetOrdersResponseDto } from '../../dto/order.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { AllowUserType, UserGuard } from 'src/common/guard/user.guard';
+import { USER_TYPES } from 'src/common/constants/user.constants';
 
 @ApiTags('orders')
 @Controller('orders')
@@ -92,6 +96,8 @@ export class OrderController {
     status: 200,
     type: GetOrdersResponseDto,
   })
+  @UseGuards(AuthGuard('jwt'), UserGuard)
+  @AllowUserType(USER_TYPES.ADMIN)
   async getAllOrders(
     @Query() query: GetOrdersQueryDto,
   ): Promise<GetOrdersResponseDto> {

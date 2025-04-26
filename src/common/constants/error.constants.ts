@@ -103,4 +103,9 @@ export const ERROR = {
     reference: 19,
     message: 'Invalid OTP',
   },
+  ACCESS_DENIED: {
+    code: HttpStatus.FORBIDDEN,
+    reference: 20,
+    message: 'Access denied',
+  },
 };
