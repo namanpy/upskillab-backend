@@ -30,7 +30,7 @@ export class User {
   @Prop({
     type: String,
     validate: function (this, value: string) {
-      this.mobileNumber && this.email ? false : true;
+      this.mobileNumber || this.email ? true : false;
     },
   })
   mobileNumber?: string;
@@ -50,6 +50,17 @@ export class User {
   @ApiProperty()
   @Prop({ required: true, enum: Object.values(USER_TYPES) })
   userType: string;
+
+  // ✅ isActive field added here
+  @ApiProperty({
+    type: Boolean,
+    default: false,
+  })
+  @Prop({
+    type: Boolean,
+    default: false,
+  })
+  isActive: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
