@@ -31,6 +31,7 @@ import { UniversityModule } from './api/universities/university/university.modul
 import { University2Module } from './api/universities/university2/university2.module';
 import { UniversityCourseModule } from './api/universities/university-course/university-course.module';
 import { UniversityCourse2Module } from './api/universities/university-course-2/university-course-2.module';
+import { ClassSessionModule } from './api/scheduler/class-session.module';
 // import { ConfigModule } from '@nestjs/config';
 //MongooseModule.forRoot('mongodb://localhost/nest')
 @Module({
@@ -67,6 +68,7 @@ import { UniversityCourse2Module } from './api/universities/university-course-2/
     University2Module,
     UniversityCourseModule,
     UniversityCourse2Module,
+    ClassSessionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
