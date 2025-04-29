@@ -6,7 +6,7 @@ import { AuthLoginRequestDto, AuthLoginResponseDto, OtpLoginRequestDto, OtpLogin
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authLogicService: AuthLogicService) {}
+  constructor(private authLogicService: AuthLogicService) { }
 
   @ApiResponse({
     status: 200,
@@ -42,29 +42,28 @@ export class AuthController {
 
   // New OTP login endpoint
   @ApiBody({
-   type: OtpLoginRequestDto,
+    type: OtpLoginRequestDto,
   })
   @ApiResponse({
     type: OtpLoginResponseDto,
-   status: 200,
-   description: 'OTP Login',
+    status: 200,
+    description: 'OTP Login',
   })
   @Post('/otp-login')
   async otpLogin(@Body() body: OtpLoginRequestDto) {
-   return this.authLogicService.sendOtpLogin(body.email);
+    return this.authLogicService.sendOtpLogin(body.email);
   }
 
   @ApiBody({
     type: verifyLoginAttemptRequestDto,
-   })
-   @ApiResponse({
-     type: verifyLoginAttemptResponseDto,
+  })
+  @ApiResponse({
+    type: verifyLoginAttemptResponseDto,
     status: 200,
     description: 'Verify OTP',
-   })
+  })
   @Post('otp/enter')
-async enterOtp(@Body() body: verifyLoginAttemptRequestDto) {
-  return this.authLogicService.enterOtp(body);
+  async enterOtp(@Body() body: verifyLoginAttemptRequestDto) {
+    return this.authLogicService.enterOtp(body);
   }
 }
-
