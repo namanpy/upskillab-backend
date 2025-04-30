@@ -1,14 +1,16 @@
 // import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+// import { Document } from 'mongoose';
 // import { ApiProperty } from '@nestjs/swagger';
-// import { HydratedDocument, Types } from 'mongoose';
-// import { Batch } from './course/batch.schema';
-// import { Course } from './course/course.schema';
-// import { Teacher } from './teacher.schema';
+// import * as mongoose from 'mongoose';
 
-// export type ClassSessionDocument = HydratedDocument<ClassSession>;
+// export type ClassSessionDocument = ClassSession & Document;
 
 // @Schema({ timestamps: true })
 // export class ClassSession {
+//   @ApiProperty()
+//   @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, auto: true }) // Explicitly define _id as ObjectId
+//   _id: mongoose.Types.ObjectId;
+
 //   @ApiProperty()
 //   @Prop({ required: true })
 //   title: string;
@@ -18,12 +20,8 @@
 //   description: string;
 
 //   @ApiProperty()
-//   @Prop({ required: true, type: Types.ObjectId, ref: 'Batch' })
-//   batchId: Types.ObjectId;
-
-//   @ApiProperty()
-//   @Prop({ required: true, type: Types.ObjectId, ref: 'Course' })
-//   courseId: string;
+//   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Batch', required: true })
+//   batchId: string;
 
 //   @ApiProperty()
 //   @Prop({ required: true })
@@ -50,11 +48,11 @@
 //   meetingPlatform: string;
 
 //   @ApiProperty()
-//   @Prop({ required: true, type: Types.ObjectId, ref: 'Teacher' })
-//   teacherId: Types.ObjectId;
+//   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Teacher', required: true })
+//   teacherId: string;
 
 //   @ApiProperty()
-//   @Prop({ required: true, default: false })
+//   @Prop({ required: true })
 //   isRecorded: boolean;
 
 //   @ApiProperty()
@@ -76,13 +74,14 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import * as mongoose from 'mongoose';
+// import { HydratedDocument, Types } from 'mongoose';
 
 export type ClassSessionDocument = ClassSession & Document;
 
 @Schema({ timestamps: true })
 export class ClassSession {
   @ApiProperty()
-  @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, auto: true }) // Explicitly define _id as ObjectId
+  @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, auto: true })
   _id: mongoose.Types.ObjectId;
 
   @ApiProperty()

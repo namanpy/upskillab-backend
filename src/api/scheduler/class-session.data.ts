@@ -88,6 +88,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ClassSession, ClassSessionDocument } from '../../schemas/class-session.schema';
 import { CreateClassSessionDto, UpdateClassSessionDto } from '../../dto/class-session.dto';
+import * as mongoose from 'mongoose'; // Add this import
 
 @Injectable()
 export class ClassSessionDataService {
@@ -108,6 +109,7 @@ export class ClassSessionDataService {
   async createClassSession(createClassSessionDto: CreateClassSessionDto): Promise<ClassSessionDocument> {
     const newSession = new this.classSessionModel({
       ...createClassSessionDto,
+      id: new mongoose.Types.ObjectId().toString(), // This will now work
       scheduledDate: new Date(createClassSessionDto.scheduledDate),
     });
     return newSession.save();
