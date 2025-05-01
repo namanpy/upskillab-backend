@@ -1,7 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsMongoId, IsEnum, IsOptional, IsBoolean } from 'class-validator';
 import { VIDEO_STATUS } from '../common/constants/recorded-video.constants';
-
 export class CreateRecordedVideoDto {
   @ApiProperty()
   @IsString()
@@ -84,9 +83,6 @@ export class RecordedVideo {
 
   @ApiProperty()
   courseId: string;
-
-  @ApiProperty()
-  uploadedBy: string;
 
   @ApiProperty()
   status: string;
