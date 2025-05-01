@@ -57,7 +57,7 @@ export class Course {
 
   @ApiProperty()
   @Prop({
-    required: true,
+    required: false,
   })
   courseImage: string;
 

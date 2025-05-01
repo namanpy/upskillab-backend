@@ -63,7 +63,7 @@ export class Batch {
   teacher: Types.ObjectId;
 
   @ApiProperty()
-  @Prop({ required: true })
+  @Prop({ required: false })
   imageUrl: string;
 
   @ApiProperty()
