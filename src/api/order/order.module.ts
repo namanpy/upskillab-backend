@@ -11,6 +11,6 @@ import { OrderDataService } from './order.data';
   ],
   controllers: [OrderController],
   providers: [OrderLogicService, OrderDataService],
-  exports: [OrderDataService],
+  exports: [OrderDataService, OrderLogicService ],
 })
 export class OrderModule {}
