@@ -16,7 +16,7 @@ import { LoginAttemptModule } from '../login-attempt/login-attempt.module';
     LoginAttemptModule,
     JwtModule.register({
       secret: JWT_SECRET,
-      signOptions: { expiresIn: '24h' },
+      signOptions: { expiresIn: '1h' },
     }),
   ],
   providers: [AuthLogicService, LocalStrategy, JwtStrategy],
