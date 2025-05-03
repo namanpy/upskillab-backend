@@ -14,7 +14,11 @@ import {
   AddMessageResponseDto,
 } from 'src/dto/doubt-session.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { AllowUserType, UserGuard } from 'src/common/guard/user.guard';
+import {
+  AllowUserType,
+  AllowUserTypes,
+  UserGuard,
+} from 'src/common/guard/user.guard';
 import { USER_TYPES } from 'src/common/constants/user.constants';
 import { StudentDataService } from '../student/student.data';
 import { CustomError } from 'src/common/classes/error.class';
@@ -29,9 +33,9 @@ export class DoubtSessionController {
     private teacherDataService: TeacherDataService,
   ) {}
 
+  @Post()
   @UseGuards(AuthGuard('jwt'), UserGuard)
   @AllowUserType(USER_TYPES.STUDENT)
-  @Post()
   async createDoubt(
     @Body() body: CreateDoubtDto,
     @Request() req: any,
@@ -51,6 +55,8 @@ export class DoubtSessionController {
   }
 
   @Post(':doubtId/message')
+  @UseGuards(AuthGuard('jwt'), UserGuard)
+  @AllowUserTypes([USER_TYPES.STUDENT, USER_TYPES.TEACHER])
   async addMessage(
     @Param('doubtId') doubtId: string,
     @Body() body: AddMessageDto,
