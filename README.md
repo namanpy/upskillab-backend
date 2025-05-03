@@ -47,10 +47,17 @@ TODO : Will be done in Digital-ocean
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 
 
-
-
 .
 ├── bash.exe.stackdump
+├── docs
+│   ├── adminPage.jpeg
+│   ├── database 2.diagram
+│   ├── homePage.jpeg
+│   ├── refWeb.md
+│   ├── studentPage.jpeg
+│   ├── teacherpage.jpeg
+│   ├── Upskillab Website.pdf
+│   └── upskills.diagram
 ├── eslint.config.mjs
 ├── nest-cli.json
 ├── package.json
@@ -80,6 +87,7 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 │   │   │   ├── category.data.ts
 │   │   │   ├── category.logic.ts
 │   │   │   └── category.module.ts
+│   │   ├── class-session
 │   │   ├── course
 │   │   │   ├── chapter
 │   │   │   │   ├── chapter.data.ts
@@ -97,7 +105,14 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 │   │   │   ├── demosession.logic.ts
 │   │   │   └── demosession.module.ts
 │   │   ├── doubt-session
-│   │   │   └── doubt-session.controller.ts
+│   │   │   ├── doubt-session.controller.ts
+│   │   │   ├── doubt-session.data.ts
+│   │   │   └── doubt-session.logic.ts
+│   │   ├── enrollment
+│   │   │   ├── enrollment.controller.ts
+│   │   │   ├── enrollment.data.ts
+│   │   │   ├── enrollment.logic.ts
+│   │   │   └── enrollment.module.ts
 │   │   ├── faq
 │   │   │   ├── faq.controller.ts
 │   │   │   ├── faq.data.ts
@@ -167,10 +182,20 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 │   │   │       ├── youtube.logic.ts
 │   │   │       ├── youtube.module.ts
 │   │   │       └── youtube.service.ts
+│   │   ├── recorded-video
+│   │   │   ├── recorded-video.controller.ts
+│   │   │   ├── recorded-video.data.ts
+│   │   │   ├── recorded-video.logic.ts
+│   │   │   └── recorded-video.module.ts
 │   │   ├── registration
 │   │   │   ├── registration.controller.ts
 │   │   │   ├── registration.logic.ts
 │   │   │   └── registration.module.ts
+│   │   ├── scheduler
+│   │   │   ├── class-session.controller.ts
+│   │   │   ├── class-session.data.ts
+│   │   │   ├── class-session.logic.ts
+│   │   │   └── class-session.module.ts
 │   │   ├── stories
 │   │   │   ├── stories.controller.ts
 │   │   │   ├── stories.data.ts
@@ -210,11 +235,13 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 │   │   │       ├── university-course-2.data.ts
 │   │   │       ├── university-course-2.logic.ts
 │   │   │       └── university-course-2.module.ts
-│   │   └── user
-│   │       ├── users.controller.ts
-│   │       ├── users.data.ts
-│   │       ├── users.logic.ts
-│   │       └── users.module.ts
+│   │   ├── user
+│   │   │   ├── users.controller.ts
+│   │   │   ├── users.data.ts
+│   │   │   ├── users.logic.ts
+│   │   │   └── users.module.ts
+│   │   └── user-session
+│   │       └── user-session.data.ts
 │   ├── app.controller.ts
 │   ├── app.module.ts
 │   ├── app.service.ts
@@ -228,9 +255,14 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 │   │   │   ├── error.constants.ts
 │   │   │   ├── order.constants.ts
 │   │   │   ├── payment.constants.ts
+│   │   │   ├── recorded-video.constants.ts
 │   │   │   ├── student.constants.ts
 │   │   │   └── user.constants.ts
+│   │   ├── decorators
+│   │   │   ├── roles.decorator.ts
+│   │   │   └── user.decorator.ts
 │   │   ├── guard
+│   │   │   ├── roles.guard.ts
 │   │   │   └── user.guard.ts
 │   │   ├── pipes
 │   │   │   └── transform-boolean.pipe.ts
@@ -250,6 +282,7 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 │   │   ├── batch.dto.ts
 │   │   ├── blog.dto.ts
 │   │   ├── category.dto.ts
+│   │   ├── class-session.dto.ts
 │   │   ├── common.dto.ts
 │   │   ├── course
 │   │   │   ├── batch.dto.ts
@@ -257,6 +290,8 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 │   │   │   ├── course.dto.ts
 │   │   │   └── topic.dto.ts
 │   │   ├── demosession.dto.ts
+│   │   ├── doubt-session.dto.ts
+│   │   ├── enrollment.dto.ts
 │   │   ├── home
 │   │   │   ├── banner3.dto.ts
 │   │   │   ├── banner4.dto.ts
@@ -271,6 +306,7 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 │   │   ├── index.ts
 │   │   ├── language.dto.ts
 │   │   ├── order.dto.ts
+│   │   ├── recorded-video.dto.ts
 │   │   ├── registration.dto.ts
 │   │   ├── stories.dto.ts
 │   │   ├── teacher.dto.ts
@@ -284,6 +320,7 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 │   └── schemas
 │       ├── blog.schema.ts
 │       ├── category.schema.ts
+│       ├── class-session.schema.ts
 │       ├── common.schema.ts
 │       ├── course
 │       │   ├── batch.schema.ts
@@ -292,6 +329,7 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 │       │   └── topic.schema.ts
 │       ├── demosession.schema.ts
 │       ├── doubt-session.schema.ts
+│       ├── enrollment.schema.ts
 │       ├── home
 │       │   ├── banner3.schema.ts
 │       │   ├── banner4.schema.ts
@@ -307,8 +345,10 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 │       ├── login-attempt.schema.ts
 │       ├── order.schema.ts
 │       ├── payment.schema.ts
+│       ├── recorded-video.schema.ts
 │       ├── stories.schema.ts
 │       ├── student.schema.ts
+│       ├── study_materials.schema.ts
 │       ├── teacher.schema.ts
 │       ├── universities
 │       │   ├── university2.schema.ts
@@ -317,11 +357,14 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 │       │   ├── university-course.schema.ts
 │       │   ├── university.module.schema.ts
 │       │   └── university.schema.ts
-│       └── user.schema.ts
+│       ├── user.schema.ts
+│       ├── user-session.schema.ts
+│       └── videos.schema.ts
 ├── test
 │   ├── app.e2e-spec.ts
+│   ├── enrollment
 │   └── jest-e2e.json
 ├── tsconfig.build.json
 └── tsconfig.json
 
-111 directories, 851 files
+64 directories, 255 files

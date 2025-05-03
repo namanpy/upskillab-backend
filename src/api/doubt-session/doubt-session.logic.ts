@@ -19,15 +19,15 @@ export class DoubtSessionLogicService {
       userId: Types.ObjectId;
     },
   ) {
-    const enrollment =
-      await this.enrollmentDataService.getEnrollmentsByCourseAndUser(
-        input.userId,
-        input.courseId,
-      );
+    // const enrollment =
+    //   await this.enrollmentDataService.getEnrollmentsByCourseAndUser(
+    //     input.userId,
+    //     input.courseId,
+    //   );
 
-    if (!enrollment) {
-      throw new CustomError(ERROR.UNAUTHORIZED);
-    }
+    // if (!enrollment) {
+    //   throw new CustomError(ERROR.UNAUTHORIZED);
+    // }
 
     const doubt = await this.dataService.createDoubt({
       studentId: new Types.ObjectId(input.studentId),
