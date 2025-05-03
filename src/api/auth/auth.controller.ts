@@ -1,12 +1,30 @@
-import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthLogicService } from './auth.logic';
-import { AuthLoginRequestDto, AuthLoginResponseDto, OtpLoginRequestDto, OtpLoginResponseDto, verifyLoginAttemptRequestDto, verifyLoginAttemptResponseDto } from 'src/dto/auth.dto';
+import {
+  AuthLoginRequestDto,
+  AuthLoginResponseDto,
+  OtpLoginRequestDto,
+  OtpLoginResponseDto,
+  verifyLoginAttemptRequestDto,
+  verifyLoginAttemptResponseDto,
+} from 'src/dto/auth.dto';
+import {
+  RefreshTokenRequestDto,
+  RefreshTokenResponseDto,
+} from 'src/dto/auth.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authLogicService: AuthLogicService) { }
+  constructor(private authLogicService: AuthLogicService) {}
 
   @ApiResponse({
     status: 200,
@@ -65,5 +83,20 @@ export class AuthController {
   @Post('otp/enter')
   async enterOtp(@Body() body: verifyLoginAttemptRequestDto) {
     return this.authLogicService.enterOtp(body);
+  }
+
+  @ApiBody({
+    type: RefreshTokenRequestDto,
+  })
+  @ApiResponse({
+    type: RefreshTokenResponseDto,
+    status: 200,
+    description: 'Refresh access and refresh tokens',
+  })
+  @Post('/refresh')
+  async refresh(
+    @Body() body: RefreshTokenRequestDto,
+  ): Promise<RefreshTokenResponseDto> {
+    return this.authLogicService.refreshTokensPair(body.refreshToken);
   }
 }

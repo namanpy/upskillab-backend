@@ -19,6 +19,13 @@ export class Order extends MongooseDocument {
   user: Types.ObjectId;
 
   @ApiProperty({
+    description: 'Mobile number of the user',
+    type: String,
+  })
+  @Prop({ required: false })
+  mobileNumber?: string;
+
+  @ApiProperty({
     description: 'Course amount',
     type: Number,
   })
