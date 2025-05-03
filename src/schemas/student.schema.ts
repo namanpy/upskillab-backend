@@ -1,9 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Types } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import { MongooseDocument } from './common.schema';
 import { STUDENT_TYPE } from 'src/common/constants/student.constants';
 
+export type StudentDocument = HydratedDocument<Student>;
 @Schema({ timestamps: true })
 export class Student extends MongooseDocument {
   @ApiProperty({ description: 'Reference to the user' })
