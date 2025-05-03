@@ -19,13 +19,7 @@ import { TeacherModule } from '../teachers/teacher.module';
     TeacherModule,
   ],
   controllers: [DoubtSessionController],
-  providers: [
-    DoubtSessionLogicService,
-    DoubtSessionDataService,
-    StudentDataService,
-    TeacherDataService,
-    EnrollmentDataService,
-  ],
+  providers: [DoubtSessionLogicService, DoubtSessionDataService],
   exports: [DoubtSessionLogicService, DoubtSessionDataService],
 })
 export class DoubtSessionModule {}
