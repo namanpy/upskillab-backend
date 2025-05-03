@@ -71,24 +71,6 @@
 //       .exec();
 //   }
 
-//   async deleteEnrollment(id: string): Promise<EnrollmentDocument | null> {
-//     return this.enrollmentModel.findByIdAndDelete(id).exec();
-//   }
-//   async getEnrollmentsByCourseAndUser(
-//     userId: string | Types.ObjectId,
-//     courseId: string | Types.ObjectId,
-//   ) {
-//     return this.enrollmentModel
-//       .findOne({ userId, courseId })
-//       .populate<{ userId: User }>('userId')
-//       .populate<{ courseId: Course }>('courseId')
-//       .populate<{ batchId: Batch }>('batchId')
-//       .populate<{ orderId: Order }>('orderId')
-//       .exec();
-//   }
-// }
-
-
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -126,4 +108,19 @@ export class EnrollmentDataService {
 
     return { user, student, order };
   }
+  // async deleteEnrollment(id: string): Promise<EnrollmentDocument | null> {
+  //   return this.enrollmentModel.findByIdAndDelete(id).exec();
+  // }
+  // async getEnrollmentsByCourseAndUser(
+  //   userId: string | Types.ObjectId,
+  //   courseId: string | Types.ObjectId,
+  // ) {
+  //   return this.enrollmentModel
+  //     .findOne({ userId, courseId })
+  //     .populate<{ userId: User }>('userId')
+  //     .populate<{ courseId: Course }>('courseId')
+  //     .populate<{ batchId: Batch }>('batchId')
+  //     .populate<{ orderId: Order }>('orderId')
+  //     .exec();
+  // }
 }
