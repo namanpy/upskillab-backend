@@ -1,35 +1,35 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { HydratedDocument, Types } from 'mongoose';
+import { User } from './user.schema';
 
 export type DoubtDocument = HydratedDocument<Doubt>;
-export type AnswerDocument = HydratedDocument<Answer>;
+export type MessageDocument = HydratedDocument<DoubtMessage>;
 
 @Schema()
-class Answer {
-  @ApiProperty({type: String})
-  @Prop({ required: false })
-  teacherId?: Types.ObjectId;
+export class DoubtMessage {
+  @ApiProperty({ type: String })
+  @Prop({ required: true, type: User })
+  user: Types.ObjectId;
 
   @ApiProperty()
   @Prop({ required: false })
-  response?: string;
+  message: string;
 
   @ApiProperty({ required: false, type: [String] })
   @Prop({ type: [String] })
   attachments?: string[];
-  
 }
 
 @Schema()
 export class Doubt {
   @ApiProperty()
   @Prop({ required: true })
-  studentId: Types.ObjectId;
+  student: Types.ObjectId;
 
   @ApiProperty()
   @Prop({ required: true })
-  courseId: Types.ObjectId;
+  course: Types.ObjectId;
 
   @ApiProperty()
   @Prop({ required: true })
@@ -38,7 +38,11 @@ export class Doubt {
   @ApiProperty({ required: false, type: [String] })
   @Prop({ type: [String], required: false })
   attachments?: string[];
+
+  @ApiProperty({ required: false, type: [DoubtMessage] })
+  @Prop({ type: [Object], default: [] })
+  messages?: DoubtMessage[];
 }
 
 export const DoubtSchema = SchemaFactory.createForClass(Doubt);
-export const AnswerSchema = SchemaFactory.createForClass(Answer);
+export const AnswerSchema = SchemaFactory.createForClass(DoubtMessage);
