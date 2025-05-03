@@ -81,6 +81,7 @@ export class RegistrationLogicService {
       batch: batch._id,
       totalAmount: batch.course.discountedPrice || batch.course.originalPrice,
       amountPaid: 0,
+      mobileNumber: registrationData.phone,
       status: ORDER_STATUS.PENDING.code,
     });
 
