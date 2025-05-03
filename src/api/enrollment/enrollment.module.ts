@@ -37,5 +37,6 @@ import { EnrollmentDataService } from './enrollment.data';
   ],
   controllers: [EnrollmentController],
   providers: [EnrollmentLogicService, EnrollmentDataService],
+  exports: [EnrollmentDataService],
 })
 export class EnrollmentModule {}
