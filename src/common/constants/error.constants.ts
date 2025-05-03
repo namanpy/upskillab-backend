@@ -2,6 +2,12 @@ import { HttpStatus } from '@nestjs/common';
 import { ref } from 'process';
 
 export const ERROR = {
+  NOT_FOUND: {
+    code: HttpStatus.NOT_FOUND,
+    reference: 0,
+    message: 'Resource not found',
+  },
+
   UNAUTHORIZED: {
     code: HttpStatus.UNAUTHORIZED,
     reference: 1,
