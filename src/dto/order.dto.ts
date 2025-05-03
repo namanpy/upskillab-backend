@@ -92,6 +92,11 @@ export class GetOrderResponseDto {
   })
   user: User;
 
+  @ApiProperty({
+    type: String,
+  })
+  mobileNumber?: string;
+
   @ApiProperty()
   totalAmount: number;
 
@@ -184,6 +189,7 @@ export class GetOrdersResponseDto {
     _id: string;
     totalAmount: number;
     amountPaid: number;
+    mobileNumber?: string;
     status: string;
     createdAt: Date;
     updatedAt: Date;
