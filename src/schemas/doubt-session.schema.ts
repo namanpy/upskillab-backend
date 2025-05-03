@@ -20,6 +20,7 @@ export class DoubtMessage {
   @Prop({ type: [String] })
   attachments?: string[];
 }
+export const DoubtMessageSchema = SchemaFactory.createForClass(DoubtMessage);
 
 @Schema()
 export class Doubt {
@@ -40,9 +41,8 @@ export class Doubt {
   attachments?: string[];
 
   @ApiProperty({ required: false, type: [DoubtMessage] })
-  @Prop({ type: [Object], default: [] })
+  @Prop({ type: [DoubtMessageSchema], default: [] })
   messages?: DoubtMessage[];
 }
 
 export const DoubtSchema = SchemaFactory.createForClass(Doubt);
-export const AnswerSchema = SchemaFactory.createForClass(DoubtMessage);

@@ -13,7 +13,10 @@ import { ERROR } from '../constants/error.constants';
 
 export const USERTYPE_KEY = 'userType';
 export const AllowUserType = (userType: string) =>
-  SetMetadata(USERTYPE_KEY, userType);
+  SetMetadata(USERTYPE_KEY, [userType]);
+
+export const AllowUserTypes = (userTypes: string[]) =>
+  SetMetadata(USERTYPE_KEY, userTypes);
 
 @Injectable()
 export class UserGuard implements CanActivate {
@@ -21,13 +24,13 @@ export class UserGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const requiredUserType = this.reflector.get<string>(
+    const requiredUserTypes = this.reflector.get<string>(
       USERTYPE_KEY,
       context.getHandler(),
     );
 
     // If no userType is required, allow access
-    if (!requiredUserType) {
+    if (!requiredUserTypes || requiredUserTypes.length === 0) {
       return true;
     }
 
@@ -36,7 +39,7 @@ export class UserGuard implements CanActivate {
       throw new CustomError(ERROR.USER_NOT_FOUND);
     }
 
-    if (request.user.userType !== requiredUserType) {
+    if (requiredUserTypes.includes(request.user.userType)) {
       throw new CustomError(ERROR.ACCESS_DENIED);
     }
 
