@@ -35,7 +35,8 @@ import { ClassSessionModule } from './api/scheduler/class-session.module';
 import { EnrollmentModule } from './api/enrollment/enrollment.module';
 import { RecordedVideoModule } from './api/recorded-video/recorded-video.module';
 import { DoubtSessionModule } from './api/doubt-session/doubt-session.module';
-import { AdminTeachersModule } from './api/admin/admin-teachers/admin-teachers.module'
+import { AdminTeachersModule } from './api/admin/admin-teachers/admin-teachers.module';
+import { LiveClassesModule } from './api/live-classes/live-classes.module';
 // import { ConfigModule } from '@nestjs/config';
 //MongooseModule.forRoot('mongodb://localhost/nest')
 @Module({
@@ -77,6 +78,7 @@ import { AdminTeachersModule } from './api/admin/admin-teachers/admin-teachers.m
     RecordedVideoModule,
     DoubtSessionModule,
     AdminTeachersModule,
+    LiveClassesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
