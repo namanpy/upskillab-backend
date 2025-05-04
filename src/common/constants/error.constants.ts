@@ -114,4 +114,9 @@ export const ERROR = {
     reference: 20,
     message: 'Access denied',
   },
+  USER_NOT_ACTIVE: {
+    code: HttpStatus.NOT_FOUND,
+    reference: 21,
+    message: 'User is not active',
+  },
 };
