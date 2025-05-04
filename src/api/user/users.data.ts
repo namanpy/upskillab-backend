@@ -31,7 +31,7 @@ export class UserDataService {
       .findOne({
         $or: [{ email: identifier }, { mobileNumber: identifier }],
       })
-      .select({ password: true })
+      .select('+password')
       .lean()
       .exec();
     if (!user) throw new CustomError(ERROR.USER_NOT_FOUND);

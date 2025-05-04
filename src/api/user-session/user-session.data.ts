@@ -31,12 +31,13 @@ export class UserSessionDataService {
 
   async updateRefreshToken(
     userId: Types.ObjectId,
+    oldRefreshToken: string,
     newRefreshToken: string,
     newExpiresAt: Date,
   ) {
     return this.userSessionModel
       .findOneAndUpdate(
-        { user: userId },
+        { user: userId, refreshToken: oldRefreshToken },
         { refreshToken: newRefreshToken, expiresAt: newExpiresAt },
         { new: true },
       )

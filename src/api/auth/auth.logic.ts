@@ -49,7 +49,9 @@ export class AuthLogicService {
         expiresAt,
       });
 
-      const authTokenExpiryDate = new Date(Date.now() + expiresInSec * 1000).toISOString();
+      const authTokenExpiryDate = new Date(
+        Date.now() + expiresInSec * 1000,
+      ).toISOString();
 
       return { authToken, refreshToken, authTokenExpiryDate };
     } else throw new CustomError(ERROR.INVALID_CREDENTIALS);
@@ -65,9 +67,9 @@ export class AuthLogicService {
       identifier: email,
     });
 
-    if (!user) {
-      throw new CustomError(ERROR.USER_NOT_FOUND);
-    }
+    if (!user) throw new CustomError(ERROR.USER_NOT_FOUND);
+
+    if (!user.isActive) throw new CustomError(ERROR.USER_NOT_ACTIVE);
 
     const otp = this.generateOTP();
 
@@ -125,7 +127,9 @@ export class AuthLogicService {
 
       await this.loginAttemptDataService.deleteAttemptById(attemptId);
 
-      const authTokenExpiryDate = new Date(Date.now() + expiresInSec * 1000).toISOString();
+      const authTokenExpiryDate = new Date(
+        Date.now() + expiresInSec * 1000,
+      ).toISOString();
 
       return {
         success: true,
@@ -141,32 +145,52 @@ export class AuthLogicService {
 
   async refreshTokensPair(refreshToken: string) {
     try {
-      const payload = await this.jwtService.verifyAsync(refreshToken);
+      let payload = await this.jwtService.verifyAsync(refreshToken);
       // Find session by refresh token
-      const session = await this.userSessionDataService.getSessionByRefreshToken(refreshToken);
-      if (!session || session.refreshToken !== refreshToken || session.expiresAt < new Date()) {
+      const session =
+        await this.userSessionDataService.getSessionByRefreshToken(
+          refreshToken,
+        );
+
+      // Check if session exists and is valid
+      if (
+        !session ||
+        session.refreshToken !== refreshToken ||
+        session.expiresAt < new Date()
+      ) {
         throw new CustomError(ERROR.INVALID_CREDENTIALS);
       }
       // Generate new tokens
       const expiresInSec = 15 * 60; // 15 minutes
+
+      payload = { userId: payload.userId, email: payload.email };
+
+      const newExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      const authTokenExpiryDate = new Date(
+        Date.now() + expiresInSec * 1000,
+      ).toISOString();
+
       const newAuthToken = await this.jwtService.signAsync(payload, {
         expiresIn: `${expiresInSec}s`,
       });
       const newRefreshToken = await this.jwtService.signAsync(payload, {
         expiresIn: '7d',
       });
-      const newExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
       await this.userSessionDataService.updateRefreshToken(
         new Types.ObjectId(payload.userId),
+        refreshToken,
         newRefreshToken,
         newExpiresAt,
       );
 
-      const authTokenExpiryDate = new Date(Date.now() + expiresInSec * 1000).toISOString();
-
-      return { authToken: newAuthToken, refreshToken: newRefreshToken, authTokenExpiryDate };
+      return {
+        authToken: newAuthToken,
+        refreshToken: newRefreshToken,
+        authTokenExpiryDate,
+      };
     } catch (err) {
+      console.log(err);
       throw new CustomError(ERROR.INVALID_CREDENTIALS);
     }
   }
