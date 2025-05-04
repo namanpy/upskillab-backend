@@ -2,9 +2,12 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Teacher, TeacherDocument } from '../../schemas/teacher.schema';
-import { User, UserDocument } from '../../schemas/user.schema';
 import { CreateTeacherDto, GetTeacherRequestDTO } from '../../dto/teacher.dto';
+import { User, UserDocument } from '../../schemas/user.schema';
 import { USER_TYPES } from '../../common/constants/user.constants';
+
+// Custom type to handle populated user field
+type PopulatedTeacherDocument = Omit<TeacherDocument, 'user'> & { user: UserDocument | null };
 
 @Injectable()
 export class TeacherDataService {
@@ -15,17 +18,23 @@ export class TeacherDataService {
 
   async getTeachers(input: GetTeacherRequestDTO) {
     const { search, skip = 0, limit = 0 } = input;
-    return this.teacherModel
+    // Fetch teachers and populate user
+    const teachers = await this.teacherModel
       .find({
         ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
       })
       .skip(skip)
       .limit(limit)
-      .populate('user')
+      .populate<{ user: UserDocument | null }>('user')
       .exec();
+
+    // Filter teachers where user.isActive is true
+    return teachers.filter((teacher) => teacher.user?.isActive === true);
   }
 
-  async createTeacher(createTeacherDto: CreateTeacherDto): Promise<TeacherDocument> {
+  async createTeacher(
+    createTeacherDto: CreateTeacherDto,
+  ): Promise<TeacherDocument> {
     // Step 1: Create a new User record with userType as TEACHER and isActive as false
     const userData = {
       email: createTeacherDto.email,
@@ -56,8 +65,16 @@ export class TeacherDataService {
     return newTeacher.save();
   }
 
-  async getTeacherById(id: string): Promise<TeacherDocument | null> {
-    return this.teacherModel.findById(id).populate('user').exec();
+  async getTeacherById(id: string): Promise<PopulatedTeacherDocument | null> {
+    const teacher = await this.teacherModel
+      .findById(id)
+      .populate<{ user: UserDocument | null }>('user')
+      .exec();
+    // Return null if teacher not found or user.isActive is not true
+    if (!teacher || !teacher.user || teacher.user.isActive !== true) {
+      return null;
+    }
+    return teacher as PopulatedTeacherDocument;
   }
 
   async updateTeacher(
@@ -109,16 +126,5 @@ export class TeacherDataService {
       .findByIdAndUpdate(id, teacherData, { new: true })
       .populate('user')
       .exec();
-  }
-
-  async deleteTeacher(id: string): Promise<TeacherDocument | null> {
-    const teacher = await this.teacherModel.findById(id).exec();
-    if (!teacher) {
-      return null;
-    }
-
-    // Delete the associated user as well
-    await this.userModel.findByIdAndDelete(teacher.user).exec();
-    return this.teacherModel.findByIdAndDelete(id).exec();
   }
 }
