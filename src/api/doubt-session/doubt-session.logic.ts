@@ -94,7 +94,7 @@ export class DoubtSessionLogicService {
               return {
                 user: message.user,
                 teacher:
-                  (await this.teacherDataService.getTeacherByUserId(
+                  (await this.teacherDataService.getTeacherByUserIdUnpopulated(
                     message.user._id,
                   )) ?? undefined,
                 student:
