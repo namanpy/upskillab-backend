@@ -3,10 +3,12 @@ import { DemoSessionDataService } from './demosession.data';
 import { CreateDemoSessionDto, GetDemoSessionsResponseDTO, DemoSession } from '../../dto/demosession.dto';
 import { DemoSessionDocument } from '../../schemas/demosession.schema';
 import { mapToDto, mapToDtoArray } from '../../common/utils/map-to-dto.util';
-
+import { NotificationLogicService } from '../notification/notification.logic';
 @Injectable()
 export class DemoSessionLogicService {
-  constructor(private demoSessionDataService: DemoSessionDataService) {}
+  constructor(private demoSessionDataService: DemoSessionDataService,
+    private notificationLogicService: NotificationLogicService
+  ) {}
 
   private mapToDto(demoSession: DemoSessionDocument): DemoSession {
     return mapToDto<DemoSession, DemoSessionDocument>(demoSession);
@@ -25,6 +27,11 @@ export class DemoSessionLogicService {
 
   async createDemoSession(createDemoSessionDto: CreateDemoSessionDto) {
     const demoSession = await this.demoSessionDataService.createDemoSession(createDemoSessionDto);
+    await this.notificationLogicService.createNotification({
+      message: `New Demo Session for course "${demoSession.course}" booked by ${demoSession.fullName} (${demoSession.phoneNumber}) from ${demoSession.sourse === 'counselHub' ? 'counselHub' : 'Upskillab'}!`,
+      role: 'admin', // change as needed: 'admin', 'teacher', etc.
+      type: 'INFO'
+    });
     return {
       demoSession: this.mapToDto(demoSession),
     };
