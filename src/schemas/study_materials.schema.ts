@@ -27,6 +27,10 @@ export class StudyMaterial {
   @ApiProperty({ type: String })
   @Prop({ type: Types.ObjectId, ref: 'Chapter', required: true })
   chapter: Types.ObjectId;
+
+  @ApiProperty({ type: String })
+  @Prop({ type: Types.ObjectId, ref: 'Teacher', required: true })
+  teacher: Types.ObjectId;
 }
 
 export const StudyMaterialSchema = SchemaFactory.createForClass(StudyMaterial);
