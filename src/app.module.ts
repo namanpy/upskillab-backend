@@ -38,6 +38,8 @@ import { DoubtSessionModule } from './api/doubt-session/doubt-session.module';
 import { AdminTeachersModule } from './api/admin/admin-teachers/admin-teachers.module';
 import { LiveClassesModule } from './api/live-classes/live-classes.module';
 import { AdminStudentsModule } from './api/admin/admin-students/admin-students.module';
+import { StudyMaterialModule } from './api/study-material/study-material.module';
+import { NotificationModule } from './api/notification/notification.module';
 // import { ConfigModule } from '@nestjs/config';
 //MongooseModule.forRoot('mongodb://localhost/nest')
 @Module({
@@ -81,6 +83,8 @@ import { AdminStudentsModule } from './api/admin/admin-students/admin-students.m
     AdminTeachersModule,
     LiveClassesModule,
     AdminStudentsModule,
+    StudyMaterialModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
