@@ -1,3 +1,4 @@
+import { Types } from 'mongoose';
 import {
   Body,
   Controller,
@@ -5,6 +6,7 @@ import {
   Post,
   UseGuards,
   Request,
+  Get, // Import Get
 } from '@nestjs/common';
 import { DoubtSessionLogicService } from './doubt-session.logic';
 import {
@@ -12,6 +14,7 @@ import {
   CreateDoubtResponseDto,
   AddMessageDto,
   AddMessageResponseDto,
+  GetDoubtsResponseDto, // Import the new DTO
 } from 'src/dto/doubt-session.dto';
 import { AuthGuard } from '@nestjs/passport';
 import {
@@ -24,6 +27,7 @@ import { StudentDataService } from '../student/student.data';
 import { CustomError } from 'src/common/classes/error.class';
 import { ERROR } from 'src/common/constants/error.constants';
 import { TeacherDataService } from '../teachers/teacher.data';
+import { ApiResponse } from '@nestjs/swagger';
 
 @Controller('/doubts')
 export class DoubtSessionController {
@@ -73,7 +77,7 @@ export class DoubtSessionController {
       const teacherId =
         req.user.userType === USER_TYPES.TEACHER
           ? await this.teacherDataService
-              .getTeacherById(req.user._id)
+              .getTeacherByUserId(req.user._id)
               .then((teacher) => teacher?._id)
           : undefined;
 
@@ -86,5 +90,40 @@ export class DoubtSessionController {
         });
       } else throw new CustomError(ERROR.UNAUTHORIZED);
     } else throw new CustomError(ERROR.UNAUTHORIZED);
+  }
+
+  @Get()
+  @ApiResponse({
+    type: GetDoubtsResponseDto,
+    description: 'Get all doubts for the authenticated user',
+  })
+  @UseGuards(AuthGuard('jwt'), UserGuard)
+  @AllowUserTypes([USER_TYPES.STUDENT, USER_TYPES.TEACHER])
+  async getDoubts(@Request() req: any): Promise<GetDoubtsResponseDto> {
+    if (!req.user) {
+      throw new CustomError(ERROR.UNAUTHORIZED);
+    }
+
+    let studentId: Types.ObjectId | undefined;
+    let teacherId: Types.ObjectId | undefined;
+
+    if (req.user.userType === USER_TYPES.STUDENT) {
+      const student = await this.studentDataService.getStudentByUserId(
+        req.user._id,
+      );
+      if (!student?._id) throw new CustomError(ERROR.UNAUTHORIZED);
+      studentId = student._id;
+    } else if (req.user.userType === USER_TYPES.TEACHER) {
+      // Assuming teacher's main ID is directly on req.user._id or you have a similar service
+      const teacher = await this.teacherDataService.getTeacherByUserId(
+        req.user._id,
+      ); // Adjust if needed
+      if (!teacher?._id) throw new CustomError(ERROR.UNAUTHORIZED);
+      teacherId = teacher._id;
+    } else {
+      throw new CustomError(ERROR.UNAUTHORIZED);
+    }
+
+    return this.logic.getDoubts({ studentId, teacherId });
   }
 }

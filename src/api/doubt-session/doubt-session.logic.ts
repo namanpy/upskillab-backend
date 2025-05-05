@@ -5,12 +5,17 @@ import { CreateDoubtDto, AddMessageDto } from 'src/dto/doubt-session.dto';
 import { CustomError } from 'src/common/classes/error.class';
 import { ERROR } from 'src/common/constants/error.constants';
 import { EnrollmentDataService } from '../enrollment/enrollment.data';
+import { GetDoubtsResponseDto } from 'src/dto/doubt-session.dto'; // Import the new DTO
+import { TeacherDataService } from '../teachers/teacher.data';
+import { StudentDataService } from '../student/student.data';
 
 @Injectable()
 export class DoubtSessionLogicService {
   constructor(
     private dataService: DoubtSessionDataService,
     private enrollmentDataService: EnrollmentDataService,
+    private teacherDataService: TeacherDataService, // Inject the teacher data service
+    private studentDataService: StudentDataService, // Inject the student data service
   ) {}
 
   async createDoubt(
@@ -19,19 +24,20 @@ export class DoubtSessionLogicService {
       userId: Types.ObjectId;
     },
   ) {
-    // const enrollment =
-    //   await this.enrollmentDataService.getEnrollmentsByCourseAndUser(
-    //     input.userId,
-    //     input.courseId,
-    //   );
+    const enrollment =
+      await this.enrollmentDataService.getEnrollmentByCourseAndUser(
+        input.userId,
+        input.courseId,
+      );
 
-    // if (!enrollment) {
-    //   throw new CustomError(ERROR.UNAUTHORIZED);
-    // }
+    if (!enrollment) {
+      throw new CustomError(ERROR.UNAUTHORIZED);
+    }
 
     const doubt = await this.dataService.createDoubt({
       studentId: new Types.ObjectId(input.studentId),
       courseId: new Types.ObjectId(input.courseId),
+      teacherId: enrollment.batch.teacher,
       question: input.question,
       attachments: input.attachments,
     });
@@ -73,5 +79,45 @@ export class DoubtSessionLogicService {
       status: 'success',
       message: 'Message submitted successfully',
     };
+  }
+
+  async getDoubts(input: {
+    studentId?: Types.ObjectId;
+    teacherId?: Types.ObjectId;
+  }): Promise<GetDoubtsResponseDto> {
+    const doubts = await this.dataService.getDoubts(input);
+    return {
+      doubts: await Promise.all(
+        doubts.map(async (doubt) => {
+          const messages = await Promise.all(
+            doubt.messages.map(async (message) => {
+              return {
+                user: message.user,
+                teacher:
+                  (await this.teacherDataService.getTeacherByUserId(
+                    message.user._id,
+                  )) ?? undefined,
+                student:
+                  (await this.studentDataService.getStudentByUserId(
+                    message.user._id,
+                  )) ?? undefined,
+                message: message.message,
+                attachments: message.attachments,
+                timestamp: message.createdAt,
+              };
+            }),
+          );
+          return {
+            _id: doubt._id.toString(),
+            student: doubt.student,
+            course: doubt.course,
+            teacher: doubt.teacher,
+            question: doubt.question,
+            attachments: doubt.attachments,
+            messages,
+          };
+        }),
+      ),
+    }; // Wrap the result in the DTO structure
   }
 }
