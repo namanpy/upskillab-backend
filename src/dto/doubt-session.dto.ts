@@ -6,6 +6,10 @@ import {
   IsArray,
   IsIn,
 } from 'class-validator';
+import { Course } from 'src/schemas/course/course.schema';
+import { Student } from 'src/schemas/student.schema';
+import { User } from 'src/schemas/user.schema';
+import { Teacher } from './teacher.dto';
 
 export class CreateDoubtDto {
   @ApiProperty()
@@ -73,4 +77,62 @@ export class AddAnswerResponseDto {
 
   @ApiProperty({ example: 'Answer submitted successfully' })
   message: string;
+}
+
+export class DoubtMessageDto {
+  @ApiProperty({ type: User })
+  user: User;
+
+  @ApiProperty({ type: Teacher })
+  teacher?: Teacher;
+
+  @ApiProperty({ type: Student })
+  student?: Student;
+
+  @ApiProperty()
+  message: string;
+
+  @ApiPropertyOptional({ type: [String] })
+  attachments?: string[];
+
+  @ApiProperty()
+  timestamp: Date;
+}
+
+// DTO for a single doubt in the list
+export class DoubtListItemDto {
+  @ApiProperty()
+  _id: string;
+
+  @ApiProperty({
+    type: Student,
+  })
+  student: Student; // Assuming student ID
+
+  @ApiProperty({
+    type: Course,
+  })
+  course: Course;
+
+  @ApiProperty({
+    type: Teacher,
+  })
+  teacher: Teacher; // Assuming teacher ID
+
+  @ApiProperty()
+  question: string;
+
+  @ApiPropertyOptional({ type: [String] })
+  attachments?: string[];
+
+  @ApiPropertyOptional({ type: [DoubtMessageDto] })
+  messages?: DoubtMessageDto[];
+
+  // Add other relevant fields like createdAt, updatedAt if needed
+}
+
+// Response DTO for the GET /doubts endpoint
+export class GetDoubtsResponseDto {
+  @ApiProperty({ type: [DoubtListItemDto] })
+  doubts: DoubtListItemDto[];
 }

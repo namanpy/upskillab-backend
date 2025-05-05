@@ -1,13 +1,15 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Teacher, TeacherDocument } from '../../schemas/teacher.schema';
 import { CreateTeacherDto, GetTeacherRequestDTO } from '../../dto/teacher.dto';
 import { User, UserDocument } from '../../schemas/user.schema';
 import { USER_TYPES } from '../../common/constants/user.constants';
 
 // Custom type to handle populated user field
-type PopulatedTeacherDocument = Omit<TeacherDocument, 'user'> & { user: UserDocument | null };
+type PopulatedTeacherDocument = Omit<TeacherDocument, 'user'> & {
+  user: UserDocument | null;
+};
 
 @Injectable()
 export class TeacherDataService {
@@ -77,6 +79,16 @@ export class TeacherDataService {
     return teacher as PopulatedTeacherDocument;
   }
 
+  async getTeacherByUserId(id: Types.ObjectId | string) {
+    const teacher = await this.teacherModel
+      .findOne({
+        user: id,
+      })
+      .exec();
+
+    return teacher;
+  }
+
   async updateTeacher(
     id: string,
     updateTeacherDto: Partial<CreateTeacherDto>,
@@ -102,11 +114,9 @@ export class TeacherDataService {
         isActive: user.isActive, // Preserve isActive status
       };
 
-      const updatedUser = await this.userModel.findByIdAndUpdate(
-        teacher.user,
-        userData,
-        { new: true },
-      ).exec();
+      const updatedUser = await this.userModel
+        .findByIdAndUpdate(teacher.user, userData, { new: true })
+        .exec();
       if (!updatedUser) {
         throw new BadRequestException('Failed to update user for teacher');
       }

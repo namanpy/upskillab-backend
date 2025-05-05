@@ -2,6 +2,8 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { HydratedDocument, Types } from 'mongoose';
 import { User } from './user.schema';
+import { Course } from './course/course.schema';
+import { Teacher } from './teacher.schema';
 
 export type DoubtDocument = HydratedDocument<Doubt>;
 export type MessageDocument = HydratedDocument<DoubtMessage>;
@@ -29,8 +31,12 @@ export class Doubt {
   student: Types.ObjectId;
 
   @ApiProperty()
-  @Prop({ required: true })
+  @Prop({ required: true, ref: Course.name })
   course: Types.ObjectId;
+
+  @ApiProperty()
+  @Prop({ required: true, ref: Teacher.name })
+  teacher: Types.ObjectId;
 
   @ApiProperty()
   @Prop({ required: true })
