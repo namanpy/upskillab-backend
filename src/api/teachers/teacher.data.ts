@@ -263,9 +263,7 @@ export class TeacherDataService {
       .exec();
   }
 
-  async getTeacherByUserId(
-    userId: Types.ObjectId | string,
-  ): Promise<PopulatedTeacherDocument | null> {
+  async getTeacherByUserId(userId: Types.ObjectId | string) {
     const teacher = await this.teacherModel
       .findOne({ user: new Types.ObjectId(userId) })
       .populate<{ user: UserDocument | null }>('user')
@@ -273,7 +271,7 @@ export class TeacherDataService {
     if (!teacher || !teacher.user) {
       return null;
     }
-    return teacher as PopulatedTeacherDocument;
+    return teacher;
   }
 
   async getTeacherByUserIdUnpopulated(userId: Types.ObjectId | string) {

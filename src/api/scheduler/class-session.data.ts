@@ -1,35 +1,52 @@
-
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { ClassSession, ClassSessionDocument } from '../../schemas/class-session.schema';
-import { CreateClassSessionDto, UpdateClassSessionDto } from '../../dto/class-session.dto';
+import { Model, Types } from 'mongoose';
+import {
+  ClassSession,
+  ClassSessionDocument,
+} from '../../schemas/class-session.schema';
+import {
+  CreateClassSessionDto,
+  UpdateClassSessionDto,
+} from '../../dto/class-session.dto';
+import { Batch } from 'src/schemas/course/batch.schema';
+import { Teacher } from 'src/schemas/teacher.schema';
 
 @Injectable()
 export class ClassSessionDataService {
-  constructor(@InjectModel(ClassSession.name) private classSessionModel: Model<ClassSessionDocument>) {}
+  constructor(
+    @InjectModel(ClassSession.name)
+    private classSessionModel: Model<ClassSessionDocument>,
+  ) {}
 
-  async getClassSessions(): Promise<ClassSessionDocument[]> {
-    return this.classSessionModel.find().populate('batchId').populate('teacherId').exec();
+  async getClassSessions() {
+    return this.classSessionModel
+      .find()
+      .populate<{ batchId: Batch }>('batchId')
+      .populate<{ teacherId: Teacher }>('teacherId')
+      .exec();
   }
 
-  async getClassSessionsByTeacher(teacherId: string): Promise<ClassSessionDocument[]> {
+  async getClassSessionsByTeacher(teacherId: string | Types.ObjectId) {
     return this.classSessionModel
       .find({ teacherId })
-      .populate('batchId')
-      .populate('teacherId')
+      .populate<{ batchId: Batch }>('batchId')
+      .populate<{ teacherId: Teacher }>('teacherId')
+      .lean()
       .exec();
   }
 
-  async getClassSessionsByBatches(batchIds: string[], isApproved: boolean): Promise<ClassSessionDocument[]> {
+  async getClassSessionsByBatches(batchIds: string[], isApproved: boolean) {
     return this.classSessionModel
       .find({ batchId: { $in: batchIds }, isApproved })
-      .populate('batchId')
-      .populate('teacherId')
+      .populate<{ batchId: Batch }>('batchId')
+      .populate<{ teacherId: Teacher }>('teacherId')
       .exec();
   }
 
-  async createClassSession(createClassSessionDto: CreateClassSessionDto & { isApproved?: boolean }): Promise<ClassSessionDocument> {
+  async createClassSession(
+    createClassSessionDto: CreateClassSessionDto & { isApproved?: boolean },
+  ): Promise<ClassSessionDocument> {
     const newSession = new this.classSessionModel({
       ...createClassSessionDto,
       scheduledDate: new Date(createClassSessionDto.scheduledDate),
@@ -38,10 +55,17 @@ export class ClassSessionDataService {
   }
 
   async getClassSessionById(id: string): Promise<ClassSessionDocument | null> {
-    return this.classSessionModel.findById(id).populate('batchId').populate('teacherId').exec();
+    return this.classSessionModel
+      .findById(id)
+      .populate('batchId')
+      .populate('teacherId')
+      .exec();
   }
 
-  async updateClassSession(id: string, updateClassSessionDto: Partial<UpdateClassSessionDto>): Promise<ClassSessionDocument | null> {
+  async updateClassSession(
+    id: string,
+    updateClassSessionDto: Partial<UpdateClassSessionDto>,
+  ): Promise<ClassSessionDocument | null> {
     const updateData: any = { ...updateClassSessionDto };
     if (updateClassSessionDto.scheduledDate) {
       updateData.scheduledDate = new Date(updateClassSessionDto.scheduledDate);
@@ -76,7 +100,7 @@ export class ClassSessionDataService {
       _id: { $ne: excludeSessionId },
     });
 
-    return sessions.some(session => {
+    return sessions.some((session) => {
       const sessionStart = this.parseTime(session.scheduledStartTime);
       const sessionEnd = this.parseTime(session.scheduledEndTime);
       return startMinutes < sessionEnd && endMinutes > sessionStart;
