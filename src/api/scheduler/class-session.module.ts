@@ -8,16 +8,21 @@ import { ClassSession, ClassSessionSchema } from '../../schemas/class-session.sc
 import { BatchModule } from '../batch/batch.module';
 import { CourseModule } from '../course/course.module';
 import { TeacherModule } from '../teachers/teacher.module';
-
+import { OrderModule } from '../order/order.module';
+import { User, UserSchema } from '../../schemas/user.schema';
+// import { UsersModule } from '../user/users.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: ClassSession.name, schema: ClassSessionSchema }
+      { name: ClassSession.name, schema: ClassSessionSchema },
+      { name: User.name, schema: UserSchema },
     ]),
     BatchModule,
     CourseModule,
     TeacherModule,
+    OrderModule,
+    // UsersModule
   ],
   providers: [
     ClassSessionDataService,
@@ -27,6 +32,6 @@ import { TeacherModule } from '../teachers/teacher.module';
     // TeacherDataService,
   ],
   controllers: [ClassSessionController],
-  exports: [ClassSessionDataService],
+  // exports: [ClassSessionDataService],
 })
 export class ClassSessionModule {}
