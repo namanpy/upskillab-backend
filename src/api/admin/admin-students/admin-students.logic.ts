@@ -40,6 +40,7 @@ export class AdminStudentsLogicService {
         batchName: order.batchDetails?.name || 'N/A', // Assuming 'name' is the field for batchName
         courseId: order.batchDetails?.course || 'N/A', // Assuming 'course' is the field for courseId
         status: order.status,
+        mobileNumber: order.mobileNumber,
         totalAmount: order.totalAmount,
         amountPaid: order.amountPaid,
       })),

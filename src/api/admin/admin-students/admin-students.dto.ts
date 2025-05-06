@@ -24,6 +24,7 @@ export class StudentResponseDto {
     batchId: Types.ObjectId;
     batchName: string; // Added batchName
     courseId: Types.ObjectId; // Added courseId
+    mobileNumber: string;
     status: string;
     totalAmount: number;
     amountPaid: number;

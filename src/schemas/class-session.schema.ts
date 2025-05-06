@@ -1,10 +1,7 @@
-
-
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import * as mongoose from 'mongoose';
-// import { HydratedDocument, Types } from 'mongoose';
 
 export type ClassSessionDocument = ClassSession & Document;
 
@@ -55,8 +52,8 @@ export class ClassSession {
   teacherId: string;
 
   @ApiProperty()
-  @Prop({ required: true })
-  isRecorded: boolean;
+  @Prop({ default: false })
+  isApproved: boolean;
 
   @ApiProperty()
   @Prop()

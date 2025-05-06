@@ -24,11 +24,6 @@
 //   batchId: string;
 
 //   @ApiProperty()
-//   @IsMongoId()
-//   @IsNotEmpty()
-//   courseId: string;
-
-//   @ApiProperty()
 //   @IsDateString()
 //   @IsNotEmpty()
 //   scheduledDate: string;
@@ -82,11 +77,6 @@
 //   @IsMongoId()
 //   @IsOptional()
 //   batchId?: string;
-
-//   @ApiPropertyOptional()
-//   @IsMongoId()
-//   @IsOptional()
-//   courseId?: string;
 
 //   @ApiPropertyOptional()
 //   @IsDateString()
@@ -151,12 +141,6 @@
 //   batchName: string;
 
 //   @ApiProperty()
-//   courseId: string;
-
-//   @ApiProperty()
-//   courseName: string;
-
-//   @ApiProperty()
 //   scheduledDate: string;
 
 //   @ApiProperty()
@@ -197,7 +181,6 @@
 //   @ApiProperty({ type: [ClassSession] })
 //   classSessions: ClassSession[];
 // }
-
 
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsEnum, IsBoolean, IsOptional, IsDateString, IsMongoId } from 'class-validator';
@@ -257,10 +240,6 @@ export class CreateClassSessionDto {
   @IsMongoId()
   @IsNotEmpty()
   teacherId: string;
-
-  @ApiProperty()
-  @IsBoolean()
-  isRecorded: boolean;
 }
 
 export class UpdateClassSessionDto {
@@ -317,7 +296,7 @@ export class UpdateClassSessionDto {
   @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
-  isRecorded?: boolean;
+  isApproved?: boolean;
 
   @ApiPropertyOptional()
   @IsString()
@@ -366,7 +345,7 @@ export class ClassSession {
   teacherName: string;
 
   @ApiProperty()
-  isRecorded: boolean;
+  isApproved: boolean;
 
   @ApiProperty()
   recordingUrl: string;
