@@ -74,13 +74,13 @@ export class ClassSessionController {
     return this.classSessionLogicService.getClassSessions(req.user);
   }
 
-  @Get('STUDENT')
+  @Get('student')
   @Roles('STUDENT')
   async getStudentClassSessions(@Request() req): Promise<GetClassSessionsResponseDTO> {
     return this.classSessionLogicService.getStudentClassSessions(req.user);
   }
 
-  @Get('TEACHER')
+  @Get('teacher')
   @Roles('TEACHER')
   async getTeacherClassSessions(@Request() req): Promise<GetClassSessionsResponseDTO> {
     return this.classSessionLogicService.getTeacherClassSessions(req.user);
@@ -92,7 +92,7 @@ export class ClassSessionController {
     return this.classSessionLogicService.createClassSession(createClassSessionDto, req.user);
   }
 
-  @Post('TEACHER')
+  @Post('teacher')
   @Roles('TEACHER')
   async createTeacherClassSession(@Body() createClassSessionDto: CreateClassSessionDto, @Request() req) {
     return this.classSessionLogicService.createTeacherClassSession(createClassSessionDto, req.user);
