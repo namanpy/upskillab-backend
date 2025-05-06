@@ -15,7 +15,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-
+    console.log(exception);
     if (exception instanceof CustomError) {
       response.status(exception.code).json({
         reference: exception.reference,

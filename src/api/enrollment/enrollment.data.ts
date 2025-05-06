@@ -42,12 +42,12 @@ export class EnrollmentDataService {
   async getEnrollmentByCourseAndUser(
     userId: string | Types.ObjectId,
     courseId: string | Types.ObjectId,
-  ): Promise<Omit<Order, 'batch'> & { batch: Batch }> {
+  ): Promise<Order & { batchDetails: Batch }> {
     return this.orderModel
       .aggregate([
         {
           $match: {
-            user: userId,
+            user: new Types.ObjectId(userId),
             status: ORDER_STATUS.COMPLETED.code,
           },
         },
@@ -64,7 +64,7 @@ export class EnrollmentDataService {
         },
         {
           $match: {
-            'batchDetails.course': courseId,
+            'batchDetails.course': new Types.ObjectId(courseId),
           },
         },
       ])

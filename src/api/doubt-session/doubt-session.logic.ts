@@ -33,11 +33,12 @@ export class DoubtSessionLogicService {
     if (!enrollment) {
       throw new CustomError(ERROR.UNAUTHORIZED);
     }
-
+    console.log(enrollment);
+    // Create the doubt with the teacherId from the enrollment
     const doubt = await this.dataService.createDoubt({
       studentId: new Types.ObjectId(input.studentId),
       courseId: new Types.ObjectId(input.courseId),
-      teacherId: enrollment.batch.teacher,
+      teacherId: enrollment.batchDetails.teacher,
       question: input.question,
       attachments: input.attachments,
     });
@@ -91,6 +92,7 @@ export class DoubtSessionLogicService {
         doubts.map(async (doubt) => {
           const messages = await Promise.all(
             doubt.messages.map(async (message) => {
+              console.log(message.user);
               return {
                 user: message.user,
                 teacher:

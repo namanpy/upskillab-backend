@@ -39,7 +39,7 @@ export class UserGuard implements CanActivate {
       throw new CustomError(ERROR.USER_NOT_FOUND);
     }
 
-    if (requiredUserTypes.includes(request.user.userType)) {
+    if (!requiredUserTypes.includes(request.user.userType)) {
       throw new CustomError(ERROR.ACCESS_DENIED);
     }
 
