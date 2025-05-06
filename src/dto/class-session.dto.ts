@@ -183,7 +183,19 @@
 // }
 
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsEnum, IsBoolean, IsOptional, IsDateString, IsMongoId } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsEnum,
+  IsBoolean,
+  IsOptional,
+  IsDateString,
+  IsMongoId,
+} from 'class-validator';
+
+import { Batch } from 'src/schemas/course/batch.schema';
+
+import { Teacher } from 'src/schemas/teacher.schema';
 
 enum MeetingPlatform {
   ZOOM = 'zoom',
@@ -314,14 +326,13 @@ export class ClassSession {
   @ApiProperty()
   description: string;
 
-  @ApiProperty()
-  batchId: string;
+  @ApiProperty({
+    type: Batch,
+  })
+  batchId: Batch;
 
   @ApiProperty()
-  batchName: string;
-
-  @ApiProperty()
-  scheduledDate: string;
+  scheduledDate: Date;
 
   @ApiProperty()
   scheduledStartTime: string;
@@ -335,14 +346,15 @@ export class ClassSession {
   @ApiProperty()
   meetingPassword: string;
 
-  @ApiProperty()
-  meetingPlatform: MeetingPlatform;
+  @ApiProperty({
+    description: 'zoom, google_meet, ms_teams',
+  })
+  meetingPlatform: string;
 
-  @ApiProperty()
-  teacherId: string;
-
-  @ApiProperty()
-  teacherName: string;
+  @ApiProperty({
+    type: Teacher,
+  })
+  teacherId: Teacher;
 
   @ApiProperty()
   isApproved: boolean;
