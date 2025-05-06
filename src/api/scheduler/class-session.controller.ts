@@ -69,55 +69,55 @@ export class ClassSessionController {
   constructor(private classSessionLogicService: ClassSessionLogicService) {}
 
   @Get()
-  @Roles('admin')
+  @Roles('ADMIN')
   async getClassSessions(@Request() req): Promise<GetClassSessionsResponseDTO> {
     return this.classSessionLogicService.getClassSessions(req.user);
   }
 
-  @Get('student')
-  @Roles('student')
+  @Get('STUDENT')
+  @Roles('STUDENT')
   async getStudentClassSessions(@Request() req): Promise<GetClassSessionsResponseDTO> {
     return this.classSessionLogicService.getStudentClassSessions(req.user);
   }
 
-  @Get('teacher')
-  @Roles('teacher')
+  @Get('TEACHER')
+  @Roles('TEACHER')
   async getTeacherClassSessions(@Request() req): Promise<GetClassSessionsResponseDTO> {
     return this.classSessionLogicService.getTeacherClassSessions(req.user);
   }
 
   @Post()
-  @Roles('admin')
+  @Roles('ADMIN')
   async createClassSession(@Body() createClassSessionDto: CreateClassSessionDto, @Request() req) {
     return this.classSessionLogicService.createClassSession(createClassSessionDto, req.user);
   }
 
-  @Post('teacher')
-  @Roles('teacher')
+  @Post('TEACHER')
+  @Roles('TEACHER')
   async createTeacherClassSession(@Body() createClassSessionDto: CreateClassSessionDto, @Request() req) {
     return this.classSessionLogicService.createTeacherClassSession(createClassSessionDto, req.user);
   }
 
   @Get(':id')
-  @Roles('admin', 'teacher', 'student')
+  @Roles('ADMIN', 'TEACHER', 'STUDENT')
   async getClassSessionById(@Param('id') id: string, @Request() req) {
     return this.classSessionLogicService.getClassSessionById(id, req.user);
   }
 
   @Patch(':id')
-  @Roles('admin', 'teacher')
+  @Roles('ADMIN', 'TEACHER')
   async updateClassSession(@Param('id') id: string, @Body() updateClassSessionDto: UpdateClassSessionDto, @Request() req) {
     return this.classSessionLogicService.updateClassSession(id, updateClassSessionDto, req.user);
   }
 
   @Patch(':id/approve')
-  @Roles('admin')
+  @Roles('ADMIN')
   async approveClassSession(@Param('id') id: string, @Request() req) {
     return this.classSessionLogicService.approveClassSession(id, req.user);
   }
 
   @Delete(':id')
-  @Roles('admin')
+  @Roles('ADMIN')
   async deleteClassSession(@Param('id') id: string, @Request() req) {
     return this.classSessionLogicService.deleteClassSession(id, req.user);
   }
