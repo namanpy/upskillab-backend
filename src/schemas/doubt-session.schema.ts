@@ -11,7 +11,7 @@ export type MessageDocument = HydratedDocument<DoubtMessage>;
 @Schema()
 export class DoubtMessage {
   @ApiProperty({ type: String })
-  @Prop({ required: true, type: User })
+  @Prop({ required: true, ref: User.name })
   user: Types.ObjectId;
 
   @ApiProperty()

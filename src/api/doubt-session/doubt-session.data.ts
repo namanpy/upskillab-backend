@@ -23,7 +23,7 @@ export class DoubtSessionDataService {
     const doubt = new this.doubtModel({
       student: data.studentId,
       course: data.courseId,
-      teacherId: data.teacherId,
+      teacher: data.teacherId,
       question: data.question,
       attachments: data.attachments,
     });
@@ -52,7 +52,6 @@ export class DoubtSessionDataService {
         ...(input.teacherId && { teacher: input.teacherId }),
       })
       .populate<{ course: Course & MongooseDocument }>('course')
-      .populate<{ batch: Batch & MongooseDocument }>('batch')
       .populate<{ student: Student & MongooseDocument }>('student')
       .populate<{ teacher: Teacher & MongooseDocument }>('teacher')
       .populate<{
