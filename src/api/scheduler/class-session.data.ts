@@ -37,7 +37,10 @@ export class ClassSessionDataService {
       .exec();
   }
 
-  async getClassSessionsByBatches(batchIds: string[], isApproved: boolean) {
+  async getClassSessionsByBatches(
+    batchIds: string[] | Types.ObjectId[],
+    isApproved: boolean,
+  ) {
     return this.classSessionModel
       .find({ batchId: { $in: batchIds }, isApproved })
       .populate<{ batchId: Batch }>('batchId')

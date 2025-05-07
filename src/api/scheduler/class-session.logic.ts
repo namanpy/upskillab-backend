@@ -20,7 +20,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../../schemas/user.schema';
 import { Model } from 'mongoose';
 import { TeacherDataService } from '../teachers/teacher.data';
-import { EnrollmentDataService } from '../enrollment/enrollment.data'
+import { EnrollmentDataService } from '../enrollment/enrollment.data';
 // import { log } from 'console';
 
 @Injectable()
@@ -30,7 +30,7 @@ export class ClassSessionLogicService {
     private batchDataService: BatchDataService,
     private orderDataService: OrderDataService,
     private teacherDataService: TeacherDataService,
-    private
+    private enrollmentDataService: EnrollmentDataService,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
 
@@ -79,7 +79,7 @@ export class ClassSessionLogicService {
   }
 
   // For Students: Get sessions for enrolled batches
-  
+
   async getStudentClassSessions(
     user: any,
   ): Promise<GetClassSessionsResponseDTO> {
@@ -91,10 +91,12 @@ export class ClassSessionLogicService {
     console.log('====================================');
     console.log(user);
     console.log('====================================');
-    // console.log(getStudentClassSessions) 
+    // console.log(getStudentClassSessions)
     // Find orders for the student to get enrolled batches
-    const enrollment = await this.EnrollmentDataService.getOrdersByUser(user._Id);
-    const batchIds = enrollment.map((order) => enrollment.batch.toString());
+    const enrollment = await this.enrollmentDataService.getEnrollmentByUserId(
+      user._Id,
+    );
+    const batchIds = enrollment.order.map((order) => order.batch._id);
     console.log('====================================');
     console.log(enrollment);
     console.log(batchIds);
@@ -106,7 +108,6 @@ export class ClassSessionLogicService {
         batchIds,
         true,
       );
-      console.log(sessions);
     return {
       classSessions: sessions.map((s) => ({ ...s, _id: s._id.toString() })),
     };
@@ -227,7 +228,7 @@ export class ClassSessionLogicService {
         'Teacher ID must match the authenticated teacher',
       );
     }
-    
+
     const scheduledDate = new Date(createClassSessionDto.scheduledDate);
     if (scheduledDate < new Date()) {
       throw new BadRequestException('Scheduled date must be in the future');
