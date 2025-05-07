@@ -88,19 +88,19 @@ export class ClassSessionLogicService {
         'Only students can access their class sessions',
       );
     }
-    console.log('====================================');
-    console.log(user);
-    console.log('====================================');
+    // console.log('====================================');
+    // console.log(user);
+    // console.log('====================================');
     // console.log(getStudentClassSessions)
     // Find orders for the student to get enrolled batches
     const enrollment = await this.enrollmentDataService.getEnrollmentByUserId(
       user._id,
     );
     const batchIds = enrollment.order.map((order) => order.batch._id);
-    console.log('====================================');
-    console.log(enrollment);
-    console.log(batchIds);
-    console.log('====================================');
+    // console.log('====================================');
+    // console.log(enrollment);
+    // console.log(batchIds);
+    // console.log('====================================');
 
     // Get approved sessions for those batches
     const sessions =
@@ -332,7 +332,7 @@ export class ClassSessionLogicService {
     }
 
     if (user.userType === USER_TYPES.TEACHER) {
-      if (session.teacherId.toString() !== user.userId) {
+      if (session.teacherId.toString() !== user._id) {
         throw new ForbiddenException(
           'You can only update your own class sessions',
         );
@@ -369,12 +369,11 @@ export class ClassSessionLogicService {
     }
 
     if (updateClassSessionDto.teacherId) {
-      const teacher = await this.userModel
-        .findOne({
-          _id: updateClassSessionDto.teacherId,
-          userType: USER_TYPES.TEACHER,
-        })
-        .exec();
+      const teacher = await this.teacherDataService.getTeacherById(updateClassSessionDto.teacherId)
+        // .exec();
+        // console.log(' teacter ====================================');
+        // console.log(teacher);
+        // console.log('====================================');
       if (!teacher) {
         throw new BadRequestException(
           `Teacher with ID ${updateClassSessionDto.teacherId} not found`,
