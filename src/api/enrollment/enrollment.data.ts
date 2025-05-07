@@ -15,7 +15,7 @@ export class EnrollmentDataService {
     @InjectModel(Student.name) private studentModel: Model<StudentDocument>,
   ) {}
 
-  async getEnrollmentByUserId(userId: string): Promise<any> {
+  async getEnrollmentByUserId(userId: string) {
     const user = await this.userModel.findById(userId).exec();
     if (!user) {
       throw new NotFoundException('User not found');
@@ -28,7 +28,7 @@ export class EnrollmentDataService {
 
     const order = await this.orderModel
       .find({ user: userId, status: ORDER_STATUS.COMPLETED.code })
-      .populate<{ batch: Batch}>('batch')
+      .populate<{ batch: Batch }>('batch')
       .exec();
     if (!order) {
       throw new NotFoundException('Order not found for this user');
