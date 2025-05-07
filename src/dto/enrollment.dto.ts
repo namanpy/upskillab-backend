@@ -88,20 +88,24 @@ import { GetUserResponseDTO } from './user.dto';
 import { StudentDTO } from './student.dto';
 import { GetOrdersResponseDto } from './order.dto';
 import { GetBatchesResponseDTO } from './course/batch.dto';
+import { User } from 'src/schemas/user.schema';
+import { Student } from 'src/schemas/student.schema';
+import { Batch } from 'src/schemas/course/batch.schema';
+import { Order } from 'src/schemas/order.schema';
 // import { User } from 'src/schemas/user.schema';
 
 export class EnrollmentResponseDTO {
-  @ApiProperty({ type: () => GetUserResponseDTO })
-  user: GetUserResponseDTO;
+  @ApiProperty()
+  user: User;
 
-  @ApiProperty({ type: () => StudentDTO })
-  student: StudentDTO;
+  @ApiProperty()
+  student: Student;
 
-  @ApiProperty({ type: () => GetOrdersResponseDto })
-  order: GetOrdersResponseDto;
+  @ApiProperty()
+  order: (Omit<Order, 'batch'> & { batch: Batch })[];
 
-  @ApiProperty({ type: () => GetBatchesResponseDTO })
-  batch: GetBatchesResponseDTO;
+  @ApiProperty()
+  batch: Batch[];
 }
 
 export class EnrollmentErrorDTO {
