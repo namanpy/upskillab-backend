@@ -61,7 +61,7 @@ export class ClassSessionDataService {
 
   async getClassSessionById(id: string): Promise<ClassSessionDocument | null> {
     return this.classSessionModel
-      .findById(id)
+      .findById(new Types.ObjectId(id))
       .populate('batchId')
       .populate('teacherId')
       .lean()

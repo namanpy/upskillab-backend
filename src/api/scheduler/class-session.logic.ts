@@ -284,7 +284,7 @@ export class ClassSessionLogicService {
     }
 
     return {
-      classSession: await this.mapToDto(updatedSession),
+      classSession: updatedSession
     };
   }
 
@@ -430,7 +430,7 @@ export class ClassSessionLogicService {
       throw new NotFoundException(`Class session with ID ${id} not found`);
     }
     return {
-      classSession: await this.mapToDto(updatedSession),
+      classSession: updatedSession,
     };
   }
 
