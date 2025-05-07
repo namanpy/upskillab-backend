@@ -20,6 +20,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../../schemas/user.schema';
 import { Model } from 'mongoose';
 import { TeacherDataService } from '../teachers/teacher.data';
+import { EnrollmentDataService } from '../enrollment/enrollment.data'
+// import { log } from 'console';
 
 @Injectable()
 export class ClassSessionLogicService {
@@ -28,6 +30,7 @@ export class ClassSessionLogicService {
     private batchDataService: BatchDataService,
     private orderDataService: OrderDataService,
     private teacherDataService: TeacherDataService,
+    private
     @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
 
@@ -76,6 +79,7 @@ export class ClassSessionLogicService {
   }
 
   // For Students: Get sessions for enrolled batches
+  
   async getStudentClassSessions(
     user: any,
   ): Promise<GetClassSessionsResponseDTO> {
@@ -84,10 +88,17 @@ export class ClassSessionLogicService {
         'Only students can access their class sessions',
       );
     }
-
+    console.log('====================================');
+    console.log(user);
+    console.log('====================================');
+    // console.log(getStudentClassSessions) 
     // Find orders for the student to get enrolled batches
-    const orders = await this.orderDataService.getOrdersByUser(user.userId);
-    const batchIds = orders.map((order) => order.batch.toString());
+    const enrollment = await this.EnrollmentDataService.getOrdersByUser(user._Id);
+    const batchIds = enrollment.map((order) => enrollment.batch.toString());
+    console.log('====================================');
+    console.log(enrollment);
+    console.log(batchIds);
+    console.log('====================================');
 
     // Get approved sessions for those batches
     const sessions =
@@ -95,6 +106,7 @@ export class ClassSessionLogicService {
         batchIds,
         true,
       );
+      console.log(sessions);
     return {
       classSessions: sessions.map((s) => ({ ...s, _id: s._id.toString() })),
     };
