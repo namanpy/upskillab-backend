@@ -40,6 +40,7 @@ export class UserGuard implements CanActivate {
     }
 
     if (!requiredUserTypes.includes(request.user.userType)) {
+      console.log('Access denied. User type:', request.user.userType, 'Required types:', requiredUserTypes);
       throw new CustomError(ERROR.ACCESS_DENIED);
     }
 
