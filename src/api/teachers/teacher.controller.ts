@@ -66,7 +66,7 @@ export class TeacherController {
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'), UserGuard, RolesGuard)
-  @AllowUserType(USER_TYPES.STUDENT) // Deny access to Student user type
+  @AllowUserType(USER_TYPES.TEACHER) // Deny access to Student user type
   @Roles(USER_TYPES.TEACHER) // Allow access to Teacher user type via RolesGuard
   @Patch('me')
   async updateTeacherDetails(
