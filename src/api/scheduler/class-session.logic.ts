@@ -208,14 +208,14 @@ export class ClassSessionLogicService {
         'You can only schedule sessions for your assigned batches',
       );
     }
-
+    // console.log(createClassSessionDto, teacher);
     // Ensure teacherId matches the authenticated teacher
-    if (createClassSessionDto.teacherId === teacher._id.toString()) {
+    if (createClassSessionDto.teacherId !== teacher._id.toString()) {
       throw new BadRequestException(
         'Teacher ID must match the authenticated teacher',
       );
     }
-
+    
     const scheduledDate = new Date(createClassSessionDto.scheduledDate);
     if (scheduledDate < new Date()) {
       throw new BadRequestException('Scheduled date must be in the future');

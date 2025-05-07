@@ -24,6 +24,7 @@ export class ClassSessionDataService {
       .find()
       .populate<{ batchId: Batch }>('batchId')
       .populate<{ teacherId: Teacher }>('teacherId')
+      .lean()
       .exec();
   }
 
