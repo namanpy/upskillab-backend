@@ -28,7 +28,7 @@ export class EnrollmentDataService {
 
     const order = await this.orderModel
       .find({ user: userId, status: ORDER_STATUS.COMPLETED.code })
-      .populate('batch')
+      .populate<{ batch: Batch}>('batch')
       .exec();
     if (!order) {
       throw new NotFoundException('Order not found for this user');

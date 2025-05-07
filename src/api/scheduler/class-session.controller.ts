@@ -77,8 +77,10 @@ export class ClassSessionController {
   @Get('student')
   @Roles('STUDENT')
   async getStudentClassSessions(@Request() req): Promise<GetClassSessionsResponseDTO> {
+    // console.log(this.getStudentClassSessions)
     return this.classSessionLogicService.getStudentClassSessions(req.user);
   }
+  // console.log()
 
   @Get('teacher')
   @Roles('TEACHER')
