@@ -94,7 +94,7 @@ export class ClassSessionLogicService {
     // console.log(getStudentClassSessions)
     // Find orders for the student to get enrolled batches
     const enrollment = await this.enrollmentDataService.getEnrollmentByUserId(
-      user._Id,
+      user._id,
     );
     const batchIds = enrollment.order.map((order) => order.batch._id);
     console.log('====================================');
