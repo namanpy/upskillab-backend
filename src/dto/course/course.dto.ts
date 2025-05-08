@@ -93,7 +93,7 @@ export class CreateCourseRequestDto {
   discountedPrice: number;
 
   @ApiProperty()
-  @IsInt()
+  @IsNumber()
   @IsNotEmpty()
   courseRating: number;
 
@@ -401,7 +401,7 @@ export class UpdateCourseRequestDto {
   discountedPrice?: number;
 
   @ApiProperty()
-  @IsInt()
+  @IsNumber()
   @IsOptional()
   courseRating?: number;
 
