@@ -85,7 +85,6 @@ export class CourseLogicService {
 
           seatsAvailable: batch?.remainingSeats || 0,
           studentsEnrolled: 5000,
-          courseRating: 4.8,
         };
       }),
     );
