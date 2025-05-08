@@ -41,6 +41,7 @@ import { AdminStudentsModule } from './api/admin/admin-students/admin-students.m
 import { StudyMaterialModule } from './api/study-material/study-material.module';
 import { NotificationModule } from './api/notification/notification.module';
 import { StudentModule } from './api/student/student.module';
+import { SuggestionModule } from './api/suggestions/suggestion.module';
 // import { ConfigModule } from '@nestjs/config';
 //MongooseModule.forRoot('mongodb://localhost/nest')
 @Module({
@@ -87,6 +88,7 @@ import { StudentModule } from './api/student/student.module';
     StudyMaterialModule,
     NotificationModule,
     StudentModule,
+    SuggestionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
