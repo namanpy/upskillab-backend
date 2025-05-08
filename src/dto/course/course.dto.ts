@@ -117,6 +117,10 @@ export class CreateCourseRequestDto {
   @IsBoolean()
   active: boolean;
 
+  @ApiProperty()
+  @IsBoolean()
+  featured: boolean;
+
   @ApiProperty({ type: [ChapterDto] })
   @IsArray()
   @ValidateNested({ each: true })
@@ -163,6 +167,7 @@ enum SortField {
   ORIGINAL_PRICE = 'originalPrice',
   DISCOUNTED_PRICE = 'discountedPrice',
   ACTIVE = 'active',
+  Featured = 'featured',
 }
 
 enum SortOrder {
@@ -294,6 +299,9 @@ class CourseDisplay {
   active: boolean;
 
   @ApiProperty()
+  featured: boolean;
+
+  @ApiProperty()
   seatsAvailable: number;
 
   @ApiProperty()
@@ -404,6 +412,11 @@ export class UpdateCourseRequestDto {
   @IsBoolean()
   @IsOptional()
   active?: boolean;
+
+  @ApiProperty()
+  @IsBoolean()
+  @IsOptional()
+  featured?: boolean;
 
   @ApiProperty({ type: [ChapterDto] })
   @IsArray()
@@ -521,6 +534,9 @@ export class GetCourseByCodeResponseDto {
 
   @ApiProperty()
   active: boolean;
+
+  @ApiProperty()
+  featured: boolean;
 
   @ApiProperty({ type: [ChapterDto] })
   chapters: ChapterDto[];

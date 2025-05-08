@@ -128,6 +128,13 @@ export class Course {
   })
   active: boolean;
 
+  @ApiProperty()
+  @Prop({
+    required: true,
+    default: true,
+  })
+  featured: boolean;
+
   @ApiProperty({ type: [FAQ] })
   @Prop({
     type: [
