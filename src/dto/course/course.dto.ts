@@ -68,6 +68,11 @@ export class CreateCourseRequestDto {
 
   @ApiProperty()
   @IsString()
+  @IsOptional()
+  certifierLogo: string;
+
+  @ApiProperty()
+  @IsString()
   @IsNotEmpty()
   courseMode: string;
 
@@ -86,6 +91,11 @@ export class CreateCourseRequestDto {
   @IsInt()
   @IsNotEmpty()
   discountedPrice: number;
+
+  @ApiProperty()
+  @IsInt()
+  @IsNotEmpty()
+  courseRating: number;
 
   @ApiProperty()
   @IsString()
@@ -265,6 +275,9 @@ class CourseDisplay {
   courseImage: string;
 
   @ApiProperty()
+  certifierLogo: string;
+
+  @ApiProperty()
   courseMode: string;
 
   @ApiProperty()
@@ -275,6 +288,9 @@ class CourseDisplay {
 
   @ApiProperty()
   discountedPrice: number;
+
+  @ApiProperty()
+  courseRating: number;
 
   @ApiPropertyOptional()
   youtubeUrl: string | null;
@@ -306,9 +322,6 @@ class CourseDisplay {
 
   @ApiProperty()
   studentsEnrolled: number;
-
-  @ApiProperty()
-  courseRating: number;
 
   @ApiProperty()
   shortDescription: string;
@@ -364,6 +377,11 @@ export class UpdateCourseRequestDto {
   @ApiProperty()
   @IsString()
   @IsOptional()
+  certifierLogo?: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
   courseMode?: string;
 
   @ApiProperty()
@@ -381,6 +399,11 @@ export class UpdateCourseRequestDto {
   @IsInt()
   @IsOptional()
   discountedPrice?: number;
+
+  @ApiProperty()
+  @IsInt()
+  @IsOptional()
+  courseRating?: number;
 
   @ApiProperty()
   @IsString()
@@ -502,6 +525,9 @@ export class GetCourseByCodeResponseDto {
   courseImage: string;
 
   @ApiProperty()
+  certifierLogo: string;
+
+  @ApiProperty()
   courseMode: string;
 
   @ApiProperty()
@@ -512,6 +538,10 @@ export class GetCourseByCodeResponseDto {
 
   @ApiProperty()
   discountedPrice: number;
+
+  @ApiProperty()
+  courseRating: number;
+
 
   @ApiProperty()
   youtubeUrl: string | null;
