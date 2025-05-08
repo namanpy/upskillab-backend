@@ -204,7 +204,7 @@ export class ClassSessionLogicService {
     if (user.userType !== USER_TYPES.TEACHER) {
       throw new ForbiddenException('Only teachers can create class sessions');
     }
-
+  
     const batch = await this.batchDataService.getBatchById(
       createClassSessionDto.batchId,
     );
@@ -213,33 +213,56 @@ export class ClassSessionLogicService {
         `Batch with ID ${createClassSessionDto.batchId} not found`,
       );
     }
-
+  
     const teacher = await this.teacherDataService.getTeacherByUserId(user._id);
-    // Check if teacher is assigned to the batch
     if (!teacher || !batch.teacher._id.equals(teacher._id)) {
       throw new ForbiddenException(
         'You can only schedule sessions for your assigned batches',
       );
     }
-    // console.log(createClassSessionDto, teacher);
-    // Ensure teacherId matches the authenticated teacher
+  
     if (createClassSessionDto.teacherId !== teacher._id.toString()) {
       throw new BadRequestException(
         'Teacher ID must match the authenticated teacher',
       );
     }
-
+  
+    const now = new Date();
     const scheduledDate = new Date(createClassSessionDto.scheduledDate);
-    if (scheduledDate < new Date()) {
-      throw new BadRequestException('Scheduled date must be in the future');
+  
+    const [startHour, startMinute] = createClassSessionDto.scheduledStartTime.split(':').map(Number);
+    const [endHour, endMinute] = createClassSessionDto.scheduledEndTime.split(':').map(Number);
+  
+    const startDateTime = new Date(
+      scheduledDate.getFullYear(),
+      scheduledDate.getMonth(),
+      scheduledDate.getDate(),
+      startHour,
+      startMinute,
+      0,
+    );
+  
+    const endDateTime = new Date(
+      scheduledDate.getFullYear(),
+      scheduledDate.getMonth(),
+      scheduledDate.getDate(),
+      endHour,
+      endMinute,
+      0,
+    );
+  
+    if (scheduledDate.toDateString() === now.toDateString() && startDateTime <= now) {
+      throw new BadRequestException('Start time must be in the future for today');
     }
-
-    const startTime = this.parseTime(createClassSessionDto.scheduledStartTime);
-    const endTime = this.parseTime(createClassSessionDto.scheduledEndTime);
-    if (endTime <= startTime) {
+  
+    if (scheduledDate < new Date(now.getFullYear(), now.getMonth(), now.getDate())) {
+      throw new BadRequestException('Scheduled date must be today or in the future');
+    }
+  
+    if (endDateTime <= startDateTime) {
       throw new BadRequestException('End time must be after start time');
     }
-
+  
     const conflict = await this.classSessionDataService.checkTeacherConflict(
       createClassSessionDto.teacherId,
       scheduledDate,
@@ -251,14 +274,19 @@ export class ClassSessionLogicService {
         'Teacher is already scheduled for this time',
       );
     }
-
-    const sessionData = { ...createClassSessionDto, isApproved: false };
+  
+    const sessionData = {
+      ...createClassSessionDto,
+      isApproved: false,
+    };
+  
     const session =
       await this.classSessionDataService.createClassSession(sessionData);
     return {
       classSession: await this.mapToDto(session),
     };
   }
+  
 
   // For Admins: Approve a session
   async approveClassSession(id: string, user: any) {
@@ -330,7 +358,7 @@ export class ClassSessionLogicService {
     if (!session) {
       throw new NotFoundException(`Class session with ID ${id} not found`);
     }
-
+  
     if (user.userType === USER_TYPES.TEACHER) {
       if (session.teacherId.toString() !== user._id) {
         throw new ForbiddenException(
@@ -352,11 +380,11 @@ export class ClassSessionLogicService {
         classSession: await this.mapToDto(updatedSession),
       };
     }
-
+  
     if (user.userType !== USER_TYPES.ADMIN) {
       throw new ForbiddenException('Only admins can update class sessions');
     }
-
+  
     if (updateClassSessionDto.batchId) {
       const batch = await this.batchDataService.getBatchById(
         updateClassSessionDto.batchId,
@@ -367,43 +395,63 @@ export class ClassSessionLogicService {
         );
       }
     }
-
+  
     if (updateClassSessionDto.teacherId) {
-      const teacher = await this.teacherDataService.getTeacherById(updateClassSessionDto.teacherId)
-        // .exec();
-        // console.log(' teacter ====================================');
-        // console.log(teacher);
-        // console.log('====================================');
+      const teacher = await this.teacherDataService.getTeacherById(updateClassSessionDto.teacherId);
       if (!teacher) {
         throw new BadRequestException(
           `Teacher with ID ${updateClassSessionDto.teacherId} not found`,
         );
       }
     }
-
+  
     if (
       updateClassSessionDto.scheduledDate ||
       updateClassSessionDto.scheduledStartTime ||
       updateClassSessionDto.scheduledEndTime
     ) {
+      const now = new Date();
+  
       const scheduledDate = updateClassSessionDto.scheduledDate
         ? new Date(updateClassSessionDto.scheduledDate)
         : session.scheduledDate;
-      const startTime =
-        updateClassSessionDto.scheduledStartTime || session.scheduledStartTime;
-      const endTime =
-        updateClassSessionDto.scheduledEndTime || session.scheduledEndTime;
-
-      if (scheduledDate < new Date()) {
-        throw new BadRequestException('Scheduled date must be in the future');
+  
+      const startTime = updateClassSessionDto.scheduledStartTime || session.scheduledStartTime;
+      const endTime = updateClassSessionDto.scheduledEndTime || session.scheduledEndTime;
+  
+      const [startHour, startMinute] = startTime.split(':').map(Number);
+      const [endHour, endMinute] = endTime.split(':').map(Number);
+  
+      const startDateTime = new Date(
+        scheduledDate.getFullYear(),
+        scheduledDate.getMonth(),
+        scheduledDate.getDate(),
+        startHour,
+        startMinute,
+        0,
+      );
+  
+      const endDateTime = new Date(
+        scheduledDate.getFullYear(),
+        scheduledDate.getMonth(),
+        scheduledDate.getDate(),
+        endHour,
+        endMinute,
+        0,
+      );
+  
+      if (scheduledDate.toDateString() === now.toDateString() && startDateTime <= now) {
+        throw new BadRequestException('Start time must be in the future for today');
       }
-
-      const parsedStartTime = this.parseTime(startTime);
-      const parsedEndTime = this.parseTime(endTime);
-      if (parsedEndTime <= parsedStartTime) {
+  
+      if (scheduledDate < new Date(now.getFullYear(), now.getMonth(), now.getDate())) {
+        throw new BadRequestException('Scheduled date must be today or in the future');
+      }
+  
+      if (endDateTime <= startDateTime) {
         throw new BadRequestException('End time must be after start time');
       }
-
+  
       const teacherId =
         updateClassSessionDto.teacherId || session.teacherId.toString();
       const conflict = await this.classSessionDataService.checkTeacherConflict(
@@ -419,7 +467,7 @@ export class ClassSessionLogicService {
         );
       }
     }
-
+  
     const updatedSession =
       await this.classSessionDataService.updateClassSession(
         id,
@@ -432,6 +480,8 @@ export class ClassSessionLogicService {
       classSession: updatedSession,
     };
   }
+  
+  
 
   async deleteClassSession(id: string, user: any) {
     if (user.userType !== USER_TYPES.ADMIN) {
