@@ -22,9 +22,7 @@ export class BatchDataService {
       .exec();
   }
 
-  async createBatch(
-    createBatchDto: CreateBatchDto & { imageUrl: string },
-  ): Promise<BatchDocument> {
+async createBatch(createBatchDto: CreateBatchDto): Promise<BatchDocument> {
     const course = await this.courseModel
       .findById(createBatchDto.course)
       .exec();

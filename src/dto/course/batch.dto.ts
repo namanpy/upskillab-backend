@@ -94,8 +94,6 @@ export class BatchResponse {
   @ApiProperty({ type: Teacher, nullable: true })
   teacher: Teacher;
 
-  @ApiProperty()
-  imageUrl: string;
 
   @ApiProperty()
   active: boolean;
