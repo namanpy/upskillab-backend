@@ -14,5 +14,6 @@ import { ImageUploaderService } from '../../common/services/image-uploader.servi
   ],
   controllers: [JobController],
   providers: [JobLogicService, JobDataService, ImageUploaderService],
+  exports: [JobDataService]
 })
 export class JobModule {}
