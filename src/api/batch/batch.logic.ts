@@ -22,7 +22,6 @@ export class BatchLogicService {
         remainingSeats: batch.remainingSeats,
         duration: batch.duration,
         teacher: batch.teacher,
-        imageUrl: batch.imageUrl,
         active: batch.active,
         createdAt: batch.createdAt,
         updatedAt: batch.updatedAt,
@@ -43,25 +42,24 @@ export class BatchLogicService {
     }));
   }
 
-  async createBatch(createBatchDto: CreateBatchDto & { imageUrl: string }) {
-    const batch = await this.batchDataService.createBatch(createBatchDto);
-    return {
-      batch: {
-        _id: batch._id.toString(),
-        course: batch.course ? (batch.course as any)._id.toString() : null,
-        batchCode: batch.batchCode,
-        startDate: batch.startDate.toISOString(),
-        totalSeats: batch.totalSeats,
-        remainingSeats: batch.remainingSeats,
-        duration: batch.duration,
-        teacher: batch.teacher ? (batch.teacher as any)._id.toString() : null,
-        imageUrl: batch.imageUrl,
-        active: batch.active,
-        createdAt: batch.createdAt,
-        updatedAt: batch.updatedAt,
-      },
-    };
-  }
+ async createBatch(createBatchDto: CreateBatchDto) {
+  const batch = await this.batchDataService.createBatch(createBatchDto);
+  return {
+    batch: {
+      _id: batch._id.toString(),
+      course: batch.course ? (batch.course as any)._id.toString() : null,
+      batchCode: batch.batchCode,
+      startDate: batch.startDate.toISOString(),
+      totalSeats: batch.totalSeats,
+      remainingSeats: batch.remainingSeats,
+      duration: batch.duration,
+      teacher: batch.teacher ? (batch.teacher as any)._id.toString() : null,
+      active: batch.active,
+      createdAt: batch.createdAt,
+      updatedAt: batch.updatedAt,
+    },
+  };
+}
 
   async getBatchById(id: string) {
     const batch = await this.batchDataService.getBatchById(id);
@@ -79,7 +77,6 @@ export class BatchLogicService {
         remainingSeats: batch.remainingSeats,
         duration: batch.duration,
         teacher: batch.teacher ? batch.teacher : null,
-        imageUrl: batch.imageUrl,
         active: batch.active,
         createdAt: batch.createdAt,
         updatedAt: batch.updatedAt,
@@ -104,7 +101,6 @@ export class BatchLogicService {
         remainingSeats: batch.remainingSeats,
         duration: batch.duration,
         teacher: batch.teacher ? (batch.teacher as any)._id.toString() : null,
-        imageUrl: batch.imageUrl,
         active: batch.active,
         createdAt: batch.createdAt,
         updatedAt: batch.updatedAt,
