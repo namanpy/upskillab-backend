@@ -62,9 +62,6 @@ export class Batch {
   })
   teacher: Types.ObjectId;
 
-  @ApiProperty()
-  @Prop({ required: false })
-  imageUrl: string;
 
   @ApiProperty()
   @Prop({ default: true })
