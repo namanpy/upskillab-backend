@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { Types } from 'mongoose';
+
 import { UserDataService } from '../user/users.data';
 import { OrderDataService } from '../order/order.data';
 import { PaymentDataService } from '../payment/payment.data';
@@ -12,6 +14,7 @@ import { SendGridService } from 'src/common/services/sendgrid.service';
 import { USER_TYPES } from 'src/common/constants/user.constants';
 import { StudentDataService } from '../student/student.data';
 import { STUDENT_TYPE } from 'src/common/constants/student.constants';
+import { CouponLogicService } from '../coupon/coupon.logic';
 
 @Injectable()
 export class RegistrationLogicService {
@@ -22,6 +25,7 @@ export class RegistrationLogicService {
     private cashfreeService: CashfreeService,
     private sendGridService: SendGridService,
     private studentDataService: StudentDataService,
+    private couponLogicService: CouponLogicService, // <-- Add this
   ) {}
 
   async registerForBatch(registrationData: BatchRegistrationRequestDto) {
@@ -75,14 +79,39 @@ export class RegistrationLogicService {
     if (existingOrder && existingOrder.status === ORDER_STATUS.COMPLETED.code) {
       throw new CustomError(ERROR.ALREADY_REGISTERED_FOR_COURSE);
     }
+    // Calculate base price
+    let totalAmount =
+      batch.course.discountedPrice || batch.course.originalPrice;
+    let discount = 0;
+    let appliedCouponId: Types.ObjectId | undefined = undefined;
+
+    // --- Coupon logic ---
+    if (registrationData.couponCode) {
+      const coupon = await this.couponLogicService.validateCoupon(
+        registrationData.couponCode,
+        batch.course._id,
+        batch._id,
+      );
+      if (!coupon) {
+        throw new CustomError(ERROR.INVALID_COUPON);
+      }
+      discount = (totalAmount * coupon.discountPercent) / 100;
+      if (coupon.maxDiscountAmount && discount > coupon.maxDiscountAmount) {
+        discount = coupon.maxDiscountAmount;
+      }
+      totalAmount = totalAmount - discount;
+      appliedCouponId = coupon._id;
+    }
+
     // Create order
     const order = await this.orderDataService.createOrder({
       user: user._id,
       batch: batch._id,
-      totalAmount: batch.course.discountedPrice || batch.course.originalPrice,
+      totalAmount,
       amountPaid: 0,
       mobileNumber: registrationData.phone,
       status: ORDER_STATUS.PENDING.code,
+      coupon: appliedCouponId,
     });
 
     // Create Cashfree payment link

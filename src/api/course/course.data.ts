@@ -108,6 +108,28 @@ export class CourseDataService {
       count: await this.courseModel.countDocuments(countConditions),
     };
   }
+
+  async getCourseById(courseId: string) {
+    return this.courseModel
+      .findById(courseId)
+      .populate<{
+        category:
+          | Category
+          | (undefined extends Course['category'] ? undefined : never);
+        language:
+          | Language
+          | (undefined extends Course['language'] ? undefined : never);
+      }>([
+        {
+          path: 'category',
+        },
+        {
+          path: 'language',
+        },
+      ])
+      .lean()
+      .exec();
+  }
   async updateCourse(
     courseId: string,
     updateData: Partial<StringifyObjectId<Course>>,

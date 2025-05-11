@@ -119,4 +119,9 @@ export const ERROR = {
     reference: 21,
     message: 'User is not active',
   },
+  INVALID_COUPON: {
+    code: HttpStatus.BAD_REQUEST,
+    reference: 22,
+    message: 'Invalid coupon',
+  },
 };
