@@ -52,6 +52,13 @@ export class Order extends MongooseDocument {
   })
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Batch', required: true })
   batch: Types.ObjectId;
+
+  @ApiProperty({
+    description: 'Reference to the coupon used',
+    type: String,
+  })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Coupon', required: true })
+  coupon?: Types.ObjectId;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);

@@ -35,6 +35,9 @@ export class BatchRegistrationRequestDto {
   @IsNotEmpty()
   @ApiProperty()
   batchId: string;
+
+  @IsString()
+  couponCode?: string;
 }
 
 export class BatchRegistrationResponseDto {

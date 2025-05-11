@@ -92,7 +92,6 @@ export class DoubtSessionLogicService {
         doubts.map(async (doubt) => {
           const messages = await Promise.all(
             doubt.messages.map(async (message) => {
-              console.log(message.user);
               return {
                 user: message.user,
                 teacher:

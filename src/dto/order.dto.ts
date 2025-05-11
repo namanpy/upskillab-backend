@@ -54,6 +54,14 @@ export class CreateOrderRequestDto {
     example: '507f1f77bcf86cd799439011',
   })
   batch: string;
+
+  @IsMongoId()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'Coupon ID',
+    example: '507f1f77bcf86cd799439011',
+  })
+  couponCode: string;
 }
 
 export class CreateOrderResponseDto {
