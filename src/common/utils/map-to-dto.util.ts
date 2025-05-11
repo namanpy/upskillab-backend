@@ -28,7 +28,7 @@ export const mapToDto = <T extends BaseDto, D extends BaseDocument>(
 
   return {
     ...baseDto,
-    ...document.toObject(),
+    ...document.  toObject(),
     ...additionalFields,
     _id: document._id.toString(),
   } as T;

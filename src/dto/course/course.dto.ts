@@ -68,6 +68,11 @@ export class CreateCourseRequestDto {
 
   @ApiProperty()
   @IsString()
+  @IsOptional()
+  certifierLogo: string;
+
+  @ApiProperty()
+  @IsString()
   @IsNotEmpty()
   courseMode: string;
 
@@ -86,6 +91,11 @@ export class CreateCourseRequestDto {
   @IsInt()
   @IsNotEmpty()
   discountedPrice: number;
+
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  courseRating: number;
 
   @ApiProperty()
   @IsString()
@@ -116,6 +126,10 @@ export class CreateCourseRequestDto {
   @ApiProperty()
   @IsBoolean()
   active: boolean;
+
+  @ApiProperty()
+  @IsBoolean()
+  featured: boolean;
 
   @ApiProperty({ type: [ChapterDto] })
   @IsArray()
@@ -163,6 +177,7 @@ enum SortField {
   ORIGINAL_PRICE = 'originalPrice',
   DISCOUNTED_PRICE = 'discountedPrice',
   ACTIVE = 'active',
+  Featured = 'featured',
 }
 
 enum SortOrder {
@@ -260,6 +275,9 @@ class CourseDisplay {
   courseImage: string;
 
   @ApiProperty()
+  certifierLogo: string;
+
+  @ApiProperty()
   courseMode: string;
 
   @ApiProperty()
@@ -270,6 +288,9 @@ class CourseDisplay {
 
   @ApiProperty()
   discountedPrice: number;
+
+  @ApiProperty()
+  courseRating: number;
 
   @ApiPropertyOptional()
   youtubeUrl: string | null;
@@ -294,13 +315,13 @@ class CourseDisplay {
   active: boolean;
 
   @ApiProperty()
+  featured: boolean;
+
+  @ApiProperty()
   seatsAvailable: number;
 
   @ApiProperty()
   studentsEnrolled: number;
-
-  @ApiProperty()
-  courseRating: number;
 
   @ApiProperty()
   shortDescription: string;
@@ -356,6 +377,11 @@ export class UpdateCourseRequestDto {
   @ApiProperty()
   @IsString()
   @IsOptional()
+  certifierLogo?: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
   courseMode?: string;
 
   @ApiProperty()
@@ -373,6 +399,11 @@ export class UpdateCourseRequestDto {
   @IsInt()
   @IsOptional()
   discountedPrice?: number;
+
+  @ApiProperty()
+  @IsNumber()
+  @IsOptional()
+  courseRating?: number;
 
   @ApiProperty()
   @IsString()
@@ -404,6 +435,11 @@ export class UpdateCourseRequestDto {
   @IsBoolean()
   @IsOptional()
   active?: boolean;
+
+  @ApiProperty()
+  @IsBoolean()
+  @IsOptional()
+  featured?: boolean;
 
   @ApiProperty({ type: [ChapterDto] })
   @IsArray()
@@ -489,6 +525,9 @@ export class GetCourseByCodeResponseDto {
   courseImage: string;
 
   @ApiProperty()
+  certifierLogo: string;
+
+  @ApiProperty()
   courseMode: string;
 
   @ApiProperty()
@@ -499,6 +538,10 @@ export class GetCourseByCodeResponseDto {
 
   @ApiProperty()
   discountedPrice: number;
+
+  @ApiProperty()
+  courseRating: number;
+
 
   @ApiProperty()
   youtubeUrl: string | null;
@@ -521,6 +564,9 @@ export class GetCourseByCodeResponseDto {
 
   @ApiProperty()
   active: boolean;
+
+  @ApiProperty()
+  featured: boolean;
 
   @ApiProperty({ type: [ChapterDto] })
   chapters: ChapterDto[];

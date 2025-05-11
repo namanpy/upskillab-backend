@@ -45,6 +45,7 @@ export class ClassSessionDataService {
       .find({ batchId: { $in: batchIds }, isApproved })
       .populate<{ batchId: Batch }>('batchId')
       .populate<{ teacherId: Teacher }>('teacherId')
+      .lean()
       .exec();
   }
 
@@ -60,9 +61,10 @@ export class ClassSessionDataService {
 
   async getClassSessionById(id: string): Promise<ClassSessionDocument | null> {
     return this.classSessionModel
-      .findById(id)
+      .findById(new Types.ObjectId(id))
       .populate('batchId')
       .populate('teacherId')
+      .lean()
       .exec();
   }
 
@@ -78,6 +80,7 @@ export class ClassSessionDataService {
       .findByIdAndUpdate(id, updateData, { new: true })
       .populate('batchId')
       .populate('teacherId')
+      .lean()
       .exec();
   }
 
