@@ -63,6 +63,12 @@ export class Course {
 
   @ApiProperty()
   @Prop({
+    required: false,
+  })
+  certifierLogo: string;
+
+  @ApiProperty()
+  @Prop({
     required: true,
     type: String,
     enum: Object.keys(COURSE_MODE),
@@ -89,6 +95,13 @@ export class Course {
     min: 0,
   })
   discountedPrice: number;
+
+  @ApiProperty()
+  @Prop({
+    required: false,
+    min: 0,
+  })
+  courseRating: number;
 
   @ApiProperty()
   @Prop({
@@ -127,6 +140,13 @@ export class Course {
     default: true,
   })
   active: boolean;
+
+  @ApiProperty()
+  @Prop({
+    required: true,
+    default: true,
+  })
+  featured: boolean;
 
   @ApiProperty({ type: [FAQ] })
   @Prop({

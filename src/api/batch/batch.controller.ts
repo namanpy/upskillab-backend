@@ -58,33 +58,39 @@ export class BatchController {
     status: 201,
     description: 'Create a new batch with image upload',
   })
+  // @Post('')
+  // @UseInterceptors(FileInterceptor('image'))
+  // @UsePipes(new TransformBooleanPipe())
+  // async createBatch(
+  //   @Body() createBatchDto: CreateBatchDto,
+  //   @UploadedFile() file: Express.Multer.File,
+  // ) {
+  //   if (!file) {
+  //     throw new BadRequestException('Image file is required');
+  //   }
+
+  //   const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+  //   if (!allowedMimeTypes.includes(file.mimetype)) {
+  //     throw new BadRequestException(
+  //       'Only JPEG, PNG, and GIF images are allowed',
+  //     );
+  //   }
+
+  //   const imageUrl = await this.imageUploaderService.uploadImage(
+  //     file,
+  //     'batches',
+  //     Date.now().toString(),
+  //   );
+  //   const batchData = { ...createBatchDto, imageUrl };
+
+  //   return await this.batchLogicService.createBatch(batchData);
+  // }
+
   @Post('')
-  @UseInterceptors(FileInterceptor('image'))
-  @UsePipes(new TransformBooleanPipe())
-  async createBatch(
-    @Body() createBatchDto: CreateBatchDto,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
-    if (!file) {
-      throw new BadRequestException('Image file is required');
-    }
-
-    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
-    if (!allowedMimeTypes.includes(file.mimetype)) {
-      throw new BadRequestException(
-        'Only JPEG, PNG, and GIF images are allowed',
-      );
-    }
-
-    const imageUrl = await this.imageUploaderService.uploadImage(
-      file,
-      'batches',
-      Date.now().toString(),
-    );
-    const batchData = { ...createBatchDto, imageUrl };
-
-    return await this.batchLogicService.createBatch(batchData);
-  }
+@UsePipes(new TransformBooleanPipe())
+async createBatch(@Body() createBatchDto: CreateBatchDto) {
+  return await this.batchLogicService.createBatch(createBatchDto);
+}
 
   @ApiResponse({
     status: 200,
