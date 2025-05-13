@@ -7,6 +7,7 @@ import { RegistrationController } from './registration.controller';
 import { RegistrationLogicService } from './registration.logic';
 import { PaymentModule } from '../payment/payment.module';
 import { StudentModule } from '../student/student.module';
+import { CouponModule } from '../coupon/coupon.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { StudentModule } from '../student/student.module';
     BatchModule,
     PaymentModule,
     StudentModule,
+    CouponModule,
   ],
   controllers: [RegistrationController],
   providers: [RegistrationLogicService],
