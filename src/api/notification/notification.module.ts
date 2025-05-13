@@ -5,13 +5,13 @@ import { NotificationDataService } from './notification.data';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Notification, NotificationSchema } from '../../schemas/notification.schema';
 import { NotificationController } from './notification.controller'; // <-- ADD THIS
-
+import { NotificationGateway } from './notification.gateway';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Notification.name, schema: NotificationSchema }]),
   ],
   controllers: [NotificationController], // <-- ADD THIS LINE
-  providers: [NotificationLogicService, NotificationDataService],
+  providers: [NotificationLogicService, NotificationDataService,NotificationGateway],
   exports: [NotificationLogicService],
 })
 export class NotificationModule {}
