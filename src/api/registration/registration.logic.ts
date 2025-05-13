@@ -14,7 +14,7 @@ import { SendGridService } from 'src/common/services/sendgrid.service';
 import { USER_TYPES } from 'src/common/constants/user.constants';
 import { StudentDataService } from '../student/student.data';
 import { STUDENT_TYPE } from 'src/common/constants/student.constants';
-import { CouponLogicService } from '../coupon/coupon.logic';
+// import { CouponLogicService } from '../coupon/coupon.logic';
 
 @Injectable()
 export class RegistrationLogicService {
@@ -25,7 +25,7 @@ export class RegistrationLogicService {
     private cashfreeService: CashfreeService,
     private sendGridService: SendGridService,
     private studentDataService: StudentDataService,
-    private couponLogicService: CouponLogicService, // <-- Add this
+    // private couponLogicService: CouponLogicService, // <-- Add this
   ) {}
 
   async registerForBatch(registrationData: BatchRegistrationRequestDto) {
@@ -86,22 +86,22 @@ export class RegistrationLogicService {
     let appliedCouponId: Types.ObjectId | undefined = undefined;
 
     // --- Coupon logic ---
-    if (registrationData.couponCode) {
-      const coupon = await this.couponLogicService.validateCoupon(
-        registrationData.couponCode,
-        batch.course._id,
-        batch._id,
-      );
-      if (!coupon) {
-        throw new CustomError(ERROR.INVALID_COUPON);
-      }
-      discount = (totalAmount * coupon.discountPercent) / 100;
-      if (coupon.maxDiscountAmount && discount > coupon.maxDiscountAmount) {
-        discount = coupon.maxDiscountAmount;
-      }
-      totalAmount = totalAmount - discount;
-      appliedCouponId = coupon._id;
-    }
+    // if (registrationData.couponCode) {
+    //   const coupon = await this.couponLogicService.validateCoupon(
+    //     registrationData.couponCode,
+    //     batch.course._id,
+    //     batch._id,
+    //   );
+    //   if (!coupon) {
+    //     throw new CustomError(ERROR.INVALID_COUPON);
+    //   }
+    //   discount = (totalAmount * coupon.discountPercent) / 100;
+    //   if (coupon.maxDiscountAmount && discount > coupon.maxDiscountAmount) {
+    //     discount = coupon.maxDiscountAmount;
+    //   }
+    //   totalAmount = totalAmount - discount;
+    //   appliedCouponId = coupon._id;
+    // }
 
     // Create order
     const order = await this.orderDataService.createOrder({
