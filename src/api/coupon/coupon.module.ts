@@ -4,8 +4,8 @@ import { Coupon, CouponSchema } from 'src/schemas/coupon.schema';
 import { CouponDataService } from './coupon.data';
 import { CouponLogicService } from './coupon.logic';
 import { CouponController } from './coupon.controller';
-import { BatchDataService } from '../batch/batch.data';
-import { CourseDataService } from '../course/course.data';
+// import { BatchDataService } from '../batch/batch.data';
+// import { CourseDataService } from '../course/course.data';
 import { BatchModule } from '../batch/batch.module';
 import { CourseModule } from '../course/course.module';
 
@@ -18,8 +18,8 @@ import { CourseModule } from '../course/course.module';
   providers: [
     CouponDataService,
     CouponLogicService,
-    BatchDataService,
-    CourseDataService,
+    // BatchDataService,
+    // CourseDataService,
   ],
   controllers: [CouponController],
   exports: [CouponLogicService, CouponDataService],
