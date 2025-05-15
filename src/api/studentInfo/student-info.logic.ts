@@ -6,9 +6,10 @@ import { Student, StudentDocument } from '../../schemas/student.schema';
 import { Order, OrderDocument } from '../../schemas/order.schema';
 import { Batch, BatchDocument } from '../../schemas/course/batch.schema';
 import { Course, CourseDocuments } from '../../schemas/course/course.schema';
-import { StudentInfoDTO, StudentInfoResponseDTO, OrderHistoryDTO } from '../../dto/student-info.dto';
+import { StudentInfoDTO, StudentInfoResponseDTO, OrderHistoryDTO, AttendanceHistoryDTO } from '../../dto/student-info.dto';
 import { USER_TYPES } from '../../common/constants/user.constants';
 import { ORDER_STATUS } from '../../common/constants/order.constants';
+import { LiveClassesDataService } from '../live-classes/live-classes.data';
 
 @Injectable()
 export class StudentInfoLogicService {
@@ -18,6 +19,7 @@ export class StudentInfoLogicService {
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
     @InjectModel(Batch.name) private batchModel: Model<BatchDocument>,
     @InjectModel(Course.name) private courseModel: Model<CourseDocuments>,
+    private liveClassesDataService: LiveClassesDataService,
   ) {}
 
   private async mapToOrderHistoryDTO(order: any): Promise<OrderHistoryDTO> {
@@ -45,6 +47,15 @@ export class StudentInfoLogicService {
     const completedCourses = orders.filter(o => o.status === ORDER_STATUS.COMPLETED.code).length;
     const pendingCourses = orders.filter(o => o.status === ORDER_STATUS.PENDING.code).length;
 
+    const attendanceData = await this.liveClassesDataService.getUserAttendance(user._id.toString());
+    const attendanceHistory = attendanceData.map(({ classSession, attendance }) => ({
+      classId: classSession._id.toString(),
+      meetingLink: classSession.meetingLink,
+      scheduledDate: classSession.scheduledDate,
+      scheduledStartTime: classSession.scheduledStartTime,
+      isAttended: attendance ? attendance.isAttended : false,
+    }));
+
     return {
       userId: user._id.toString(),
       email: user.email,
@@ -60,6 +71,7 @@ export class StudentInfoLogicService {
       orderHistory,
       completedCourses,
       pendingCourses,
+      attendanceHistory,
     };
   }
 

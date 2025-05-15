@@ -10,7 +10,7 @@ export class LiveClassesDataService {
   constructor(
     @InjectModel(ClassSession.name) private classSessionModel: Model<ClassSessionDocument>,
     @InjectModel(Attendance.name) private attendanceModel: Model<AttendanceDocument>,
-  ) {}
+  ) { }
 
   async getLiveClasses(): Promise<ClassSessionDocument[]> {
     // Fetch live classes for today or future dates
@@ -78,5 +78,37 @@ export class LiveClassesDataService {
     };
     const newAttendance = new this.attendanceModel(attendanceData);
     return newAttendance.save();
+  }
+  async getUserAttendance(userId: string): Promise<{ classSession: ClassSessionDocument; attendance: AttendanceDocument | null }[]> {
+    // Get all upcoming classes (similar to getLiveClasses())
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to start of the day
+
+    const classSessions = await this.classSessionModel
+      .find({
+        scheduledDate: { $gte: today },
+      })
+      .sort({ scheduledDate: 1, scheduledStartTime: 1 })
+      .exec();
+
+    // Get all attendance records for this user for these classes
+    const attendances = await this.attendanceModel
+      .find({
+        userId,
+        classId: { $in: classSessions.map(session => session._id) }
+      })
+      .exec();
+
+    // Map attendance records to classes
+    return classSessions.map(classSession => {
+      const attendance = attendances.find(
+        attendance => attendance.classId.toString() === classSession._id.toString()
+      );
+
+      return {
+        classSession,
+        attendance: attendance || null,
+      };
+    });
   }
 }
