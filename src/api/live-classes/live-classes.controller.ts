@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, UseGuards, BadRequestException } from '@nestjs/common';
 import { LiveClassesLogicService } from './live-classes.logic';
-import { LiveClassesResponseDto, LiveClassResponseDto, MarkAttendanceDto, MarkAttendanceResponseDto } from '../../dto/live-classes.dto';
+import { LiveClassesResponseDto, LiveClassResponseDto, MarkAttendanceDto, MarkAttendanceResponseDto, UserAttendanceResponseDto } from '../../dto/live-classes.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-// import { User } from '../../common/decorators/get-user.decorator';
 import { User } from '../../common/decorators/user.decorator';
 import { UserDocument } from '../../schemas/user.schema';
+import { Types } from 'mongoose';
 
 @ApiTags('live-classes')
 @Controller('live-classes')
@@ -24,11 +24,28 @@ export class LiveClassesController {
 
   @ApiResponse({
     status: 200,
+    description: 'Get user attendance history',
+    type: UserAttendanceResponseDto,
+  })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Get('attendance')
+  async getUserAttendance(@User() user: UserDocument): Promise<UserAttendanceResponseDto> {
+    console.log('getUserAttendance: User ID:', user._id.toString());
+    return this.liveClassesLogicService.getUserAttendance(user._id.toString());
+  }
+
+  @ApiResponse({
+    status: 200,
     description: 'Get a live class by ID',
     type: LiveClassResponseDto,
   })
   @Get(':classId')
   async getLiveClassById(@Param('classId') classId: string): Promise<LiveClassResponseDto> {
+    console.log('getLiveClassById: Class ID:', classId);
+    if (!Types.ObjectId.isValid(classId)) {
+      throw new BadRequestException('Invalid class ID');
+    }
     return this.liveClassesLogicService.getLiveClassById(classId);
   }
 
@@ -45,6 +62,10 @@ export class LiveClassesController {
     @User() user: UserDocument,
     @Body() markAttendanceDto: MarkAttendanceDto,
   ): Promise<MarkAttendanceResponseDto> {
+    console.log('markAttendance: Class ID:', classId, 'User ID:', user._id.toString());
+    if (!Types.ObjectId.isValid(classId)) {
+      throw new BadRequestException('Invalid class ID');
+    }
     return this.liveClassesLogicService.markAttendance(
       classId,
       user._id.toString(),
