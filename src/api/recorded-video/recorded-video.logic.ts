@@ -194,6 +194,7 @@ export class RecordedVideoLogicService {
     const video = await this.recordedVideoDataService.createVideo(createRecordedVideoDto);
     return { video: await this.mapToDto(video) };
   }
+  
 
   async getVideoById(id: string, user: IUser) {
     const video = await this.recordedVideoDataService.getVideoById(id);

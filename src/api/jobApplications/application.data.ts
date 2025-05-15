@@ -12,6 +12,7 @@ export class ApplicationDataService {
   async createApplication(applicationData: Omit<Application, '_id' | 'createdAt' | 'updatedAt'>): Promise<ApplicationDocument> {
     try {
       const newApplication = new this.applicationModel(applicationData);
+      console.log(newApplication)
       return await newApplication.save();
     } catch (error) {
       if (error.code === 11000) { // Duplicate key error (unique constraint violation)

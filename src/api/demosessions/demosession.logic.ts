@@ -28,7 +28,7 @@ export class DemoSessionLogicService {
   async createDemoSession(createDemoSessionDto: CreateDemoSessionDto) {
     const demoSession = await this.demoSessionDataService.createDemoSession(createDemoSessionDto);
     await this.notificationLogicService.createNotification({
-      message: `New Demo Session for course "${demoSession.course}" booked by ${demoSession.fullName} (${demoSession.phoneNumber}) from ${demoSession.sourse === 'counselHub' ? 'counselHub' : 'Upskillab'}!`,
+      message: `New Demo Session for course "${demoSession.course}" booked by ${demoSession.fullName} from ${demoSession.sourse === 'counselHub' ? 'counselHub' : 'Upskillab'}!`,
       role: 'admin', // change as needed: 'admin', 'teacher', etc.
       type: 'INFO'
     });

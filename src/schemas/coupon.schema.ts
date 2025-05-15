@@ -9,11 +9,11 @@ export type CouponDocument = Coupon & Document;
 @Schema({ timestamps: true })
 export class Coupon {
   @ApiProperty()
-  @Prop({ required: true, unique: true })
+  @Prop({ required: false, unique: true })
   code: string;
 
   @ApiPropertyOptional({ type: Number, description: 'Discount percentage (0-100)' })
-  @Prop({ required: true })
+  @Prop({ required: false })
   discountPercent: number;
 
   @ApiPropertyOptional({ type: Number, description: 'Maximum discount amount' })

@@ -4,6 +4,7 @@ import { HydratedDocument, Types } from 'mongoose';
 import { User } from './user.schema';
 import { Course } from './course/course.schema';
 import { Teacher } from './teacher.schema';
+import { Student } from './student.schema';
 
 export type DoubtDocument = HydratedDocument<Doubt>;
 export type MessageDocument = HydratedDocument<DoubtMessage>;
@@ -27,7 +28,7 @@ export const DoubtMessageSchema = SchemaFactory.createForClass(DoubtMessage);
 @Schema()
 export class Doubt {
   @ApiProperty()
-  @Prop({ required: true })
+  @Prop({ required: true,ref: Student.name })
   student: Types.ObjectId;
 
   @ApiProperty()
