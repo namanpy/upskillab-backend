@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsBoolean, IsArray, IsNumber, IsOptional } from 'class-validator';
+import { Types } from 'mongoose';
 
 export class QualificationDTO {
   @ApiPropertyOptional({ description: 'College name of the student' })
@@ -36,6 +37,27 @@ export class OrderHistoryDTO {
   @ApiProperty({ description: 'Course title' })
   @IsString()
   courseTitle: string;
+}
+
+export class AttendanceHistoryDTO {
+  @ApiProperty({ description: 'Class ID' })
+  @IsString()
+  classId: string;
+
+  @ApiProperty({ description: 'Meeting link for the class' })
+  @IsString()
+  meetingLink: string;
+
+  @ApiProperty({ description: 'Scheduled date of the class' })
+  scheduledDate: Date;
+
+  @ApiProperty({ description: 'Scheduled start time of the class' })
+  @IsString()
+  scheduledStartTime: string;
+
+  @ApiProperty({ description: 'Whether the user attended the class' })
+  @IsBoolean()
+  isAttended: boolean;
 }
 
 export class StudentInfoDTO {
@@ -100,6 +122,10 @@ export class StudentInfoDTO {
   @ApiProperty({ description: 'Number of pending courses' })
   @IsNumber()
   pendingCourses: number;
+
+  @ApiProperty({ description: 'Attendance history of the student', type: [AttendanceHistoryDTO] })
+  @IsArray()
+  attendanceHistory: AttendanceHistoryDTO[];
 }
 
 export class StudentInfoResponseDTO {

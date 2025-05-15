@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { LiveClassesDataService } from './live-classes.data';
-import { LiveClassesResponseDto, LiveClassResponseDto, MarkAttendanceDto, MarkAttendanceResponseDto } from '../../dto/live-classes.dto';
+import { LiveClassesResponseDto, LiveClassResponseDto, MarkAttendanceDto, MarkAttendanceResponseDto, UserAttendanceResponseDto } from '../../dto/live-classes.dto';
 import { ClassSessionDocument } from '../../schemas/class-session.schema';
 import { AttendanceDocument } from '../../schemas/attendance.schema';
 
@@ -16,6 +16,7 @@ export class LiveClassesLogicService {
         meetingLink: liveClass.meetingLink,
         scheduledDate: liveClass.scheduledDate,
         scheduledStartTime: liveClass.scheduledStartTime,
+        isAttended: false, // Default for listing all classes
       })),
     };
   }
@@ -30,6 +31,7 @@ export class LiveClassesLogicService {
       meetingLink: liveClass.meetingLink,
       scheduledDate: liveClass.scheduledDate,
       scheduledStartTime: liveClass.scheduledStartTime,
+      isAttended: false, // Default for single class
     };
   }
 
@@ -50,6 +52,19 @@ export class LiveClassesLogicService {
       isAttended: attendance.isAttended,
       createdAt: attendance.createdAt,
       updatedAt: attendance.updatedAt,
+    };
+  }
+
+  async getUserAttendance(userId: string): Promise<UserAttendanceResponseDto> {
+    const attendanceData = await this.liveClassesDataService.getUserAttendance(userId);
+    return {
+      classes: attendanceData.map(({ classSession, attendance }) => ({
+        _id: classSession._id,
+        meetingLink: classSession.meetingLink,
+        scheduledDate: classSession.scheduledDate,
+        scheduledStartTime: classSession.scheduledStartTime,
+        isAttended: attendance ? attendance.isAttended : false,
+      })),
     };
   }
 }
