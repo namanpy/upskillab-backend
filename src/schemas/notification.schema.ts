@@ -14,7 +14,7 @@ export class Notification extends Document {
   recipient: Types.ObjectId;
 
   @Prop({
-    required: true,
+    required: false,
     enum: [
       'admin',
       'teacher',
