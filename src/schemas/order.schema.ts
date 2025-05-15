@@ -57,7 +57,11 @@ export class Order extends MongooseDocument {
     description: 'Reference to the coupon used',
     type: String,
   })
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Coupon', required: true })
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Coupon',
+    required: false,
+  })
   coupon?: Types.ObjectId;
 }
 
