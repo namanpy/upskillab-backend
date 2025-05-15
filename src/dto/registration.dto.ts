@@ -4,6 +4,7 @@ import {
   IsEmail,
   IsMongoId,
   IsNotEmpty,
+  IsOptional,
   IsString,
   Length,
   Matches,
@@ -37,6 +38,7 @@ export class BatchRegistrationRequestDto {
   batchId: string;
 
   @IsString()
+  @IsOptional()
   couponCode?: string;
 }
 
