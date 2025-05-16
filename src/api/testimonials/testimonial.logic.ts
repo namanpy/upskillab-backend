@@ -1,15 +1,33 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { TestimonialDataService } from './testimonial.data';
+import { Types } from 'mongoose';
 // import { CreateTestimonialDto } from '../../dto/testimonial.dto';
-import { CreateTestimonialDto, GetTestimonialsResponseDTO } from '../../dto//home/testimonial.dto';
+import {
+  CreateTestimonialDto,
+  GetTestimonialsResponseDTO,
+} from '../../dto//home/testimonial.dto';
+import { StudentDataService } from '../student/student.data';
+import { USER_TYPES } from 'src/common/constants/user.constants';
+import { CustomError } from 'src/common/classes/error.class';
+import { ERROR } from 'src/common/constants/error.constants';
 // import { TestimonialDocument } from '../../schemas/testimonial.schema';
 
 @Injectable()
 export class TestimonialLogicService {
-  constructor(private testimonialDataService: TestimonialDataService) {}
+  constructor(
+    private testimonialDataService: TestimonialDataService,
+    private studentDataService: StudentDataService,
+  ) {}
 
-  async getTestimonials(): Promise<GetTestimonialsResponseDTO> {
-    const testimonials = await this.testimonialDataService.getTestimonials();
+  async getTestimonials({
+    userType,
+  }: {
+    userType?: string;
+  }): Promise<GetTestimonialsResponseDTO> {
+    const testimonials = await this.testimonialDataService.getTestimonials({
+      onlyActive: userType !== USER_TYPES.ADMIN,
+    });
+
     return {
       testimonials: testimonials.map((testimonial) => ({
         _id: testimonial._id.toString(),
@@ -27,8 +45,25 @@ export class TestimonialLogicService {
     };
   }
 
-  async createTestimonial(createTestimonialDto: CreateTestimonialDto) {
-    const testimonial = await this.testimonialDataService.createTestimonial(createTestimonialDto);
+  async createTestimonial(
+    createTestimonialDto: CreateTestimonialDto & { userId?: Types.ObjectId },
+  ) {
+    const student = createTestimonialDto.userId
+      ? await this.studentDataService.getStudentByUserId(
+          createTestimonialDto.userId,
+        )
+      : undefined;
+
+    const testimonial = await this.testimonialDataService.createTestimonial({
+      ...createTestimonialDto,
+      name: student?.fullName || createTestimonialDto.name,
+      testimonialImageUrl:
+        student?.image || createTestimonialDto.testimonialImageUrl,
+      socialMediaLinks: createTestimonialDto.socialMediaLinks || [],
+      student: student?._id,
+      isActive: !student?._id,
+    });
+
     return {
       testimonial: {
         _id: testimonial._id.toString(),
@@ -47,7 +82,8 @@ export class TestimonialLogicService {
   }
 
   async getTestimonialById(id: string) {
-    const testimonial = await this.testimonialDataService.getTestimonialById(id);
+    const testimonial =
+      await this.testimonialDataService.getTestimonialById(id);
     if (!testimonial) {
       throw new NotFoundException(`Testimonial with ID ${id} not found`);
     }
@@ -68,11 +104,43 @@ export class TestimonialLogicService {
     };
   }
 
-  async updateTestimonial(id: string, updateTestimonialDto: Partial<CreateTestimonialDto>) {
-    const testimonial = await this.testimonialDataService.updateTestimonial(id, updateTestimonialDto);
-    if (!testimonial) {
-      throw new NotFoundException(`Testimonial with ID ${id} not found`);
+  async updateTestimonial(
+    id: string,
+    updateTestimonialDto: Partial<CreateTestimonialDto> & {
+      userId: Types.ObjectId;
+      userType: string;
+    },
+  ) {
+    const existingTestimonial =
+      await this.testimonialDataService.getTestimonialById(id);
+
+    if (!existingTestimonial) throw new CustomError(ERROR.NOT_FOUND);
+
+    if (updateTestimonialDto.userType === USER_TYPES.STUDENT) {
+      const student = await this.studentDataService.getStudentByUserId(
+        updateTestimonialDto.userId,
+      );
+
+      // If not the owner of the testimonial, throw an error
+      if (
+        !existingTestimonial.student ||
+        !student?._id?.equals(existingTestimonial.student)
+      )
+        throw new CustomError(ERROR.UNAUTHORIZED);
     }
+
+    const testimonial = await this.testimonialDataService.updateTestimonial(
+      id,
+      {
+        ...updateTestimonialDto,
+        ...(updateTestimonialDto.userType === USER_TYPES.STUDENT && {
+          isActive: false,
+        }),
+      },
+    );
+
+    if (!testimonial) throw new CustomError(ERROR.NOT_FOUND);
+
     return {
       testimonial: {
         _id: testimonial._id.toString(),
