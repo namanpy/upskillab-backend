@@ -7,12 +7,14 @@ import {
   Testimonial,
   TestimonialSchema,
 } from '../../schemas/home/testimonial.schema';
+import { StudentModule } from '../student/student.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Testimonial.name, schema: TestimonialSchema },
     ]),
+    StudentModule,
   ],
   providers: [TestimonialDataService, TestimonialLogicService],
   controllers: [TestimonialController],

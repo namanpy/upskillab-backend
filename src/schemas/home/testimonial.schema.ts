@@ -4,6 +4,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import mongoose, { HydratedDocument, Types } from 'mongoose';
+import { Student } from '../student.schema';
 
 export type TestimonialDocument = HydratedDocument<Testimonial> & {
   createdAt: Date;
@@ -47,6 +48,14 @@ export class Testimonial {
   @ApiProperty({ type: [SocialMediaLink] })
   @Prop({ type: [SocialMediaLink], default: [] })
   socialMediaLinks: SocialMediaLink[];
+
+  @ApiProperty({ type: Types.ObjectId })
+  @Prop({ required: false, ref: Student.name })
+  student?: Types.ObjectId;
+
+  @ApiProperty()
+  @Prop({ default: false, required: false })
+  isActive?: boolean;
 }
 
 export const TestimonialSchema = SchemaFactory.createForClass(Testimonial);

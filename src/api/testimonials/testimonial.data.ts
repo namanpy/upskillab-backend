@@ -1,20 +1,40 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Testimonial, TestimonialDocument } from '../../schemas/home/testimonial.schema';
+import {
+  Testimonial,
+  TestimonialDocument,
+} from '../../schemas/home/testimonial.schema';
 import { CreateTestimonialDto } from '../../dto/home/testimonial.dto';
+import { MongooseDocument } from 'src/schemas/common.schema';
 
 @Injectable()
 export class TestimonialDataService {
   constructor(
-    @InjectModel(Testimonial.name) private testimonialModel: Model<TestimonialDocument>,
+    @InjectModel(Testimonial.name)
+    private testimonialModel: Model<TestimonialDocument>,
   ) {}
 
-  async getTestimonials(): Promise<TestimonialDocument[]> {
-    return this.testimonialModel.find().exec();
+  async getTestimonials({
+    onlyActive = true,
+  }: {
+    onlyActive?: boolean;
+  } = {}): Promise<TestimonialDocument[]> {
+    return this.testimonialModel
+      .find(
+        onlyActive
+          ? {
+              $or: [{ isActive: true }, { isActive: { $exists: false } }],
+            }
+          : {},
+      )
+      .lean()
+      .exec();
   }
 
-  async createTestimonial(createTestimonialDto: CreateTestimonialDto): Promise<TestimonialDocument> {
+  async createTestimonial(
+    createTestimonialDto: Omit<Testimonial, keyof MongooseDocument>,
+  ): Promise<TestimonialDocument> {
     const newTestimonial = new this.testimonialModel(createTestimonialDto);
     return newTestimonial.save();
   }
@@ -25,7 +45,7 @@ export class TestimonialDataService {
 
   async updateTestimonial(
     id: string,
-    updateTestimonialDto: Partial<CreateTestimonialDto>,
+    updateTestimonialDto: Partial<Testimonial>,
   ): Promise<TestimonialDocument | null> {
     return this.testimonialModel
       .findByIdAndUpdate(id, updateTestimonialDto, { new: true })
