@@ -31,7 +31,7 @@ export class StudentInfoLogicService {
       totalAmount: order.totalAmount,
       amountPaid: order.amountPaid,
       status: order.status,
-      batchId: order.batch.toString(),
+      batchId: order.batch,
       courseId: batch?.course?.toString() || '',
       courseTitle: course?.courseName || 'Unknown',
     };
