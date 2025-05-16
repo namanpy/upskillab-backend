@@ -40,6 +40,7 @@ export class TestimonialController {
   async getTestimonials(@Request() req): Promise<GetTestimonialsResponseDTO> {
     return await this.testimonialLogicService.getTestimonials({
       userType: req.user?.userType,
+      userId: req.user?._id,
     });
   }
 
