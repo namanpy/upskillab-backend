@@ -21,11 +21,20 @@ export class TestimonialLogicService {
 
   async getTestimonials({
     userType,
+    userId,
   }: {
     userType?: string;
+    userId?: Types.ObjectId;
   }): Promise<GetTestimonialsResponseDTO> {
+    let studentId: Types.ObjectId | undefined;
+
+    if (userType === USER_TYPES.STUDENT && userId) {
+      const student = await this.studentDataService.getStudentByUserId(userId);
+      studentId = student?._id;
+    }
     const testimonials = await this.testimonialDataService.getTestimonials({
-      onlyActive: userType !== USER_TYPES.ADMIN,
+      onlyActive: userType !== USER_TYPES.ADMIN && !studentId,
+      studentId,
     });
 
     return {

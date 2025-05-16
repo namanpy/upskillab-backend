@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import {
   Testimonial,
   TestimonialDocument,
@@ -17,16 +17,31 @@ export class TestimonialDataService {
 
   async getTestimonials({
     onlyActive = true,
+    studentId,
   }: {
     onlyActive?: boolean;
+    studentId?: string | Types.ObjectId;
   } = {}): Promise<TestimonialDocument[]> {
+    console.log(
+      onlyActive
+        ? {
+            $or: [{ isActive: true }, { isActive: { $exists: false } }],
+            ...(studentId && { student: studentId }),
+          }
+        : {
+            ...(studentId && { student: studentId }),
+          },
+    );
     return this.testimonialModel
       .find(
         onlyActive
           ? {
               $or: [{ isActive: true }, { isActive: { $exists: false } }],
+              ...(studentId && { student: studentId }),
             }
-          : {},
+          : {
+              ...(studentId && { student: studentId }),
+            },
       )
       .lean()
       .exec();
