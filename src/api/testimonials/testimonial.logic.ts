@@ -48,6 +48,7 @@ export class TestimonialLogicService {
           platform: link.platform,
           url: link.url,
         })),
+        isActive:testimonial.isActive,
         createdAt: testimonial.createdAt,
         updatedAt: testimonial.updatedAt,
       })),
