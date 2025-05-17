@@ -7,15 +7,15 @@ export type AttendanceDocument = Attendance & Document;
 @Schema({ timestamps: true })
 export class Attendance {
   @ApiProperty()
-  @Prop({ type: Types.ObjectId, required: true, auto: true })
+  @Prop({ required: true, auto: true })
   _id: Types.ObjectId;
 
   @ApiProperty()
-  @Prop({ type: Types.ObjectId, ref: 'ClassSession', required: true })
+  @Prop({ ref: 'ClassSession', required: true })
   classId: Types.ObjectId;
 
   @ApiProperty()
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  @Prop({ ref: 'User', required: true })
   userId: Types.ObjectId;
 
   @ApiProperty()
