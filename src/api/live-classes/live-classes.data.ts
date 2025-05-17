@@ -1,16 +1,49 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { ClassSession, ClassSessionDocument } from '../../schemas/class-session.schema';
-import { Attendance, AttendanceDocument } from '../../schemas/attendance.schema';
+import {
+  ClassSession,
+  ClassSessionDocument,
+} from '../../schemas/class-session.schema';
+import {
+  Attendance,
+  AttendanceDocument,
+} from '../../schemas/attendance.schema';
 import { MarkAttendanceDto } from '../../dto/live-classes.dto';
 
 @Injectable()
 export class LiveClassesDataService {
   constructor(
-    @InjectModel(ClassSession.name) private classSessionModel: Model<ClassSessionDocument>,
-    @InjectModel(Attendance.name) private attendanceModel: Model<AttendanceDocument>,
+    @InjectModel(ClassSession.name)
+    private classSessionModel: Model<ClassSessionDocument>,
+    @InjectModel(Attendance.name)
+    private attendanceModel: Model<AttendanceDocument>,
   ) {}
+
+  async getAttendanceForClass(userId: string, classId: string) {
+    return this.attendanceModel
+      .findOne({
+        classId,
+        userId,
+      })
+      .lean()
+      .exec();
+  }
+  async getAttendanceForClasses(userId: string, classIds: string[]) {
+    return this.attendanceModel
+      .find({
+        classId: {
+          $in: classIds,
+        },
+        userId,
+      })
+      .lean()
+      .exec();
+  }
 
   async getLiveClasses(): Promise<ClassSessionDocument[]> {
     const today = new Date();
@@ -23,7 +56,9 @@ export class LiveClassesDataService {
       .exec();
   }
 
-  async getLiveClassById(classId: string): Promise<ClassSessionDocument | null> {
+  async getLiveClassById(
+    classId: string,
+  ): Promise<ClassSessionDocument | null> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const liveClass = await this.classSessionModel
@@ -33,7 +68,9 @@ export class LiveClassesDataService {
       })
       .exec();
     if (!liveClass) {
-      throw new NotFoundException(`Live class with ID ${classId} not found or not scheduled`);
+      throw new NotFoundException(
+        `Live class with ID ${classId} not found or not scheduled`,
+      );
     }
     return liveClass;
   }
@@ -67,7 +104,9 @@ export class LiveClassesDataService {
     }
 
     // Skip enrollment check for now
-    console.log(`Bypassing enrollment check for user ${userId} in class ${classId}`);
+    console.log(
+      `Bypassing enrollment check for user ${userId} in class ${classId}`,
+    );
 
     // Check if attendance already marked
     const existingAttendance = await this.attendanceModel
@@ -79,7 +118,6 @@ export class LiveClassesDataService {
       );
     }
 
-    // Mark attendance with manually generated _id
     const attendanceData = {
       _id: new Types.ObjectId(), // Manually generate _id
       classId: new Types.ObjectId(classId), // Ensure ObjectId type
@@ -87,14 +125,18 @@ export class LiveClassesDataService {
       isAttended: markAttendanceDto.isAttended,
     };
 
-    // Debug: Log attendanceData to verify
     console.log('attendanceData:', attendanceData);
 
     const newAttendance = new this.attendanceModel(attendanceData);
     return newAttendance.save();
   }
 
-  async getUserAttendance(userId: string): Promise<{ classSession: ClassSessionDocument; attendance: AttendanceDocument | null }[]> {
+  async getUserAttendance(userId: string): Promise<
+    {
+      classSession: ClassSessionDocument;
+      attendance: AttendanceDocument | null;
+    }[]
+  > {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -108,13 +150,14 @@ export class LiveClassesDataService {
     const attendances = await this.attendanceModel
       .find({
         userId,
-        classId: { $in: classSessions.map(session => session._id) },
+        classId: { $in: classSessions.map((session) => session._id) },
       })
       .exec();
 
-    return classSessions.map(classSession => {
+    return classSessions.map((classSession) => {
       const attendance = attendances.find(
-        attendance => attendance.classId.toString() === classSession._id.toString(),
+        (attendance) =>
+          attendance.classId.toString() === classSession._id.toString(),
       );
 
       return {

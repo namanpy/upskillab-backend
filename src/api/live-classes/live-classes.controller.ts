@@ -1,6 +1,21 @@
-import { Controller, Get, Post, Param, Body, UseGuards, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Param,
+  Body,
+  UseGuards,
+  BadRequestException,
+  Request,
+} from '@nestjs/common';
 import { LiveClassesLogicService } from './live-classes.logic';
-import { LiveClassesResponseDto, LiveClassResponseDto, MarkAttendanceDto, MarkAttendanceResponseDto, UserAttendanceResponseDto } from '../../dto/live-classes.dto';
+import {
+  LiveClassesResponseDto,
+  LiveClassResponseDto,
+  MarkAttendanceDto,
+  MarkAttendanceResponseDto,
+  UserAttendanceResponseDto,
+} from '../../dto/live-classes.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { User } from '../../common/decorators/user.decorator';
@@ -18,8 +33,9 @@ export class LiveClassesController {
     type: LiveClassesResponseDto,
   })
   @Get()
-  async getLiveClasses(): Promise<LiveClassesResponseDto> {
-    return this.liveClassesLogicService.getLiveClasses();
+  @UseGuards(AuthGuard('jwt'))
+  async getLiveClasses(@Request() req): Promise<LiveClassesResponseDto> {
+    return this.liveClassesLogicService.getLiveClasses(req.user._id.toString());
   }
 
   @ApiResponse({
@@ -30,7 +46,9 @@ export class LiveClassesController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Get('attendance')
-  async getUserAttendance(@User() user: UserDocument): Promise<UserAttendanceResponseDto> {
+  async getUserAttendance(
+    @User() user: UserDocument,
+  ): Promise<UserAttendanceResponseDto> {
     console.log('getUserAttendance: User ID:', user._id.toString());
     return this.liveClassesLogicService.getUserAttendance(user._id.toString());
   }
@@ -41,12 +59,19 @@ export class LiveClassesController {
     type: LiveClassResponseDto,
   })
   @Get(':classId')
-  async getLiveClassById(@Param('classId') classId: string): Promise<LiveClassResponseDto> {
+  @UseGuards(AuthGuard('jwt'))
+  async getLiveClassById(
+    @Param('classId') classId: string,
+    @Request() req,
+  ): Promise<LiveClassResponseDto> {
     console.log('getLiveClassById: Class ID:', classId);
     if (!Types.ObjectId.isValid(classId)) {
       throw new BadRequestException('Invalid class ID');
     }
-    return this.liveClassesLogicService.getLiveClassById(classId);
+    return this.liveClassesLogicService.getLiveClassById(
+      classId,
+      req.user._id.toString(),
+    );
   }
 
   @ApiResponse({
@@ -62,7 +87,12 @@ export class LiveClassesController {
     @User() user: UserDocument,
     @Body() markAttendanceDto: MarkAttendanceDto,
   ): Promise<MarkAttendanceResponseDto> {
-    console.log('markAttendance: Class ID:', classId, 'User ID:', user._id.toString());
+    console.log(
+      'markAttendance: Class ID:',
+      classId,
+      'User ID:',
+      user._id.toString(),
+    );
     if (!Types.ObjectId.isValid(classId)) {
       throw new BadRequestException('Invalid class ID');
     }
