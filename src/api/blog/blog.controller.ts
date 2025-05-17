@@ -62,13 +62,30 @@
 //   }
 // }
 
-
-import { Controller, Get, Post, Put, Patch, Delete, Body, Param, UploadedFile, UseInterceptors, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  UploadedFile,
+  UseInterceptors,
+  BadRequestException,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { BlogLogicService } from './blog.logic';
 import { CreateBlogDto, GetBlogsResponseDTO } from '../../dto/blog.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageUploaderService } from '../../common/services/image-uploader.service';
+import { AuthGuard } from '@nestjs/passport';
+import { AllowUserTypes } from 'src/common/guard/user.guard';
+import { USER_TYPES } from 'src/common/constants/user.constants';
+import { StudentDataService } from '../student/student.data';
 
 @ApiTags('blogs')
 @Controller('blogs')
@@ -76,27 +93,51 @@ export class BlogController {
   constructor(
     private blogLogicService: BlogLogicService,
     private imageUploaderService: ImageUploaderService,
+    private studentDataService: StudentDataService,
   ) {}
 
-  @ApiResponse({ status: 200, description: 'Get all blogs', type: GetBlogsResponseDTO })
+  @ApiResponse({
+    status: 200,
+    description: 'Get all blogs',
+    type: GetBlogsResponseDTO,
+  })
   @Get('')
   async getBlogs(): Promise<GetBlogsResponseDTO> {
     return await this.blogLogicService.getBlogs();
   }
 
-  @ApiResponse({ status: 201, description: 'Create a new blog with image upload' })
+  @ApiResponse({
+    status: 201,
+    description: 'Create a new blog with image upload',
+  })
   @Post('')
   @UseInterceptors(FileInterceptor('image'))
+  @UseGuards(AuthGuard('jwt'))
+  @AllowUserTypes([USER_TYPES.ADMIN, USER_TYPES.STUDENT])
   async createBlog(
     @Body() createBlogDto: CreateBlogDto,
     @UploadedFile() file: Express.Multer.File,
+    @Request() req,
   ) {
     if (!file) {
       throw new BadRequestException('Image file is required');
     }
 
-    const image = await this.imageUploaderService.uploadImage(file, 'blogs', Date.now().toString());
-    const blogData = { ...createBlogDto, image };
+    const student =
+      req.user.userType === USER_TYPES.STUDENT
+        ? await this.studentDataService.getStudentByUserId(req.user._id)
+        : undefined;
+
+    const image = await this.imageUploaderService.uploadImage(
+      file,
+      'blogs',
+      Date.now().toString(),
+    );
+    const blogData = {
+      ...createBlogDto,
+      image,
+      studentId: student?._id.toString() || createBlogDto.studentId,
+    };
 
     return await this.blogLogicService.createBlog(blogData);
   }
@@ -107,36 +148,76 @@ export class BlogController {
     return await this.blogLogicService.getBlogById(id);
   }
 
-  @ApiResponse({ status: 200, description: 'Update a blog by ID (fields optional)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Update a blog by ID (fields optional)',
+  })
   @Put(':id')
   @UseInterceptors(FileInterceptor('image'))
+  @UseGuards(AuthGuard('jwt'))
+  @AllowUserTypes([USER_TYPES.ADMIN, USER_TYPES.STUDENT])
   async updateBlog(
     @Param('id') id: string,
     @Body() updateBlogDto: Partial<CreateBlogDto>,
-    @UploadedFile() file?: Express.Multer.File, // Image is optional
+    @Request() req,
+    @UploadedFile() file?: Express.Multer.File, // Image is optional,
   ) {
-    let blogData: Partial<CreateBlogDto & { image: string }> = { ...updateBlogDto };
+    const student =
+      req.user.userType === USER_TYPES.STUDENT
+        ? await this.studentDataService.getStudentByUserId(req.user._id)
+        : undefined;
+
+    let blogData: Partial<CreateBlogDto & { image: string; userType: string }> =
+      {
+        ...updateBlogDto,
+        studentId: student?._id.toString() || updateBlogDto.studentId,
+        userType: req.user.userType,
+      };
 
     if (file) {
-      const image = await this.imageUploaderService.uploadImage(file, 'blogs', `${id}-${Date.now()}`);
+      const image = await this.imageUploaderService.uploadImage(
+        file,
+        'blogs',
+        `${id}-${Date.now()}`,
+      );
       blogData = { ...blogData, image };
     }
 
     return await this.blogLogicService.updateBlog(id, blogData);
   }
 
-  @ApiResponse({ status: 200, description: 'Partially update a blog by ID (fields optional)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Partially update a blog by ID (fields optional)',
+  })
   @Patch(':id')
   @UseInterceptors(FileInterceptor('image'))
+  @UseGuards(AuthGuard('jwt'))
+  @AllowUserTypes([USER_TYPES.ADMIN, USER_TYPES.STUDENT])
   async patchBlog(
     @Param('id') id: string,
     @Body() updateBlogDto: Partial<CreateBlogDto>,
+    @Request() req,
     @UploadedFile() file?: Express.Multer.File, // Image is optional
   ) {
-    let blogData: Partial<CreateBlogDto & { image: string }> = { ...updateBlogDto };
+    const student =
+      req.user.userType === USER_TYPES.STUDENT
+        ? await this.studentDataService.getStudentByUserId(req.user._id)
+        : undefined;
+
+    let blogData: Partial<CreateBlogDto & { image: string; userType: string }> =
+      {
+        ...updateBlogDto,
+        studentId: student?._id.toString() || updateBlogDto.studentId,
+        userType: req.user.userType,
+      };
 
     if (file) {
-      const image = await this.imageUploaderService.uploadImage(file, 'blogs', `${id}-${Date.now()}`);
+      const image = await this.imageUploaderService.uploadImage(
+        file,
+        'blogs',
+        `${id}-${Date.now()}`,
+      );
       blogData = { ...blogData, image };
     }
 
