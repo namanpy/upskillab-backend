@@ -149,10 +149,18 @@ export class LiveClassesDataService {
 
     const attendances = await this.attendanceModel
       .find({
-        userId,
+        userId: new Types.ObjectId(userId),
         classId: { $in: classSessions.map((session) => session._id) },
       })
       .exec();
+    console.log(
+      attendances,
+      {
+        userId,
+        classId: { $in: classSessions.map((session) => session._id) },
+      },
+      '<====',
+    );
 
     return classSessions.map((classSession) => {
       const attendance = attendances.find(
