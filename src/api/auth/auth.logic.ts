@@ -33,7 +33,8 @@ export class AuthLogicService {
         email: user.email,
         mobileNumber: user.mobileNumber,
       };
-      const expiresInSec = 15 * 60; // 15 minutes
+      // const expiresInSec = 15 * 60; // 15 minutes
+      const expiresInSec = 24 * 60 * 60; // 24 hours
       const authToken = await this.jwtService.signAsync(payload, {
         expiresIn: `${expiresInSec}s`,
       });
