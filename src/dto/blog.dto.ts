@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsMongoId, IsBoolean, IsDate, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsMongoId,
+  IsBoolean,
+  IsDate,
+  IsOptional,
+} from 'class-validator';
 
 export class CreateBlogDto {
   @ApiProperty()
@@ -19,8 +26,8 @@ export class CreateBlogDto {
 
   @ApiProperty()
   @IsMongoId()
-  @IsNotEmpty()
-  studentId: string; // ID of the student from the students table
+  @IsOptional()
+  studentId?: string; // ID of the student from the students table
 
   @ApiProperty()
   @IsBoolean()

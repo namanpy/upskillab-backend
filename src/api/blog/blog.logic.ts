@@ -4,6 +4,9 @@ import { CreateBlogDto, GetBlogsResponseDTO, Blog } from '../../dto/blog.dto';
 import { BlogDocument } from '../../schemas/blog.schema';
 import { mapToDto, mapToDtoArray } from '../../common/utils/map-to-dto.util';
 import { Types } from 'mongoose';
+import { CustomError } from 'src/common/classes/error.class';
+import { ERROR } from 'src/common/constants/error.constants';
+import { USER_TYPES } from 'src/common/constants/user.constants';
 
 // Define PopulatedStudent interface based on the Student schema
 interface PopulatedStudent {
@@ -104,8 +107,25 @@ export class BlogLogicService {
     };
   }
 
-  async updateBlog(id: string, updateBlogDto: Partial<CreateBlogDto & { image: string }>) {
-    const blog = await this.blogDataService.updateBlog(id, updateBlogDto);
+  async updateBlog(
+    id: string,
+    updateBlogDto: Partial<CreateBlogDto & { image: string; userType: string }>,
+  ) {
+    const existingBlog = await this.blogDataService.getBlogById(id);
+
+    if (
+      updateBlogDto.userType === USER_TYPES.STUDENT &&
+      !existingBlog?.studentId.equals(updateBlogDto.studentId)
+    )
+      throw new CustomError(ERROR.UNAUTHORIZED);
+
+    const blog = await this.blogDataService.updateBlog(id, {
+      ...updateBlogDto,
+      ...(updateBlogDto.userType === USER_TYPES.STUDENT && {
+        approvedByAdmin: false,
+      }),
+    });
+
     if (!blog) {
       throw new NotFoundException(`Blog with ID ${id} not found`);
     }
