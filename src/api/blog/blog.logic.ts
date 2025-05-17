@@ -7,6 +7,7 @@ import { Types } from 'mongoose';
 import { CustomError } from 'src/common/classes/error.class';
 import { ERROR } from 'src/common/constants/error.constants';
 import { USER_TYPES } from 'src/common/constants/user.constants';
+import { StudentDataService } from '../student/student.data';
 
 // Define PopulatedStudent interface based on the Student schema
 interface PopulatedStudent {
@@ -19,7 +20,10 @@ interface PopulatedStudent {
 
 @Injectable()
 export class BlogLogicService {
-  constructor(private blogDataService: BlogDataService) {}
+  constructor(
+    private blogDataService: BlogDataService,
+    private studentDataService: StudentDataService,
+  ) {}
 
   private mapToDto(blog: BlogDocument): Blog {
     const docObject = blog.toObject();
@@ -83,15 +87,38 @@ export class BlogLogicService {
     });
   }
 
-  async getBlogs(approvedOnly: boolean = true): Promise<GetBlogsResponseDTO> {
-    const blogs = await this.blogDataService.getBlogs(approvedOnly);
+  async getBlogs(
+    approvedOnly: boolean = true,
+    options: {
+      userType?: string;
+      userId?: Types.ObjectId;
+    } = {},
+  ): Promise<GetBlogsResponseDTO> {
+    const studentId =
+      options.userType === USER_TYPES.STUDENT && options.userId
+        ? await this.studentDataService
+            .getStudentByUserId(options.userId)
+            .then((s) => s?._id)
+        : undefined;
+
+    const blogs = await this.blogDataService.getBlogs(approvedOnly, {
+      studentId,
+    });
+
     return {
       blogs: this.mapToDtoArray(blogs),
     };
   }
 
-  async createBlog(createBlogDto: CreateBlogDto & { image: string }) {
-    const blog = await this.blogDataService.createBlog(createBlogDto);
+  async createBlog(
+    createBlogDto: CreateBlogDto & { image: string; userType: string },
+  ) {
+    const blog = await this.blogDataService.createBlog({
+      ...createBlogDto,
+      ...(createBlogDto.userType === USER_TYPES.STUDENT && {
+        approvedByAdmin: false,
+      }),
+    });
     return {
       blog: this.mapToDto(blog),
     };
@@ -136,6 +163,7 @@ export class BlogLogicService {
 
   async deleteBlog(id: string) {
     const blog = await this.blogDataService.deleteBlog(id);
+
     if (!blog) {
       throw new NotFoundException(`Blog with ID ${id} not found`);
     }
