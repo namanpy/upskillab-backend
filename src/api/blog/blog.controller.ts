@@ -86,6 +86,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { AllowUserTypes } from 'src/common/guard/user.guard';
 import { USER_TYPES } from 'src/common/constants/user.constants';
 import { StudentDataService } from '../student/student.data';
+import { OptionalAuthGuard } from 'src/common/guard/optional-auth.guard';
 
 @ApiTags('blogs')
 @Controller('blogs')
@@ -102,8 +103,12 @@ export class BlogController {
     type: GetBlogsResponseDTO,
   })
   @Get('')
-  async getBlogs(): Promise<GetBlogsResponseDTO> {
-    return await this.blogLogicService.getBlogs();
+  @UseGuards(OptionalAuthGuard)
+  async getBlogs(@Request() req): Promise<GetBlogsResponseDTO> {
+    return await this.blogLogicService.getBlogs(!req.user, {
+      userType: req.user.userType,
+      userId: req.user?._id,
+    });
   }
 
   @ApiResponse({
@@ -137,6 +142,7 @@ export class BlogController {
       ...createBlogDto,
       image,
       studentId: student?._id.toString() || createBlogDto.studentId,
+      userType: req.user.userType,
     };
 
     return await this.blogLogicService.createBlog(blogData);
