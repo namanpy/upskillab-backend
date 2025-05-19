@@ -21,6 +21,8 @@ export class JobLogicService {
         company: job.company,
         logo: job.logo,
         skills: job.skills,
+        ExtraLink: job.ExtraLink,
+        source: job.source,
         createdAt: job.createdAt,
         updatedAt: job.updatedAt,
       })),
@@ -41,6 +43,8 @@ export class JobLogicService {
         company: job.company,
         logo: job.logo,
         skills: job.skills,
+        ExtraLink: job.ExtraLink,
+        source: job.source,
         createdAt: job.createdAt,
         updatedAt: job.updatedAt,
       },
@@ -65,7 +69,9 @@ export class JobLogicService {
       description: createJobDto.description,
       company: createJobDto.company,
       logo: logoUrl,
-      skills: createJobDto.skills as string[], // Ensure skills is string[]
+      skills: Array.isArray(createJobDto.skills) ? createJobDto.skills : [createJobDto.skills], // Handle string or array
+      ExtraLink: createJobDto.ExtraLink,
+      source: createJobDto.source,
     };
 
     const job = await this.jobDataService.createJob(jobData);
@@ -78,6 +84,8 @@ export class JobLogicService {
         company: job.company,
         logo: job.logo,
         skills: job.skills,
+        ExtraLink: job.ExtraLink,
+        source: job.source,
         createdAt: job.createdAt,
         updatedAt: job.updatedAt,
       },
@@ -102,7 +110,13 @@ export class JobLogicService {
       description: updateJobDto.description,
       company: updateJobDto.company,
       logo: logoUrl,
-      skills: updateJobDto.skills as string[] | undefined, // Ensure skills is string[] | undefined
+      skills: updateJobDto.skills
+        ? Array.isArray(updateJobDto.skills)
+          ? updateJobDto.skills
+          : [updateJobDto.skills]
+        : undefined, // Handle string or array
+      ExtraLink: updateJobDto.ExtraLink,
+      source: updateJobDto.source,
     };
 
     const job = await this.jobDataService.updateJob(id, jobData);
@@ -118,6 +132,8 @@ export class JobLogicService {
         company: job.company,
         logo: job.logo,
         skills: job.skills,
+        ExtraLink: job.ExtraLink,
+        source: job.source,
         createdAt: job.createdAt,
         updatedAt: job.updatedAt,
       },
