@@ -47,6 +47,11 @@ export class CreateApplicationDto {
   @ApiProperty({ type: 'string', format: 'binary' })
   @ValidateIf((object, value) => false, { groups: ['createApplication'] })
   resume: Express.Multer.File;
+
+  @ApiProperty()
+  @IsString({ groups: ['createApplication'] })
+  @IsNotEmpty({ groups: ['createApplication'] })
+  source: string;
 }
 
 export class ApplicationResponse {
@@ -70,6 +75,9 @@ export class ApplicationResponse {
 
   @ApiProperty()
   resumeUrl: string;
+
+  @ApiProperty()
+  source: string;
 
   @ApiProperty()
   createdAt: Date;

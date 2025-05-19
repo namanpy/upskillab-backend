@@ -32,6 +32,7 @@ export class ApplicationLogicService {
       phoneNumber: createApplicationDto.phoneNumber,
       jobId: new Types.ObjectId(createApplicationDto.jobId),
       qualification: createApplicationDto.qualification,
+      source: createApplicationDto.source,
       resumeUrl,
     };
 
@@ -45,6 +46,7 @@ export class ApplicationLogicService {
         jobId: application.jobId.toString(),
         qualification: application.qualification,
         resumeUrl: application.resumeUrl,
+        source: application.source,
         createdAt: application.createdAt,
         updatedAt: application.updatedAt,
       },
@@ -62,6 +64,7 @@ export class ApplicationLogicService {
         jobId: app.jobId.toString(),
         qualification: app.qualification,
         resumeUrl: app.resumeUrl,
+        source: app.source,
         createdAt: app.createdAt,
         updatedAt: app.updatedAt,
       })),
@@ -82,6 +85,7 @@ export class ApplicationLogicService {
         jobId: application.jobId.toString(),
         qualification: application.qualification,
         resumeUrl: application.resumeUrl,
+        source: application.source,
         createdAt: application.createdAt,
         updatedAt: application.updatedAt,
       },
