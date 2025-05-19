@@ -26,6 +26,9 @@ export class Job {
   @Prop({ type: [String], required: true })
   skills: string[];
 
+  @Prop({ type: [String], required: false })
+  ExtraLink: string[];
+
   @Prop()
   createdAt: Date;
 
