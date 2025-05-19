@@ -3,10 +3,6 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { HydratedDocument, Types } from 'mongoose';
 import { MongooseDocument } from './common.schema';
 
-export enum SUGGESTION_TYPE {
-  POST = 'POST',
-  PDF = 'PDF',
-}
 
 export type SuggestionDocument = HydratedDocument<Suggestion>;
 
@@ -21,10 +17,9 @@ export class Suggestion extends MongooseDocument {
   description?: string;
 
   @ApiProperty({
-    description: 'Type of suggestion',
-    enum: Object.keys(SUGGESTION_TYPE),
+    description: 'Type of suggestion'
   })
-  @Prop({ required: true, enum: Object.keys(SUGGESTION_TYPE) })
+  @Prop({ required: true})
   type: string;
 
   @ApiProperty({ description: 'Content of the suggestion (URL or PDF S3 URL)' })
