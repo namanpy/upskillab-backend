@@ -37,6 +37,9 @@ export class Application {
   @Prop({ required: true })
   resumeUrl: string;
 
+  @Prop({ type: String, enum: ['upskill', 'external'], required: false })
+  source: string;
+
   @Prop()
   createdAt: Date;
 
