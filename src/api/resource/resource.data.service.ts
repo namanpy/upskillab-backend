@@ -10,7 +10,7 @@ export class ResourceDataService {
   constructor(@InjectModel(Resource.name) private resourceModel: Model<ResourceDocument>) {}
 
   async getResources(): Promise<ResourceDocument[]> {
-    return this.resourceModel.find().populate('courseId').exec();
+    return this.resourceModel.find().populate('courseId').lean().exec();
   }
 
   async createResource(createResourceDto: CreateResourceDto, createdBy: string, pdfUrl?: string, imageUrl?: string): Promise<ResourceDocument> {
@@ -24,14 +24,14 @@ export class ResourceDataService {
   }
 
   async getResourceById(id: string): Promise<ResourceDocument | null> {
-    return this.resourceModel.findById(id).populate('courseId').exec();
+    return this.resourceModel.findById(id).populate('courseId').lean().exec();
   }
 
   async updateResource(id: string, updateResourceDto: UpdateResourceDto, pdfUrl?: string, imageUrl?: string): Promise<ResourceDocument | null> {
     const updateData: any = { ...updateResourceDto };
     if (pdfUrl) updateData.pdf = pdfUrl;
     if (imageUrl) updateData.image = imageUrl;
-    return this.resourceModel.findByIdAndUpdate(id, updateData, { new: true }).exec();
+    return this.resourceModel.findByIdAndUpdate(id, updateData, { new: true }).lean().exec();
   }
 
   async deleteResource(id: string): Promise<ResourceDocument | null> {

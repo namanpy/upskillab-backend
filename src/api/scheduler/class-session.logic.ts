@@ -88,11 +88,6 @@ export class ClassSessionLogicService {
         'Only students can access their class sessions',
       );
     }
-    // console.log('====================================');
-    // console.log(user);
-    // console.log('====================================');
-    // console.log(getStudentClassSessions)
-    // Find orders for the student to get enrolled batches
     const enrollment = await this.enrollmentDataService.getEnrollmentByUserId(
       user._id,
     );
