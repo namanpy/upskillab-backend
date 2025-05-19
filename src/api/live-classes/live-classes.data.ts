@@ -50,7 +50,7 @@ export class LiveClassesDataService {
     today.setHours(0, 0, 0, 0);
     return this.classSessionModel
       .find({
-        scheduledDate: { $gte: today },
+        // scheduledDate: { $gte: today },
       })
       .sort({ scheduledDate: 1, scheduledStartTime: 1 })
       .exec();
@@ -142,7 +142,7 @@ export class LiveClassesDataService {
 
     const classSessions = await this.classSessionModel
       .find({
-        scheduledDate: { $gte: today },
+        // scheduledDate: { $gte: today },
       })
       .sort({ scheduledDate: 1, scheduledStartTime: 1 })
       .exec();

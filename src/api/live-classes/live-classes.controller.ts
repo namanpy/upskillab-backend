@@ -27,22 +27,22 @@ import { Types } from 'mongoose';
 export class LiveClassesController {
   constructor(private liveClassesLogicService: LiveClassesLogicService) {}
 
-  @ApiResponse({
-    status: 200,
-    description: 'Get all live classes',
-    type: LiveClassesResponseDto,
-  })
-  @Get()
-  @UseGuards(AuthGuard('jwt'))
-  async getLiveClasses(@Request() req): Promise<LiveClassesResponseDto> {
-    return this.liveClassesLogicService.getLiveClasses(req.user._id.toString());
-  }
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'Get all live classes',
+  //   type: LiveClassesResponseDto,
+  // })
+  // @Get()
+  // @UseGuards(AuthGuard('jwt'))
+  // async getLiveClasses(@Request() req): Promise<LiveClassesResponseDto> {
+  //   return this.liveClassesLogicService.getLiveClasses(req.user._id.toString());
+  // }
 
-  @ApiResponse({
-    status: 200,
-    description: 'Get user attendance history',
-    type: UserAttendanceResponseDto,
-  })
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'Get user attendance history',
+  //   type: UserAttendanceResponseDto,
+  // })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Get('attendance')
