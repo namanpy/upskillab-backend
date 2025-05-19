@@ -1,5 +1,4 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { SUGGESTION_TYPE } from '../schemas/suggestion.schema';
 
 export class CreateSuggestionDTO {
   @ApiProperty({ description: 'Title of the suggestion' })
@@ -9,8 +8,7 @@ export class CreateSuggestionDTO {
   description?: string;
 
   @ApiProperty({
-    description: 'Type of suggestion',
-    enum: Object.keys(SUGGESTION_TYPE),
+    description: 'Type of suggestion'
   })
   type: string;
 
@@ -29,8 +27,7 @@ export class UpdateSuggestionDTO {
   description?: string;
 
   @ApiPropertyOptional({
-    description: 'Type of suggestion',
-    enum: Object.keys(SUGGESTION_TYPE),
+    description: 'Type of suggestion'
   })
   type?: string;
 

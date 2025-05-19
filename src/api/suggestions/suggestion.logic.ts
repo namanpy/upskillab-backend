@@ -4,7 +4,7 @@ import { BatchDataService } from '../batch/batch.data';
 import { OrderDataService } from '../order/order.data';
 import { FileUploaderService } from '../../common/services/file-uploader.service';
 import { CreateSuggestionDTO, UpdateSuggestionDTO, SuggestionDTO, GetSuggestionsResponseDTO } from '../../dto/suggestion.dto';
-import { SUGGESTION_TYPE } from '../../schemas/suggestion.schema';
+// import { SUGGESTION_TYPE } from '../../schemas/suggestion.schema';
 import { USER_TYPES } from '../../common/constants/user.constants';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -78,27 +78,27 @@ export class SuggestionLogicService {
       throw new ForbiddenException(`You are not assigned to batch ${createSuggestionDto.batchId}. Assigned teacher ID: ${batchTeacherId}`);
     }
 
-    if (createSuggestionDto.type === SUGGESTION_TYPE.PDF && !file) {
-      console.log('createSuggestion: PDF file missing');
-      throw new BadRequestException('PDF file is required for PDF type suggestion');
-    }
+    // if (createSuggestionDto.type === SUGGESTION_TYPE.PDF && !file) {
+    //   console.log('createSuggestion: PDF file missing');
+    //   throw new BadRequestException('PDF file is required for PDF type suggestion');
+    // }
 
-    if (createSuggestionDto.type === SUGGESTION_TYPE.POST && !createSuggestionDto.content) {
-      console.log('createSuggestion: Content URL missing');
-      throw new BadRequestException('Content URL is required for POST type suggestion');
-    }
+    // if (createSuggestionDto.type === SUGGESTION_TYPE.POST && !createSuggestionDto.content) {
+    //   console.log('createSuggestion: Content URL missing');
+    //   throw new BadRequestException('Content URL is required for POST type suggestion');
+    // }
 
     let content = createSuggestionDto.content || '';
-    if (createSuggestionDto.type === SUGGESTION_TYPE.PDF && file) {
-      console.log('createSuggestion: Uploading PDF file');
-      const uploadedFiles = await this.fileUploaderService.uploadFiles([file], 'suggestion', user._id);
-      if (!uploadedFiles || uploadedFiles.length === 0) {
-        console.log('createSuggestion: File upload failed');
-        throw new BadRequestException('Failed to upload PDF file');
-      }
-      content = uploadedFiles[0]?.fileUrl || '';
-      console.log('createSuggestion: PDF uploaded, URL:', content);
-    }
+    // if (createSuggestionDto.type === SUGGESTION_TYPE.PDF && file) {
+    //   console.log('createSuggestion: Uploading PDF file');
+    //   const uploadedFiles = await this.fileUploaderService.uploadFiles([file], 'suggestion', user._id);
+    //   if (!uploadedFiles || uploadedFiles.length === 0) {
+    //     console.log('createSuggestion: File upload failed');
+    //     throw new BadRequestException('Failed to upload PDF file');
+    //   }
+    //   content = uploadedFiles[0]?.fileUrl || '';
+    //   console.log('createSuggestion: PDF uploaded, URL:', content);
+    // }
 
     const suggestionData = {
       ...createSuggestionDto,
