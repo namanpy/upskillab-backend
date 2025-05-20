@@ -6,7 +6,12 @@ import { Student, StudentDocument } from '../../schemas/student.schema';
 import { Order, OrderDocument } from '../../schemas/order.schema';
 import { Batch, BatchDocument } from '../../schemas/course/batch.schema';
 import { Course, CourseDocuments } from '../../schemas/course/course.schema';
-import { StudentInfoDTO, StudentInfoResponseDTO, OrderHistoryDTO, AttendanceHistoryDTO } from '../../dto/student-info.dto';
+import {
+  StudentInfoDTO,
+  StudentInfoResponseDTO,
+  OrderHistoryDTO,
+  AttendanceHistoryDTO,
+} from '../../dto/student-info.dto';
 import { USER_TYPES } from '../../common/constants/user.constants';
 import { ORDER_STATUS } from '../../common/constants/order.constants';
 import { LiveClassesDataService } from '../live-classes/live-classes.data';
@@ -23,8 +28,13 @@ export class StudentInfoLogicService {
   ) {}
 
   private async mapToOrderHistoryDTO(order: any): Promise<OrderHistoryDTO> {
-    const batch = await this.batchModel.findById(order.batch).select('course').exec();
-    const course = batch ? await this.courseModel.findById(batch.course).select('title').exec() : null;
+    const batch = await this.batchModel
+      .findById(order.batch)
+      .select('course')
+      .exec();
+    const course = batch
+      ? await this.courseModel.findById(batch.course).select('title').exec()
+      : null;
 
     return {
       orderId: order._id.toString(),
@@ -37,24 +47,37 @@ export class StudentInfoLogicService {
     };
   }
 
-  private async mapToStudentInfoDTO(user: any, student: any): Promise<StudentInfoDTO> {
+  private async mapToStudentInfoDTO(
+    user: any,
+    student: any,
+  ): Promise<StudentInfoDTO> {
     const orders = await this.orderModel
       .find({ user: user._id })
       .populate('batch')
       .exec();
-    
-    const orderHistory = await Promise.all(orders.map(order => this.mapToOrderHistoryDTO(order)));
-    const completedCourses = orders.filter(o => o.status === ORDER_STATUS.COMPLETED.code).length;
-    const pendingCourses = orders.filter(o => o.status === ORDER_STATUS.PENDING.code).length;
 
-    const attendanceData = await this.liveClassesDataService.getUserAttendance(user._id.toString());
-    const attendanceHistory = attendanceData.map(({ classSession, attendance }) => ({
-      classId: classSession._id.toString(),
-      meetingLink: classSession.meetingLink,
-      scheduledDate: classSession.scheduledDate,
-      scheduledStartTime: classSession.scheduledStartTime,
-      isAttended: attendance ? attendance.isAttended : false,
-    }));
+    const orderHistory = await Promise.all(
+      orders.map((order) => this.mapToOrderHistoryDTO(order)),
+    );
+    const completedCourses = orders.filter(
+      (o) => o.status === ORDER_STATUS.COMPLETED.code,
+    ).length;
+    const pendingCourses = orders.filter(
+      (o) => o.status === ORDER_STATUS.PENDING.code,
+    ).length;
+
+    const attendanceData = await this.liveClassesDataService.getUserAttendance(
+      user._id.toString(),
+    );
+    const attendanceHistory = attendanceData.map(
+      ({ classSession, attendances }) => ({
+        classId: classSession._id.toString(),
+        meetingLink: classSession.meetingLink,
+        scheduledDate: classSession.scheduledDate,
+        scheduledStartTime: classSession.scheduledStartTime,
+        isAttended: !!attendances?.at(0)?.isAttended,
+      }),
+    );
 
     return {
       userId: user._id.toString(),
@@ -82,27 +105,39 @@ export class StudentInfoLogicService {
       console.log('getStudentInfo: Fetching all students (Admin)');
       const students = await this.studentModel.find().populate('user').exec();
       const studentInfos = await Promise.all(
-        students.map(student => {
+        students.map((student) => {
           return this.userModel
             .findById(student.user)
             .exec()
-            .then(user => (user ? this.mapToStudentInfoDTO(user, student) : null));
+            .then((user) =>
+              user ? this.mapToStudentInfoDTO(user, student) : null,
+            );
         }),
       );
       return {
-        students: studentInfos.filter(info => info !== null) as StudentInfoDTO[],
+        students: studentInfos.filter(
+          (info) => info !== null,
+        ) as StudentInfoDTO[],
       };
     }
 
     if (user.userType !== USER_TYPES.STUDENT) {
-      console.log('getStudentInfo: Forbidden - User is not a student or admin:', user.userType);
-      throw new ForbiddenException('Only students or admins can access student info');
+      console.log(
+        'getStudentInfo: Forbidden - User is not a student or admin:',
+        user.userType,
+      );
+      throw new ForbiddenException(
+        'Only students or admins can access student info',
+      );
     }
 
     console.log('getStudentInfo: Fetching student info for user:', user._id);
     const student = await this.studentModel.findOne({ user: user._id }).exec();
     if (!student) {
-      console.log('getStudentInfo: Student profile not found for user:', user._id);
+      console.log(
+        'getStudentInfo: Student profile not found for user:',
+        user._id,
+      );
       throw new ForbiddenException('Student profile not found');
     }
 

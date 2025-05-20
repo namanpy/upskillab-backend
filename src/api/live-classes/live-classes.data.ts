@@ -131,10 +131,18 @@ export class LiveClassesDataService {
     return newAttendance.save();
   }
 
-  async getUserAttendance(userId: string): Promise<
+  async getUserAttendance(
+    input:
+      | { teacherId: Types.ObjectId }
+      | {
+          userId: Types.ObjectId;
+          batchIds: Types.ObjectId[];
+        }
+      | {} = {},
+  ): Promise<
     {
       classSession: ClassSessionDocument;
-      attendance: AttendanceDocument | null;
+      attendances: AttendanceDocument[] | null;
     }[]
   > {
     const today = new Date();
@@ -143,34 +151,32 @@ export class LiveClassesDataService {
     const classSessions = await this.classSessionModel
       .find({
         // scheduledDate: { $gte: today },
+        ...('teacherId' in input && { teacherId: input.teacherId }), // Add teacherId condition
+        ...('batchIds' in input && {
+          batchId: {
+            $in: (input.batchIds || []).map((b) => new Types.ObjectId(b)),
+          },
+        }), // Add batchId condition
       })
       .sort({ scheduledDate: 1, scheduledStartTime: 1 })
       .exec();
 
     const attendances = await this.attendanceModel
       .find({
-        userId: new Types.ObjectId(userId),
+        ...('userId' in input && { userId: new Types.ObjectId(input.userId) }),
         classId: { $in: classSessions.map((session) => session._id) },
       })
       .exec();
-    console.log(
-      attendances,
-      {
-        userId,
-        classId: { $in: classSessions.map((session) => session._id) },
-      },
-      '<====',
-    );
 
     return classSessions.map((classSession) => {
-      const attendance = attendances.find(
+      const attendances_ = attendances.filter(
         (attendance) =>
           attendance.classId.toString() === classSession._id.toString(),
       );
 
       return {
         classSession,
-        attendance: attendance || null,
+        attendances: attendances_ || null,
       };
     });
   }

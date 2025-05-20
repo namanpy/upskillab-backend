@@ -16,9 +16,9 @@ export class LiveClassResponseDto {
   @ApiProperty()
   scheduledStartTime: string;
 
-  @ApiProperty({ description: 'Whether the user attended the class' })
+  @ApiPropertyOptional({ description: 'Whether the user attended the class' })
   @IsBoolean()
-  isAttended: boolean;
+  isAttended?: boolean;
 }
 
 // Response DTO for multiple live classes

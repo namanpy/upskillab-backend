@@ -9,11 +9,21 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  HttpCode,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JobLogicService } from './job.logic';
-import { CreateJobDto, GetJobsResponseDTO, UpdateJobDto } from '../../dto/job.dto';
-import { ApiResponse, ApiTags, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
+import {
+  CreateJobDto,
+  GetJobsResponseDTO,
+  UpdateJobDto,
+} from '../../dto/job.dto';
+import {
+  ApiResponse,
+  ApiTags,
+  ApiBearerAuth,
+  ApiConsumes,
+} from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { AllowUserType, UserGuard } from '../../common/guard/user.guard';
 import { RolesGuard } from '../../common/guard/roles.guard';
@@ -85,7 +95,7 @@ export class JobController {
     if (updateJobDto.skills) {
       updateJobDto.skills = this.processSkills(updateJobDto.skills);
     }
-    
+
     updateJobDto.logo = logo;
     return await this.jobLogicService.updateJob(id, updateJobDto);
   }
@@ -98,6 +108,7 @@ export class JobController {
   @UseGuards(AuthGuard('jwt'), UserGuard, RolesGuard)
   @AllowUserType(USER_TYPES.ADMIN)
   @Roles(USER_TYPES.ADMIN)
+  @HttpCode(200)
   @Delete(':id')
   async deleteJob(@Param('id') id: string) {
     return await this.jobLogicService.deleteJob(id);
@@ -113,7 +124,7 @@ export class JobController {
     if (Array.isArray(skills)) {
       return skills;
     }
-    
+
     // If it's a string, try to parse it as JSON
     if (typeof skills === 'string') {
       try {
@@ -123,13 +134,13 @@ export class JobController {
           return parsedSkills;
         }
         // If parsed but not an array, split by comma
-        return skills.split(',').map(skill => skill.trim());
+        return skills.split(',').map((skill) => skill.trim());
       } catch {
         // Not valid JSON, treat as comma-separated string
-        return skills.split(',').map(skill => skill.trim());
+        return skills.split(',').map((skill) => skill.trim());
       }
     }
-    
+
     // Default fallback - return empty array
     return [];
   }

@@ -50,7 +50,8 @@ export class LiveClassesController {
     @User() user: UserDocument,
   ): Promise<UserAttendanceResponseDto> {
     console.log('getUserAttendance: User ID:', user._id.toString());
-    return this.liveClassesLogicService.getUserAttendance(user._id.toString());
+
+    return this.liveClassesLogicService.getUserAttendance(user);
   }
 
   @ApiResponse({
