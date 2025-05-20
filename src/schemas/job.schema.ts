@@ -7,7 +7,6 @@ export type JobDocument = Job & Document;
 @Schema({ timestamps: true })
 export class Job {
   @ApiProperty({ description: 'Unique identifier for the job' })
-  @Prop({ type: Types.ObjectId, required: true, default: () => new Types.ObjectId() })
   _id: Types.ObjectId;
 
   @ApiProperty({ description: 'Title of the job' })
@@ -30,11 +29,18 @@ export class Job {
   @Prop({ required: false })
   logo: string;
 
-  @ApiProperty({ description: 'List of required skills for the job', type: [String] })
+  @ApiProperty({
+    description: 'List of required skills for the job',
+    type: [String],
+  })
   @Prop({ type: [String], required: true })
   skills: string[];
 
-  @ApiProperty({ description: 'Additional links related to the job', type: [String], required: false })
+  @ApiProperty({
+    description: 'Additional links related to the job',
+    type: [String],
+    required: false,
+  })
   @Prop({ required: false })
   ExtraLink: string;
 
