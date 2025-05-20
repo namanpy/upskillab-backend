@@ -13,10 +13,20 @@ import {
 } from '../../dto/live-classes.dto';
 import { ClassSessionDocument } from '../../schemas/class-session.schema';
 import { AttendanceDocument } from '../../schemas/attendance.schema';
+import { User } from 'src/schemas/user.schema';
+import { USER_TYPES } from 'src/common/constants/user.constants';
+import { TeacherDataService } from '../teachers/teacher.data';
+import { OrderDataService } from '../order/order.data';
+import { StudentDataService } from '../student/student.data';
 
 @Injectable()
 export class LiveClassesLogicService {
-  constructor(private liveClassesDataService: LiveClassesDataService) {}
+  constructor(
+    private liveClassesDataService: LiveClassesDataService,
+    private teacherDataService: TeacherDataService,
+    private studentDataService: StudentDataService,
+    private orderDataService: OrderDataService,
+  ) {}
 
   async getLiveClasses(userId: string): Promise<LiveClassesResponseDto> {
     console.log('getLiveClasses: Starting for userId:', userId);
@@ -171,25 +181,87 @@ export class LiveClassesLogicService {
     };
   }
 
-  async getUserAttendance(userId: string): Promise<UserAttendanceResponseDto> {
-    console.log('getUserAttendance: Starting for userId:', userId);
-    const attendanceData =
-      await this.liveClassesDataService.getUserAttendance(userId);
-    console.log(
-      'getUserAttendance: Attendance data:',
-      attendanceData.map((data) => ({
-        classId: data.classSession._id.toString(),
-        isAttended: data.attendance ? data.attendance.isAttended : false,
-      })),
+  async getUserAttendance(user: User): Promise<UserAttendanceResponseDto> {
+    const userId = user._id;
+    const teacherId =
+      user.userType === USER_TYPES.TEACHER
+        ? await this.teacherDataService
+            .getTeacherByUserId(userId)
+            .then((t) => t?._id)
+        : undefined;
+
+    let batchIds: string[] = [];
+
+    if (user.userType === USER_TYPES.STUDENT) {
+      const orders = await this.orderDataService.getOrdersByUser(
+        userId.toString(),
+      );
+      batchIds = orders.map((order) => order.batch._id.toString());
+    }
+
+    const attendanceData = await this.liveClassesDataService.getUserAttendance(
+      user.userType === USER_TYPES.STUDENT
+        ? {
+            userId,
+            batchIds,
+          }
+        : user.userType === USER_TYPES.TEACHER
+          ? {
+              teacherId,
+            }
+          : {},
     );
+
     return {
-      classes: attendanceData.map(({ classSession, attendance }) => ({
-        _id: classSession._id,
-        meetingLink: classSession.meetingLink,
-        scheduledDate: classSession.scheduledDate,
-        scheduledStartTime: classSession.scheduledStartTime,
-        isAttended: attendance ? attendance.isAttended : false,
-      })),
+      classes: await Promise.all(
+        attendanceData.map(async ({ classSession, attendances }) => {
+          if (user.userType === USER_TYPES.TEACHER) {
+            const student = !!attendances?.at(0)?.userId
+              ? await this.studentDataService.getStudentByUserId(
+                  attendances?.at(0)?.userId!,
+                )
+              : undefined;
+
+            const teacher = classSession?.teacherId
+              ? await this.teacherDataService.getTeacherById(
+                  classSession.teacherId,
+                )
+              : undefined;
+
+            return {
+              _id: classSession._id,
+              meetingLink: classSession.meetingLink,
+              scheduledDate: classSession.scheduledDate,
+              scheduledStartTime: classSession.scheduledStartTime,
+              students: await Promise.all(
+                attendances?.map(async (attendance) => ({
+                  _id: attendance.userId,
+                  student: await this.studentDataService.getStudentByUserId(
+                    attendance.userId,
+                  ),
+                  isAttended: attendance.isAttended,
+                })) || [],
+              ),
+              teacher,
+            };
+          } else {
+            const teacher = classSession?.teacherId
+              ? await this.teacherDataService.getTeacherById(
+                  classSession.teacherId,
+                )
+              : undefined;
+
+            return {
+              _id: classSession._id,
+              meetingLink: classSession.meetingLink,
+              scheduledDate: classSession.scheduledDate,
+              scheduledStartTime: classSession.scheduledStartTime,
+              isAttended: !!attendances?.at(0)?.isAttended,
+              teacher,
+            };
+          }
+        }),
+      ),
     };
   }
 }
