@@ -1,10 +1,21 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { ResourceDataService } from './resource.data.service';
-import { CreateResourceDto, UpdateResourceDto, Resource, GetResourcesResponseDTO } from '../../dto/resource.dto';
+import {
+  CreateResourceDto,
+  UpdateResourceDto,
+  Resource,
+  GetResourcesResponseDTO,
+} from '../../dto/resource.dto';
 import { ResourceDocument } from '../../schemas/resource.schema';
 import { USER_TYPES } from '../../common/constants/user.constants';
 import { FileUploaderService } from '../../common/services/file-uploader.service';
 import { ImageUploaderService } from '../../common/services/image-uploader.service';
+import { User } from 'src/schemas/user.schema';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class ResourceLogicService {
@@ -15,27 +26,29 @@ export class ResourceLogicService {
   ) {}
 
   // Helper function to convert ResourceDocument to Resource DTO
- private convertToResourceDTO(doc: any): Resource {
-  const resource = doc.toObject ? doc.toObject() : { ...doc };
+  private convertToResourceDTO(doc: any): Resource {
+    const resource = doc.toObject ? doc.toObject() : { ...doc };
 
-  return {
-    ...resource,
-    _id: resource._id?.toString(),
-    createdBy: resource.createdBy?.toString(),
-    // courseId: resource.courseId && typeof resource.courseId === 'object' && resource.courseId.toString
-    //   ? resource.courseId.toString()
-    //   : resource.courseId,
-    createdAt: resource.createdAt || new Date(),
-    updatedAt: resource.updatedAt || new Date(),
-  };
-}
+    return {
+      ...resource,
+      _id: resource._id?.toString(),
+      createdBy: resource.createdBy?.toString(),
+      // courseId: resource.courseId && typeof resource.courseId === 'object' && resource.courseId.toString
+      //   ? resource.courseId.toString()
+      //   : resource.courseId,
+      createdAt: resource.createdAt || new Date(),
+      updatedAt: resource.updatedAt || new Date(),
+    };
+  }
 
+  async getResources(user: User): Promise<GetResourcesResponseDTO> {
+    let userId: Types.ObjectId | undefined;
+    if (user.userType === USER_TYPES.TEACHER) userId = user._id;
 
-  async getResources(): Promise<GetResourcesResponseDTO> {
-    const resourceDocs = await this.resourceDataService.getResources();
+    const resourceDocs = await this.resourceDataService.getResources(userId);
     // Convert each document to Resource DTO
-    const resources = resourceDocs.map(doc => this.convertToResourceDTO(doc));
-    
+    const resources = resourceDocs.map((doc) => this.convertToResourceDTO(doc));
+
     return {
       resources: resources,
     };
@@ -48,23 +61,38 @@ export class ResourceLogicService {
     imageFile?: Express.Multer.File,
   ) {
     if (![USER_TYPES.TEACHER, USER_TYPES.ADMIN].includes(user.userType)) {
-      throw new ForbiddenException('Only teachers or admins can create resources');
+      throw new ForbiddenException(
+        'Only teachers or admins can create resources',
+      );
     }
 
     let pdfUrl: string | undefined;
     let imageUrl: string | undefined;
 
     if (pdfFile) {
-      const uploadResult = await this.fileUploaderService.uploadFiles([pdfFile], 'resources');
+      const uploadResult = await this.fileUploaderService.uploadFiles(
+        [pdfFile],
+        'resources',
+      );
       pdfUrl = uploadResult[0].fileUrl; // Get URL from the first result
     }
 
     if (imageFile) {
-      const fileId = Date.now().toString() + Math.random().toString(36).substring(2, 15);
-      imageUrl = await this.imageUploaderService.uploadImage(imageFile, 'resource', fileId);
+      const fileId =
+        Date.now().toString() + Math.random().toString(36).substring(2, 15);
+      imageUrl = await this.imageUploaderService.uploadImage(
+        imageFile,
+        'resource',
+        fileId,
+      );
     }
 
-    const resourceDoc = await this.resourceDataService.createResource(createResourceDto, user._id, pdfUrl, imageUrl);
+    const resourceDoc = await this.resourceDataService.createResource(
+      createResourceDto,
+      user._id,
+      pdfUrl,
+      imageUrl,
+    );
     return {
       resource: this.convertToResourceDTO(resourceDoc),
     };
@@ -75,7 +103,7 @@ export class ResourceLogicService {
     if (!resourceDoc) {
       throw new NotFoundException(`Resource with ID ${id} not found`);
     }
-    
+
     return {
       resource: this.convertToResourceDTO(resourceDoc),
     };
@@ -93,8 +121,13 @@ export class ResourceLogicService {
       throw new NotFoundException(`Resource with ID ${id} not found`);
     }
 
-    const resource = resourceDoc.toObject ? resourceDoc.toObject() : { ...resourceDoc };
-    if (resource.createdBy.toString() !== user._id.toString() && user.userType !== USER_TYPES.ADMIN) {
+    const resource = resourceDoc.toObject
+      ? resourceDoc.toObject()
+      : { ...resourceDoc };
+    if (
+      resource.createdBy.toString() !== user._id.toString() &&
+      user.userType !== USER_TYPES.ADMIN
+    ) {
       throw new ForbiddenException('You can only update your own resources');
     }
 
@@ -102,20 +135,33 @@ export class ResourceLogicService {
     let imageUrl: string | undefined;
 
     if (pdfFile) {
-      const uploadResult = await this.fileUploaderService.uploadFiles([pdfFile], 'resources');
+      const uploadResult = await this.fileUploaderService.uploadFiles(
+        [pdfFile],
+        'resources',
+      );
       pdfUrl = uploadResult[0].fileUrl; // Get URL from the first result
     }
 
     if (imageFile) {
-      const fileId = Date.now().toString() + Math.random().toString(36).substring(2, 15);
-      imageUrl = await this.imageUploaderService.uploadImage(imageFile, 'resource', fileId);
+      const fileId =
+        Date.now().toString() + Math.random().toString(36).substring(2, 15);
+      imageUrl = await this.imageUploaderService.uploadImage(
+        imageFile,
+        'resource',
+        fileId,
+      );
     }
 
-    const updatedResourceDoc = await this.resourceDataService.updateResource(id, updateResourceDto, pdfUrl, imageUrl);
+    const updatedResourceDoc = await this.resourceDataService.updateResource(
+      id,
+      updateResourceDto,
+      pdfUrl,
+      imageUrl,
+    );
     if (!updatedResourceDoc) {
       throw new NotFoundException(`Resource with ID ${id} not found`);
     }
-    
+
     return {
       resource: this.convertToResourceDTO(updatedResourceDoc),
     };
@@ -127,8 +173,13 @@ export class ResourceLogicService {
       throw new NotFoundException(`Resource with ID ${id} not found`);
     }
 
-    const resource = resourceDoc.toObject ? resourceDoc.toObject() : { ...resourceDoc };
-    if (resource.createdBy.toString() !== user._id.toString() && user.userType !== USER_TYPES.ADMIN) {
+    const resource = resourceDoc.toObject
+      ? resourceDoc.toObject()
+      : { ...resourceDoc };
+    if (
+      resource.createdBy.toString() !== user._id.toString() &&
+      user.userType !== USER_TYPES.ADMIN
+    ) {
       throw new ForbiddenException('You can only delete your own resources');
     }
 
