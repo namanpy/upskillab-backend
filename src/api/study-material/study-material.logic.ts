@@ -30,7 +30,6 @@ export class StudyMaterialLogicService {
   // Get study materials by course ID
   async getStudyMaterialsByCourseId(courseId: string) {
     const studyMaterials = await this.studyMaterialDataService.getStudyMaterialsByCourseId(courseId);
-    console.log(studyMaterials,'hi')
     if (!studyMaterials || studyMaterials.length === 0) {
       // throw new NotFoundException(`No study materials found for course ID ${courseId}`);
       return {studyMaterials};
