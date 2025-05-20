@@ -42,7 +42,18 @@ export class ApplicationDataService {
     return this.applicationModel.findById(id).exec();
   }
 
-  async deleteApplication(id: string): Promise<void> {
+async getApplicationsByJobId(jobId: Types.ObjectId): Promise<Application[]> {
+  return this.applicationModel.find({ jobId }).lean();
+}
+
+async getApplicationsByEmail(email: string) {
+  return this.applicationModel
+    .find({ email })
+    .populate('jobId') // Ensure it populates the job details
+    .exec();
+}
+
+async deleteApplication(id: string): Promise<void> {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException('Invalid application ID');
     }
