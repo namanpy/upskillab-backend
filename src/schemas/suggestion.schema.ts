@@ -3,7 +3,6 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { HydratedDocument, Types } from 'mongoose';
 import { MongooseDocument } from './common.schema';
 
-
 export type SuggestionDocument = HydratedDocument<Suggestion>;
 
 @Schema({ timestamps: true })
@@ -17,9 +16,9 @@ export class Suggestion extends MongooseDocument {
   description?: string;
 
   @ApiProperty({
-    description: 'Type of suggestion'
+    description: 'Type of suggestion',
   })
-  @Prop({ required: true})
+  @Prop({ required: true })
   type: string;
 
   @ApiProperty({ description: 'Content of the suggestion (URL or PDF S3 URL)' })
@@ -27,11 +26,11 @@ export class Suggestion extends MongooseDocument {
   content: string;
 
   @ApiProperty({ description: 'Reference to the batch' })
-  @Prop({ type: Types.ObjectId, ref: 'Batch', required: true })
+  @Prop({ ref: 'Batch', required: true })
   batchId: Types.ObjectId;
 
   @ApiProperty({ description: 'Reference to the teacher' })
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  @Prop({ ref: 'User', required: true })
   teacherId: Types.ObjectId;
 
   @ApiProperty({ description: 'Approval status of the suggestion' })
