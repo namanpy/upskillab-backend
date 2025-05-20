@@ -1,7 +1,30 @@
-import { Controller, Get, Post, Put, Patch, Delete, Body, Param, UseGuards, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  UseInterceptors,
+  UploadedFiles,
+  Request,
+} from '@nestjs/common';
 import { ResourceLogicService } from './resource.logic';
-import { CreateResourceDto, UpdateResourceDto, GetResourcesResponseDTO } from '../../dto/resource.dto';
-import { ApiResponse, ApiTags, ApiBody, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
+import {
+  CreateResourceDto,
+  UpdateResourceDto,
+  GetResourcesResponseDTO,
+} from '../../dto/resource.dto';
+import {
+  ApiResponse,
+  ApiTags,
+  ApiBody,
+  ApiBearerAuth,
+  ApiConsumes,
+} from '@nestjs/swagger';
 // import { AuthGuard('jwt') } from '../../common/guard/jwt-auth.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../../common/guard/roles.guard';
@@ -15,10 +38,16 @@ import { User } from '../../common/decorators/user.decorator';
 export class ResourceController {
   constructor(private resourceLogicService: ResourceLogicService) {}
 
-  @ApiResponse({ status: 200, description: 'Get all resources', type: GetResourcesResponseDTO })
+  @ApiResponse({
+    status: 200,
+    description: 'Get all resources',
+    type: GetResourcesResponseDTO,
+  })
   @Get('')
-  async getResources(): Promise<GetResourcesResponseDTO> {
-    return await this.resourceLogicService.getResources();
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(USER_TYPES.TEACHER, USER_TYPES.ADMIN, USER_TYPES.STUDENT)
+  async getResources(@Request() req): Promise<GetResourcesResponseDTO> {
+    return await this.resourceLogicService.getResources(req.user);
   }
 
   @ApiResponse({ status: 201, description: 'Create a new resource' })
@@ -27,10 +56,12 @@ export class ResourceController {
   @Roles(USER_TYPES.TEACHER, USER_TYPES.ADMIN)
   @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileFieldsInterceptor([
-    { name: 'pdf', maxCount: 1 },
-    { name: 'image', maxCount: 1 },
-  ]))
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'pdf', maxCount: 1 },
+      { name: 'image', maxCount: 1 },
+    ]),
+  )
   @ApiBody({
     description: 'Create a new resource with optional PDF or image upload',
     type: CreateResourceDto,
@@ -38,9 +69,15 @@ export class ResourceController {
   async createResource(
     @Body() createResourceDto: CreateResourceDto,
     @User() user: any,
-    @UploadedFiles() files: { pdf?: Express.Multer.File[], image?: Express.Multer.File[] },
+    @UploadedFiles()
+    files: { pdf?: Express.Multer.File[]; image?: Express.Multer.File[] },
   ) {
-    return await this.resourceLogicService.createResource(createResourceDto, user, files.pdf?.[0], files.image?.[0]);
+    return await this.resourceLogicService.createResource(
+      createResourceDto,
+      user,
+      files.pdf?.[0],
+      files.image?.[0],
+    );
   }
 
   @ApiResponse({ status: 200, description: 'Get a single resource by ID' })
@@ -50,43 +87,72 @@ export class ResourceController {
   }
 
   @ApiResponse({ status: 200, description: 'Update a resource by ID' })
-  @ApiBody({ type: UpdateResourceDto, required: false, description: 'Partial update of resource' })
+  @ApiBody({
+    type: UpdateResourceDto,
+    required: false,
+    description: 'Partial update of resource',
+  })
   @Put(':id')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(USER_TYPES.TEACHER, USER_TYPES.ADMIN)
   @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileFieldsInterceptor([
-    { name: 'pdf', maxCount: 1 },
-    { name: 'image', maxCount: 1 },
-  ]))
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'pdf', maxCount: 1 },
+      { name: 'image', maxCount: 1 },
+    ]),
+  )
   async updateResource(
     @Param('id') id: string,
     @Body() updateResourceDto: UpdateResourceDto,
     @User() user: any,
-    @UploadedFiles() files: { pdf?: Express.Multer.File[], image?: Express.Multer.File[] },
+    @UploadedFiles()
+    files: { pdf?: Express.Multer.File[]; image?: Express.Multer.File[] },
   ) {
-    return await this.resourceLogicService.updateResource(id, updateResourceDto, user, files.pdf?.[0], files.image?.[0]);
+    return await this.resourceLogicService.updateResource(
+      id,
+      updateResourceDto,
+      user,
+      files.pdf?.[0],
+      files.image?.[0],
+    );
   }
 
-  @ApiResponse({ status: 200, description: 'Partially update a resource by ID' })
-  @ApiBody({ type: UpdateResourceDto, required: false, description: 'Partial update of resource' })
+  @ApiResponse({
+    status: 200,
+    description: 'Partially update a resource by ID',
+  })
+  @ApiBody({
+    type: UpdateResourceDto,
+    required: false,
+    description: 'Partial update of resource',
+  })
   @Patch(':id')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(USER_TYPES.TEACHER, USER_TYPES.ADMIN)
   @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileFieldsInterceptor([
-    { name: 'pdf', maxCount: 1 },
-    { name: 'image', maxCount: 1 },
-  ]))
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'pdf', maxCount: 1 },
+      { name: 'image', maxCount: 1 },
+    ]),
+  )
   async patchResource(
     @Param('id') id: string,
     @Body() updateResourceDto: UpdateResourceDto,
     @User() user: any,
-    @UploadedFiles() files: { pdf?: Express.Multer.File[], image?: Express.Multer.File[] },
+    @UploadedFiles()
+    files: { pdf?: Express.Multer.File[]; image?: Express.Multer.File[] },
   ) {
-    return await this.resourceLogicService.updateResource(id, updateResourceDto, user, files.pdf?.[0], files.image?.[0]);
+    return await this.resourceLogicService.updateResource(
+      id,
+      updateResourceDto,
+      user,
+      files.pdf?.[0],
+      files.image?.[0],
+    );
   }
 
   @ApiResponse({ status: 200, description: 'Delete a resource by ID' })
