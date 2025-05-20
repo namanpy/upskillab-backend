@@ -215,7 +215,7 @@ export class LiveClassesLogicService {
     return {
       classes: await Promise.all(
         attendanceData.map(async ({ classSession, attendances }) => {
-          if (user.userType === USER_TYPES.TEACHER) {
+          if (user.userType === USER_TYPES.TEACHER || user.userType ==== USER_TYPES.ADMIN) {
             const student = !!attendances?.at(0)?.userId
               ? await this.studentDataService.getStudentByUserId(
                   attendances?.at(0)?.userId!,
