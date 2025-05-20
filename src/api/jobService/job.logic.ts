@@ -140,7 +140,8 @@ export class JobLogicService {
     };
   }
 
-  async deleteJob(id: string): Promise<void> {
+  async deleteJob(id: string){
     await this.jobDataService.deleteJob(id);
+    return { message: 'Job deleted successfully' };
   }
 }

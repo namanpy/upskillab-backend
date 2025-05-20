@@ -462,5 +462,6 @@ export class SuggestionLogicService {
 
     await this.suggestionDataService.deleteSuggestion(id);
     console.log('deleteSuggestion: Suggestion deleted:', id);
+
   }
 }

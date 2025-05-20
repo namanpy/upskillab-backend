@@ -92,7 +92,28 @@ export class ApplicationLogicService {
     };
   }
 
-  async deleteApplication(id: string): Promise<void> {
-    await this.applicationDataService.deleteApplication(id);
+
+async getApplicationByJobId(jobId: string){
+  if (!Types.ObjectId.isValid(jobId)) {
+    throw new BadRequestException('Invalid job ID');
+  }
+
+  const applications = await this.applicationDataService.getApplicationsByJobId(new Types.ObjectId(jobId));
+
+  return { applications };
+}
+
+async getAppliedJobsByStudent(email: string) {
+  const applications = await this.applicationDataService.getApplicationsByEmail(email);
+
+  return {
+    jobs: applications.map(app => app.jobId), // If jobId is populated
+  };
+}
+
+
+  async deleteApplication(id: string){
+   await this.applicationDataService.deleteApplication(id);
+   return { message: 'Applications deleted successfully' };
   }
 }
