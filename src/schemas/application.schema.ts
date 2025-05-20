@@ -5,7 +5,6 @@ export type ApplicationDocument = Application & Document;
 
 @Schema({ timestamps: true })
 export class Application {
-  @Prop({ type: Types.ObjectId, required: true, default: () => new Types.ObjectId() })
   _id: Types.ObjectId;
 
   @Prop({ required: true })

@@ -1,22 +1,31 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { Application, ApplicationDocument } from '../../schemas/application.schema';
+import {
+  Application,
+  ApplicationDocument,
+} from '../../schemas/application.schema';
 
 @Injectable()
 export class ApplicationDataService {
   constructor(
-    @InjectModel(Application.name) private applicationModel: Model<ApplicationDocument>,
+    @InjectModel(Application.name)
+    private applicationModel: Model<ApplicationDocument>,
   ) {}
 
-  async createApplication(applicationData: Omit<Application, '_id' | 'createdAt' | 'updatedAt'>): Promise<ApplicationDocument> {
+  async createApplication(
+    applicationData: Omit<Application, '_id' | 'createdAt' | 'updatedAt'>,
+  ): Promise<ApplicationDocument> {
     try {
       const newApplication = new this.applicationModel(applicationData);
-      console.log(newApplication)
+      console.log(newApplication);
       return await newApplication.save();
     } catch (error) {
-      if (error.code === 11000) { // Duplicate key error (unique constraint violation)
-        throw new BadRequestException('You have already applied for this job with this email or phone number');
+      if (error.code === 11000) {
+        // Duplicate key error (unique constraint violation)
+        throw new BadRequestException(
+          'You have already applied for this job with this email or phone number',
+        );
       }
       throw error;
     }
@@ -37,7 +46,9 @@ export class ApplicationDataService {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException('Invalid application ID');
     }
-    const result = await this.applicationModel.findByIdAndDelete(id).exec();
+    const result = await this.applicationModel
+      .findByIdAndDelete(new Types.ObjectId(id))
+      .exec();
     if (!result) {
       throw new BadRequestException('Application not found');
     }
