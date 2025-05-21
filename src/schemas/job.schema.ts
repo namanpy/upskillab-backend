@@ -49,6 +49,12 @@ export class Job {
     enum: ['upskill', 'external'],
     required: false,
   })
+
+  @ApiProperty()
+  @Prop({ default: false })
+  isPublic: boolean;
+
+
   @Prop({ type: String, enum: ['upskill', 'external'], required: false })
   source: string;
 
@@ -59,6 +65,7 @@ export class Job {
   @ApiProperty({ description: 'Last update timestamp' })
   @Prop()
   updatedAt: Date;
+
 }
 
 export const JobSchema = SchemaFactory.createForClass(Job);
