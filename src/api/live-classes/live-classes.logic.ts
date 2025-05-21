@@ -11,7 +11,7 @@ import {
   MarkAttendanceDto,
   MarkAttendanceResponseDto,
   UserAttendanceResponseDto,
-  ClassAttendanceResponseDto, // Newly added DTO
+  ClassAttendanceResponseDto,
 } from '../../dto/live-classes.dto';
 import { ClassSessionDocument } from '../../schemas/class-session.schema';
 import { AttendanceDocument } from '../../schemas/attendance.schema';
@@ -270,26 +270,22 @@ export class LiveClassesLogicService {
     };
   }
 
-  // New method for admin to get class attendance
   async getClassAttendance(
     classId: string,
     user: User,
   ): Promise<ClassAttendanceResponseDto> {
     console.log('getClassAttendance: Starting for classId:', classId, 'userId:', user._id.toString());
     
-    // Check if user is admin
     if (user.userType !== USER_TYPES.ADMIN) {
       console.log('getClassAttendance: User is not admin:', user._id.toString());
       throw new ForbiddenException('Only admins can access class attendance');
     }
 
-    // Validate classId
     if (!classId || !/^[0-9a-fA-F]{24}$/.test(classId)) {
       console.log('getClassAttendance: Invalid classId format:', classId);
       throw new BadRequestException('Invalid class ID');
     }
 
-    // Fetch class details
     console.log('getClassAttendance: Fetching class:', classId);
     const liveClass = await this.liveClassesDataService.getLiveClassById(classId);
     if (!liveClass) {
@@ -297,7 +293,6 @@ export class LiveClassesLogicService {
       throw new NotFoundException(`Live class with ID ${classId} not found`);
     }
 
-    // Fetch attendance records for the class
     console.log('getClassAttendance: Fetching attendance for classId:', classId);
     const attendanceRecords = await this.liveClassesDataService.getAttendanceForClassAdmin(classId);
     console.log(
@@ -308,8 +303,20 @@ export class LiveClassesLogicService {
       })),
     );
 
-    // Calculate total attended
-    const totalAttended = attendanceRecords.filter((rec) => rec.isAttended).length;
+    const students = await Promise.all(
+      attendanceRecords
+        .filter((rec) => rec.isAttended) // Only include students who attended
+        .map(async (rec) => {
+          const student = await this.studentDataService.getStudentByUserId(rec.userId);
+          return {
+            userId: rec.userId,
+            isAttended: rec.isAttended,
+            name: student ? student.fullName : 'Unknown',
+          };
+        }),
+    );
+
+    const totalAttended = students.length; // Since we filtered by isAttended: true
 
     return {
       _id: liveClass._id,
@@ -317,10 +324,7 @@ export class LiveClassesLogicService {
       scheduledDate: liveClass.scheduledDate,
       scheduledStartTime: liveClass.scheduledStartTime,
       totalAttended,
-      students: attendanceRecords.map((rec) => ({
-        userId: rec.userId,
-        isAttended: rec.isAttended,
-      })),
+      students,
     };
   }
 }
