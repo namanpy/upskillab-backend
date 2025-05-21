@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { LiveClassesDataService } from './live-classes.data';
 import {
@@ -10,6 +11,7 @@ import {
   MarkAttendanceDto,
   MarkAttendanceResponseDto,
   UserAttendanceResponseDto,
+  ClassAttendanceResponseDto, // Newly added DTO
 } from '../../dto/live-classes.dto';
 import { ClassSessionDocument } from '../../schemas/class-session.schema';
 import { AttendanceDocument } from '../../schemas/attendance.schema';
@@ -265,6 +267,60 @@ export class LiveClassesLogicService {
           }
         }),
       ),
+    };
+  }
+
+  // New method for admin to get class attendance
+  async getClassAttendance(
+    classId: string,
+    user: User,
+  ): Promise<ClassAttendanceResponseDto> {
+    console.log('getClassAttendance: Starting for classId:', classId, 'userId:', user._id.toString());
+    
+    // Check if user is admin
+    if (user.userType !== USER_TYPES.ADMIN) {
+      console.log('getClassAttendance: User is not admin:', user._id.toString());
+      throw new ForbiddenException('Only admins can access class attendance');
+    }
+
+    // Validate classId
+    if (!classId || !/^[0-9a-fA-F]{24}$/.test(classId)) {
+      console.log('getClassAttendance: Invalid classId format:', classId);
+      throw new BadRequestException('Invalid class ID');
+    }
+
+    // Fetch class details
+    console.log('getClassAttendance: Fetching class:', classId);
+    const liveClass = await this.liveClassesDataService.getLiveClassById(classId);
+    if (!liveClass) {
+      console.log('getClassAttendance: Class not found:', classId);
+      throw new NotFoundException(`Live class with ID ${classId} not found`);
+    }
+
+    // Fetch attendance records for the class
+    console.log('getClassAttendance: Fetching attendance for classId:', classId);
+    const attendanceRecords = await this.liveClassesDataService.getAttendanceForClassAdmin(classId);
+    console.log(
+      'getClassAttendance: Attendance records:',
+      attendanceRecords.map((rec) => ({
+        userId: rec.userId.toString(),
+        isAttended: rec.isAttended,
+      })),
+    );
+
+    // Calculate total attended
+    const totalAttended = attendanceRecords.filter((rec) => rec.isAttended).length;
+
+    return {
+      _id: liveClass._id,
+      meetingLink: liveClass.meetingLink,
+      scheduledDate: liveClass.scheduledDate,
+      scheduledStartTime: liveClass.scheduledStartTime,
+      totalAttended,
+      students: attendanceRecords.map((rec) => ({
+        userId: rec.userId,
+        isAttended: rec.isAttended,
+      })),
     };
   }
 }
