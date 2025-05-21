@@ -25,6 +25,19 @@ export class BlogDataService {
       .exec();
   }
 
+
+  async getStudentBlogs(
+    options: {
+      studentId?: string;
+    } = {},
+  ): Promise<BlogDocument[]> {
+    const { studentId } = options;
+    return this.blogModel
+      .find({studentId:studentId})
+      .populate('studentId', 'fullName')
+      .exec();
+  }
+
   async createBlog(
     createBlogDto: CreateBlogDto & { image: string },
   ): Promise<BlogDocument> {
