@@ -25,6 +25,28 @@ export class JobLogicService {
         source: job.source,
         createdAt: job.createdAt,
         updatedAt: job.updatedAt,
+        isPublic:job.isPublic,
+      })),
+    };
+  }
+
+  async getPublicJob(): Promise<GetJobsResponseDTO> {
+    const jobs = await this.jobDataService.getPublicJob();
+    console.log(jobs)
+    return {
+      jobs: jobs.map((job) => ({
+        _id: job._id.toString(),
+        title: job.title,
+        subtitle: job.subtitle,
+        description: job.description,
+        company: job.company,
+        logo: job.logo,
+        skills: job.skills,
+        ExtraLink: job.ExtraLink,
+        source: job.source,
+        createdAt: job.createdAt,
+        updatedAt: job.updatedAt,
+        isPublic:job.isPublic,
       })),
     };
   }
@@ -47,6 +69,7 @@ export class JobLogicService {
         source: job.source,
         createdAt: job.createdAt,
         updatedAt: job.updatedAt,
+        isPublic:job.isPublic,
       },
     };
   }
@@ -88,6 +111,7 @@ export class JobLogicService {
         source: job.source,
         createdAt: job.createdAt,
         updatedAt: job.updatedAt,
+        isPublic:job.isPublic,
       },
     };
   }
@@ -136,6 +160,7 @@ export class JobLogicService {
         source: job.source,
         createdAt: job.createdAt,
         updatedAt: job.updatedAt,
+        isPublic:job.isPublic,
       },
     };
   }

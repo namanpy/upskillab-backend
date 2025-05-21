@@ -11,7 +11,9 @@ export class JobDataService {
   async getJobs(): Promise<JobDocument[]> {
     return this.jobModel.find().exec();
   }
-
+  async getPublicJob(): Promise<JobDocument[]> {
+    return this.jobModel.find({isPublic:true}).exec();
+  }
   async getJobById(id: string): Promise<JobDocument | null> {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException('Invalid job ID');

@@ -54,6 +54,11 @@ export class JobController {
     return await this.jobLogicService.getJobById(id);
   }
 
+    @Get('public/job')
+  async getPublicJob(): Promise<GetJobsResponseDTO> {
+    return await this.jobLogicService.getPublicJob();
+  }
+
   @ApiResponse({
     status: 201,
     description: 'Create a new job',
