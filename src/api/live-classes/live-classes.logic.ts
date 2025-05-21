@@ -276,7 +276,7 @@ export class LiveClassesLogicService {
   ): Promise<ClassAttendanceResponseDto> {
     console.log('getClassAttendance: Starting for classId:', classId, 'userId:', user._id.toString());
     
-    if (user.userType !== USER_TYPES.ADMIN) {
+    if (user.userType !== USER_TYPES.TEACHER) {
       console.log('getClassAttendance: User is not admin:', user._id.toString());
       throw new ForbiddenException('Only admins can access class attendance');
     }

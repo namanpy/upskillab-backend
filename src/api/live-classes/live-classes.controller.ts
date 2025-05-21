@@ -220,7 +220,7 @@ export class LiveClassesController {
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Get(':classId/attendance/admin')
+  @Get(':classId/attendance/teacher')
   async getClassAttendance(
     @Param('classId') classId: string,
     @User() user: UserDocument,
