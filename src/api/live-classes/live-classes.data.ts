@@ -133,7 +133,6 @@ export class LiveClassesDataService {
 
     const classSessions = await this.classSessionModel
       .find({
-        // scheduledDate: { $gte: today },
         ...('teacherId' in input && { teacherId: input.teacherId }),
         ...('batchIds' in input && {
           batchId: {
