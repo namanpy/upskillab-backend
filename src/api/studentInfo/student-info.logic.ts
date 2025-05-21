@@ -1,3 +1,4 @@
+// import { Batch } from 'src/schemas/course/batch.schema';
 import { Injectable, ForbiddenException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -25,7 +26,7 @@ export class StudentInfoLogicService {
     @InjectModel(Batch.name) private batchModel: Model<BatchDocument>,
     @InjectModel(Course.name) private courseModel: Model<CourseDocuments>,
     private liveClassesDataService: LiveClassesDataService,
-  ) {}
+  ) { }
 
   private async mapToOrderHistoryDTO(order: any): Promise<OrderHistoryDTO> {
     const batch = await this.batchModel
@@ -67,7 +68,11 @@ export class StudentInfoLogicService {
     ).length;
 
     const attendanceData = await this.liveClassesDataService.getUserAttendance(
-      user._id.toString(),
+      {
+        userId: user._id.toString(), batchIds: orders.filter(
+          (o) => o.status === ORDER_STATUS.COMPLETED.code,
+        ).map(c => c.batch)
+      },
     );
     const attendanceHistory = attendanceData.map(
       ({ classSession, attendances }) => ({
