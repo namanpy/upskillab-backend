@@ -63,7 +63,7 @@ export class TestimonialLogicService {
           createTestimonialDto.userId,
         )
       : undefined;
-
+    console.log(student)
     const testimonial = await this.testimonialDataService.createTestimonial({
       ...createTestimonialDto,
       name: student?.fullName || createTestimonialDto.name,
