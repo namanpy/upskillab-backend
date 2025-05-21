@@ -100,11 +100,29 @@ export class BlogLogicService {
             .getStudentByUserId(options.userId)
             .then((s) => s?._id)
         : undefined;
-
     const blogs = await this.blogDataService.getBlogs(approvedOnly, {
       studentId,
     });
 
+    return {
+      blogs: this.mapToDtoArray(blogs),
+    };
+  }
+
+   async getStudentBlogs(
+    options: {
+      userType?: string;
+      userId?: Types.ObjectId;
+    } = {},
+  ): Promise<GetBlogsResponseDTO> {
+    const studentId =
+      options.userType === USER_TYPES.STUDENT && options.userId
+        ? await this.studentDataService
+            .getStudentByUserId(options.userId)
+            .then((s) => s?._id?.toString())
+        : undefined;
+    const blogs = await this.blogDataService.getStudentBlogs({studentId});
+    console.log(blogs,studentId)
     return {
       blogs: this.mapToDtoArray(blogs),
     };
