@@ -3,6 +3,7 @@ import { TestimonialController } from './testimonial.controller';
 import { TestimonialLogicService } from './testimonial.logic';
 import { TestimonialDataService } from './testimonial.data';
 import { MongooseModule } from '@nestjs/mongoose';
+import { NotificationModule } from '../notification/notification.module';
 import {
   Testimonial,
   TestimonialSchema,
@@ -14,6 +15,7 @@ import { StudentModule } from '../student/student.module';
     MongooseModule.forFeature([
       { name: Testimonial.name, schema: TestimonialSchema },
     ]),
+    NotificationModule,
     StudentModule,
   ],
   providers: [TestimonialDataService, TestimonialLogicService],

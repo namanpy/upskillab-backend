@@ -141,6 +141,7 @@ export class JobLogicService {
         : undefined, // Handle string or array
       ExtraLink: updateJobDto.ExtraLink,
       source: updateJobDto.source,
+      isPublic:updateJobDto.isPublic,
     };
 
     const job = await this.jobDataService.updateJob(id, jobData);

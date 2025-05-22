@@ -102,6 +102,7 @@ export class JobController {
     }
 
     updateJobDto.logo = logo;
+    console.log(updateJobDto,"2",id)
     return await this.jobLogicService.updateJob(id, updateJobDto);
   }
 

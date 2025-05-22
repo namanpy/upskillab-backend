@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { TestimonialDataService } from './testimonial.data';
 import { Types } from 'mongoose';
+import { NotificationLogicService } from '../notification/notification.logic';
 // import { CreateTestimonialDto } from '../../dto/testimonial.dto';
 import {
   CreateTestimonialDto,
@@ -17,6 +18,7 @@ export class TestimonialLogicService {
   constructor(
     private testimonialDataService: TestimonialDataService,
     private studentDataService: StudentDataService,
+    private notificationLogicService: NotificationLogicService
   ) {}
 
   async getTestimonials({
@@ -63,7 +65,6 @@ export class TestimonialLogicService {
           createTestimonialDto.userId,
         )
       : undefined;
-    console.log(student)
     const testimonial = await this.testimonialDataService.createTestimonial({
       ...createTestimonialDto,
       name: student?.fullName || createTestimonialDto.name,
@@ -73,7 +74,11 @@ export class TestimonialLogicService {
       student: student?._id,
       isActive: !student?._id,
     });
-
+    await this.notificationLogicService.createNotification({
+      message: `New Testimonial Created By ${testimonial.name} Check Now`,
+      role: 'admin',
+      type: 'testimonial'
+    });
     return {
       testimonial: {
         _id: testimonial._id.toString(),
@@ -150,7 +155,11 @@ export class TestimonialLogicService {
     );
 
     if (!testimonial) throw new CustomError(ERROR.NOT_FOUND);
-
+    await this.notificationLogicService.createNotification({
+      message: `Testimonial Updated by ${testimonial.name} check Now`,
+      role: 'admin',
+      type: 'info'
+    });
     return {
       testimonial: {
         _id: testimonial._id.toString(),
