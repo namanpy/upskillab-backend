@@ -10,6 +10,7 @@ import { EnrollmentDataService } from '../enrollment/enrollment.data';
 import { EnrollmentModule } from '../enrollment/enrollment.module';
 import { StudentModule } from '../student/student.module';
 import { TeacherModule } from '../teachers/teacher.module';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { TeacherModule } from '../teachers/teacher.module';
     EnrollmentModule,
     StudentModule,
     TeacherModule,
+    NotificationModule,
   ],
   controllers: [DoubtSessionController],
   providers: [DoubtSessionLogicService, DoubtSessionDataService],

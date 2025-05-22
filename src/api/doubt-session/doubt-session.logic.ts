@@ -8,7 +8,7 @@ import { EnrollmentDataService } from '../enrollment/enrollment.data';
 import { GetDoubtsResponseDto } from 'src/dto/doubt-session.dto'; // Import the new DTO
 import { TeacherDataService } from '../teachers/teacher.data';
 import { StudentDataService } from '../student/student.data';
-
+import { NotificationLogicService } from '../notification/notification.logic';
 @Injectable()
 export class DoubtSessionLogicService {
   constructor(
@@ -16,6 +16,7 @@ export class DoubtSessionLogicService {
     private enrollmentDataService: EnrollmentDataService,
     private teacherDataService: TeacherDataService, // Inject the teacher data service
     private studentDataService: StudentDataService, // Inject the student data service
+    private notificationLogicService: NotificationLogicService
   ) {}
 
   async createDoubt(
@@ -33,8 +34,7 @@ export class DoubtSessionLogicService {
     if (!enrollment) {
       throw new CustomError(ERROR.UNAUTHORIZED);
     }
-    console.log(enrollment);
-    // Create the doubt with the teacherId from the enrollment
+       // Create the doubt with the teacherId from the enrollment
     const doubt = await this.dataService.createDoubt({
       studentId: new Types.ObjectId(input.studentId),
       courseId: new Types.ObjectId(input.courseId),
@@ -42,6 +42,13 @@ export class DoubtSessionLogicService {
       question: input.question,
       attachments: input.attachments,
     });
+    await this.notificationLogicService.createNotification({
+      message: `New Doubt asked by on ${enrollment.batchDetails.batchCode} batch`,
+      recipient: enrollment.batchDetails.teacher.toString(), 
+      type: 'Doubts'
+    });
+
+
 
     return {
       status: 'success',
@@ -74,6 +81,12 @@ export class DoubtSessionLogicService {
       user: input.userId,
       message: input.message,
       attachments: input.attachments,
+    });
+
+    await this.notificationLogicService.createNotification({
+      message: `Doubt Resolved`,
+      recipient: doubt?.student?.toString(), 
+      type: 'Doubts'
     });
 
     return {

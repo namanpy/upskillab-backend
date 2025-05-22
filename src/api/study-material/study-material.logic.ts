@@ -1,14 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { StudyMaterialDataService } from './study-material.data';
 import { CreateStudyMaterialDto, UpdateStudyMaterialDto } from 'src/dto/update-study.dto';
-
+import { NotificationLogicService } from '../notification/notification.logic';
 @Injectable()
 export class StudyMaterialLogicService {
-  constructor(private readonly studyMaterialDataService: StudyMaterialDataService) {}
+  constructor(private readonly studyMaterialDataService: StudyMaterialDataService,
+    private notificationLogicService: NotificationLogicService
+  ) {}
 
   // Create a new study material
   async createStudyMaterial(createStudyMaterialDto: CreateStudyMaterialDto) {
     const studyMaterial = await this.studyMaterialDataService.createStudyMaterial(createStudyMaterialDto);
+    await this.notificationLogicService.createNotification({
+      message: `New Study Material Added`,
+      role: 'admin', // change as needed: 'admin', 'teacher', etc.
+      type: 'material'
+    });
     return { studyMaterial };
   }
 
