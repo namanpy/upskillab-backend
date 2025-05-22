@@ -8,6 +8,7 @@ import { RegistrationLogicService } from './registration.logic';
 import { PaymentModule } from '../payment/payment.module';
 import { StudentModule } from '../student/student.module';
 import { CouponModule } from '../coupon/coupon.module';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { CouponModule } from '../coupon/coupon.module';
     PaymentModule,
     StudentModule,
     CouponModule,
+    NotificationModule,
   ],
   controllers: [RegistrationController],
   providers: [RegistrationLogicService],

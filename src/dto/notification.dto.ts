@@ -1,7 +1,7 @@
 export class CreateNotificationDto {
     message: string;
     type?: string;
-    role: 'admin' | 'teacher' | 'student' | 'adminTeacher' | 'adminStudent' | 'teacherStudent';
+    role?: 'admin' | 'teacher' | 'student' | 'adminTeacher' | 'adminStudent' | 'teacherStudent';
     recipient?: string;
   }
   

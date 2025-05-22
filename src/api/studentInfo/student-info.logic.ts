@@ -34,9 +34,8 @@ export class StudentInfoLogicService {
       .select('course')
       .exec();
     const course = batch
-      ? await this.courseModel.findById(batch.course).select('title').exec()
+      ? await this.courseModel.findById(batch.course).select('courseName').exec()
       : null;
-
     return {
       orderId: order._id.toString(),
       totalAmount: order.totalAmount,
@@ -74,9 +73,12 @@ export class StudentInfoLogicService {
         ).map(c => c.batch)
       },
     );
+    console.log(attendanceData)
     const attendanceHistory = attendanceData.map(
       ({ classSession, attendances }) => ({
+        
         classId: classSession._id.toString(),
+        batchId:classSession.batchId.toString(),
         meetingLink: classSession.meetingLink,
         scheduledDate: classSession.scheduledDate,
         scheduledStartTime: classSession.scheduledStartTime,

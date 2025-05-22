@@ -10,6 +10,12 @@ export class CreateRecordedVideoDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  description: string;
+
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   videoUrl: string;
 
   @ApiProperty()

@@ -14,6 +14,7 @@ import { SendGridService } from 'src/common/services/sendgrid.service';
 import { USER_TYPES } from 'src/common/constants/user.constants';
 import { StudentDataService } from '../student/student.data';
 import { STUDENT_TYPE } from 'src/common/constants/student.constants';
+import { NotificationLogicService } from '../notification/notification.logic';
 // import { CouponLogicService } from '../coupon/coupon.logic';
 
 @Injectable()
@@ -25,6 +26,7 @@ export class RegistrationLogicService {
     private cashfreeService: CashfreeService,
     private sendGridService: SendGridService,
     private studentDataService: StudentDataService,
+    private notificationLogicService: NotificationLogicService
     // private couponLogicService: CouponLogicService, // <-- Add this
   ) {}
 
@@ -125,6 +127,12 @@ export class RegistrationLogicService {
         customerPhone: registrationData.phone,
         customerName: registrationData.name,
       },
+    });
+
+    await this.notificationLogicService.createNotification({
+      message: `New order Created By ${registrationData.name} email:${registrationData.email}`,
+      role: 'admin',
+      type: 'Order'
     });
 
     return {
