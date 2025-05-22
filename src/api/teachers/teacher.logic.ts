@@ -123,8 +123,10 @@ export class TeacherLogicService {
   }
 
   async createTeacher(createTeacherDto: CreateTeacherDto) {
+
     const teacher =
       await this.teacherDataService.createTeacher(createTeacherDto);
+      console.log(teacher,"2")
     return {
       teacher: {
         _id: teacher._id.toString(),

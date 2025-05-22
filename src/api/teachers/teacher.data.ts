@@ -129,7 +129,7 @@
 //   }
 // }
 
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException,ConflictException,HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Teacher, TeacherDocument } from '../../schemas/teacher.schema';
@@ -173,6 +173,10 @@ export class TeacherDataService {
     createTeacherDto: CreateTeacherDto,
   ): Promise<TeacherDocument> {
     // Step 1: Create a new User record with userType as TEACHER and isActive as false
+    const existingUser = await this.userModel.findOne({ email: createTeacherDto.email });
+if (existingUser) {
+ throw new BadRequestException('Email already registered');
+}
     const userData = {
       email: createTeacherDto.email,
       mobileNumber: createTeacherDto.mobileNumber,
