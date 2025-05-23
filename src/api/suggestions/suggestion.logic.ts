@@ -195,7 +195,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { User, UserDocument } from '../../schemas/user.schema';
 import { Teacher, TeacherDocument } from '../../schemas/teacher.schema';
-
+import { NotificationLogicService } from '../notification/notification.logic';
 @Injectable()
 export class SuggestionLogicService {
   constructor(
@@ -203,6 +203,7 @@ export class SuggestionLogicService {
     private batchDataService: BatchDataService,
     private orderDataService: OrderDataService,
     private fileUploaderService: FileUploaderService,
+    private notificationLogicService: NotificationLogicService,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Teacher.name) private teacherModel: Model<TeacherDocument>,
   ) {}
@@ -309,6 +310,12 @@ export class SuggestionLogicService {
 
     const suggestion =
       await this.suggestionDataService.createSuggestion(suggestionData);
+    
+    await this.notificationLogicService.createNotification({
+      message: `New Suggestions Created on ${suggestion.title}`,
+      role: 'admin',
+      type: 'suggestion'
+    });
     return this.mapToDto(suggestion);
   }
 
@@ -329,6 +336,10 @@ export class SuggestionLogicService {
       batchIds,
       true,
     );
+
+
+
+
     return {
       suggestions: await this.mapToDtoArray(suggestions),
     };
