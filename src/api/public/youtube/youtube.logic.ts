@@ -33,6 +33,11 @@ export class YoutubeLogicService {
     return { videos: this.mapToDtoArray(videos) };
   }
 
+   async getAllVideos(): Promise<GetYoutubeVideosResponseDTO> {
+    const videos = await this.youtubeDataService.getAllVideos();
+    return { videos: this.mapToDtoArray(videos) };
+  }
+
   async getVideoById(id: string): Promise<{ video: YoutubeVideo }> {
     const video = await this.youtubeDataService.getVideoById(id);
     if (!video) throw new NotFoundException(`Video with ID ${id} not found`);

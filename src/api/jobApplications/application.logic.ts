@@ -3,12 +3,13 @@ import { Types } from 'mongoose';
 import { ApplicationDataService } from './application.data';
 import { CreateApplicationDto, GetApplicationsResponseDTO, ApplicationResponse } from '../../dto/application.dto';
 import { FileUploaderService } from '../../common/services/file-uploader.service';
-
+import { NotificationLogicService } from '../notification/notification.logic';
 @Injectable()
 export class ApplicationLogicService {
   constructor(
     private applicationDataService: ApplicationDataService,
     private fileUploaderService: FileUploaderService,
+    private notificationLogicService: NotificationLogicService,
   ) {}
 
   async createApplication(createApplicationDto: CreateApplicationDto): Promise<{ application: ApplicationResponse }> {
@@ -37,6 +38,12 @@ export class ApplicationLogicService {
     };
 
     const application = await this.applicationDataService.createApplication(applicationData);
+
+     await this.notificationLogicService.createNotification({
+      message: `New Application from ${application.source}`,
+      role: 'admin',
+      type: 'applicatiions'
+    });
     return {
       application: {
         _id: application._id.toString(),

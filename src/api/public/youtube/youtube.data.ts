@@ -17,6 +17,11 @@ export class YoutubeDataService {
     return this.youtubeModel.find(activeOnly ? { active: true } : {}).exec();
   }
 
+    async getAllVideos(): Promise<YoutubeVideoDocument[]> {
+    return this.youtubeModel.find().exec();
+  }
+
+
   async getVideoById(id: string): Promise<YoutubeVideoDocument | null> {
     return this.youtubeModel.findById(id).exec();
   }
