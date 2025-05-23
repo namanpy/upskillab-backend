@@ -16,13 +16,14 @@ import { FileUploaderService } from '../../common/services/file-uploader.service
 import { ImageUploaderService } from '../../common/services/image-uploader.service';
 import { User } from 'src/schemas/user.schema';
 import { Types } from 'mongoose';
-
+import { NotificationLogicService } from '../notification/notification.logic';
 @Injectable()
 export class ResourceLogicService {
   constructor(
     private resourceDataService: ResourceDataService,
     private fileUploaderService: FileUploaderService,
     private imageUploaderService: ImageUploaderService,
+    private notificationLogicService: NotificationLogicService,
   ) {}
 
   // Helper function to convert ResourceDocument to Resource DTO
@@ -93,6 +94,12 @@ export class ResourceLogicService {
       pdfUrl,
       imageUrl,
     );
+
+    await this.notificationLogicService.createNotification({
+      message: `New Resource Created Check out`,
+      role: 'admin',
+      type: 'resource'
+    });
     return {
       resource: this.convertToResourceDTO(resourceDoc),
     };
@@ -162,6 +169,11 @@ export class ResourceLogicService {
       throw new NotFoundException(`Resource with ID ${id} not found`);
     }
 
+    await this.notificationLogicService.createNotification({
+      message: `Resource Updated Check out`,
+      role: 'admin',
+      type: 'resource'
+    });
     return {
       resource: this.convertToResourceDTO(updatedResourceDoc),
     };
