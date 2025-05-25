@@ -25,7 +25,7 @@ export class JobLogicService {
         source: job.source,
         createdAt: job.createdAt,
         updatedAt: job.updatedAt,
-        isPublic:job.isPublic,
+        isPublic: job.isPublic,
       })),
     };
   }
@@ -69,7 +69,7 @@ export class JobLogicService {
         source: job.source,
         createdAt: job.createdAt,
         updatedAt: job.updatedAt,
-        isPublic:job.isPublic,
+        isPublic: job.isPublic,
       },
     };
   }
@@ -142,7 +142,7 @@ export class JobLogicService {
         : undefined, // Handle string or array
       ExtraLink: updateJobDto.ExtraLink,
       source: updateJobDto.source,
-      isPublic:updateJobDto.isPublic,
+      isPublic: updateJobDto.isPublic,
     };
 
     const job = await this.jobDataService.updateJob(id, jobData);
@@ -162,7 +162,7 @@ export class JobLogicService {
         source: job.source,
         createdAt: job.createdAt,
         updatedAt: job.updatedAt,
-        isPublic:job.isPublic,
+        isPublic: job.isPublic,
       },
     };
   }
