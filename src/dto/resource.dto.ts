@@ -26,8 +26,8 @@ export class CreateResourceDto {
   link?: string;
 
   @ApiProperty({ description: 'Approval status of the resource' })
-  @IsBoolean()
-  isApproved: boolean;
+  @IsString()
+  isApproved: string;
 
   @ApiProperty({ description: 'Tags associated with the resource', type: [String] })
   @IsArray()

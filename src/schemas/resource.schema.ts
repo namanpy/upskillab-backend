@@ -38,8 +38,8 @@ export class Resource {
   link?: string;
 
   @ApiProperty()
-  @Prop({ default: false })
-  isApproved: boolean;
+  @Prop({ default: false, required: false })
+  isApproved: string;
 
   @ApiProperty({ type: [String] })
   @Prop({ type: [String], default: [] })
