@@ -9,7 +9,7 @@ import { Course } from 'src/schemas/course/course.schema';
 export class CouponDataService {
   constructor(@InjectModel(Coupon.name) private couponModel: Model<Coupon>) {}
 
-  async validateCoupon(
+async validateCoupon(
     code: string,
     courseId?: Types.ObjectId,
     batchId?: Types.ObjectId,
@@ -31,6 +31,12 @@ export class CouponDataService {
       ],
     });
   }
+
+  async validateCouponRaw(code: string) {
+  return this.couponModel
+    .findOne({ code: code.toLowerCase(), active: true })
+    .exec();
+}
 
   async createCoupon(data: {
     code: string;
@@ -72,6 +78,32 @@ export class CouponDataService {
       totalPages: Math.ceil(total / limit),
     };
   }
+
+async getCouponsByCourse(courseId: string) {
+  const now = new Date();
+
+  return this.couponModel
+    .find({
+      course: new Types.ObjectId(courseId),
+      active: true,
+      $and: [
+        { $or: [{ validFrom: { $lte: now } }, { validFrom: null }] },
+        { $or: [{ validTo: { $gte: now } }, { validTo: null }] },
+      ],
+    })
+    .populate([
+  { path: 'course' },
+  {
+    path: 'batch',
+    populate: {
+      path: 'course',
+      model: 'Course',
+    },
+  },
+])
+    .lean()
+    .exec();
+}
 
   async updateCoupon(id: string, data: any) {
     return this.couponModel.findByIdAndUpdate(id, data, { new: true });

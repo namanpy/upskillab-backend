@@ -95,6 +95,7 @@ export class JobLogicService {
       skills: Array.isArray(createJobDto.skills) ? createJobDto.skills : [createJobDto.skills], // Handle string or array
       ExtraLink: createJobDto.ExtraLink,
       source: createJobDto.source,
+      isPublic:createJobDto.isPublic,
     };
 
     const job = await this.jobDataService.createJob(jobData);

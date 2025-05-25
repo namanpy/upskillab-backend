@@ -12,6 +12,7 @@ export class UserDataService {
   async createUser(userData: {
     username: string;
     email: string;
+    mobileNumber:string;
     userType: string;
     password?: string;
   }) {
