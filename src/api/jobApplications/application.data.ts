@@ -18,13 +18,14 @@ export class ApplicationDataService {
   ): Promise<ApplicationDocument> {
     try {
       const newApplication = new this.applicationModel(applicationData);
-      console.log(newApplication);
+      // console.log(newApplication);
       return await newApplication.save();
     } catch (error) {
       if (error.code === 11000) {
+        console.log(error)
         // Duplicate key error (unique constraint violation)
         throw new BadRequestException(
-          'You have already applied for this job with this email or phone number',
+          'You have already applied for this job with this email',
         );
       }
       throw error;

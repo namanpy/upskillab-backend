@@ -15,7 +15,7 @@ import { USER_TYPES } from 'src/common/constants/user.constants';
 import { StudentDataService } from '../student/student.data';
 import { STUDENT_TYPE } from 'src/common/constants/student.constants';
 import { NotificationLogicService } from '../notification/notification.logic';
-// import { CouponLogicService } from '../coupon/coupon.logic';
+import { CouponLogicService } from '../coupon/coupon.logic';
 
 @Injectable()
 export class RegistrationLogicService {
@@ -26,8 +26,8 @@ export class RegistrationLogicService {
     private cashfreeService: CashfreeService,
     private sendGridService: SendGridService,
     private studentDataService: StudentDataService,
-    private notificationLogicService: NotificationLogicService
-    // private couponLogicService: CouponLogicService, // <-- Add this
+    private notificationLogicService: NotificationLogicService,
+    private CouponLogicService: CouponLogicService, // <-- Add this
   ) {}
 
   async registerForBatch(registrationData: BatchRegistrationRequestDto) {
@@ -52,6 +52,7 @@ export class RegistrationLogicService {
     if (!user) {
       user = await this.userDataService.createUser({
         email: registrationData.email,
+        mobileNumber:registrationData.phone,
         username: `user_${Math.random().toString(36).substring(2, 10)}`,
         userType: USER_TYPES.STUDENT,
       });
@@ -86,24 +87,23 @@ export class RegistrationLogicService {
       batch.course.discountedPrice || batch.course.originalPrice;
     let discount = 0;
     let appliedCouponId: Types.ObjectId | undefined = undefined;
-
+    console.log(totalAmount,"1")
     // --- Coupon logic ---
-    // if (registrationData.couponCode) {
-    //   const coupon = await this.couponLogicService.validateCoupon(
-    //     registrationData.couponCode,
-    //     batch.course._id,
-    //     batch._id,
-    //   );
-    //   if (!coupon) {
-    //     throw new CustomError(ERROR.INVALID_COUPON);
-    //   }
-    //   discount = (totalAmount * coupon.discountPercent) / 100;
-    //   if (coupon.maxDiscountAmount && discount > coupon.maxDiscountAmount) {
-    //     discount = coupon.maxDiscountAmount;
-    //   }
-    //   totalAmount = totalAmount - discount;
-    //   appliedCouponId = coupon._id;
-    // }
+    if (registrationData.couponCode) {
+      const coupon = await this.CouponLogicService.validateCoupon(
+        registrationData.couponCode,
+        batch._id,
+      );
+      if (!coupon) {
+        throw new CustomError(ERROR.INVALID_COUPON);
+      }
+      discount = (totalAmount * coupon?.discountPercent) / 100;
+      if (coupon?.maxDiscountAmount && discount > coupon?.maxDiscountAmount) {
+        discount = coupon?.maxDiscountAmount;
+      }
+      totalAmount = totalAmount - discount;
+      appliedCouponId = coupon._id;
+    }
 
     // Create order
     const order = await this.orderDataService.createOrder({
@@ -116,6 +116,8 @@ export class RegistrationLogicService {
       coupon: appliedCouponId,
     });
 
+    console.log(appliedCouponId,totalAmount,"2")
+    console.log(order,"3")
     // Create Cashfree payment link
     const paymentLink = await this.cashfreeService.createPayment({
       orderId: order._id,
@@ -137,6 +139,7 @@ export class RegistrationLogicService {
 
     return {
       orderId: order._id,
+      totalAmount:order.totalAmount,
       paymentSessionId: paymentLink.paymentSessionId!,
     };
   }

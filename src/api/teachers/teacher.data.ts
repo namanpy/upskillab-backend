@@ -326,6 +326,8 @@ if (existingUser) {
       ...(updateTeacherDto.social_links && {
         social_links: updateTeacherDto.social_links,
       }),
+      ...(updateTeacherDto.qualification && { qualification: updateTeacherDto.qualification }),
+      ...(updateTeacherDto.expertise && { expertise: updateTeacherDto.expertise }),
       ...(updateTeacherDto.bio && { bio: updateTeacherDto.bio }),
       ...(updateTeacherDto.experience && {
         experience: updateTeacherDto.experience,

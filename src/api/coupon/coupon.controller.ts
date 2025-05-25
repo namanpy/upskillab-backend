@@ -5,13 +5,14 @@ import {
   Post,
   Body,
   Patch,
+  UseGuards,
   Param,
 } from '@nestjs/common';
 import { CouponLogicService } from './coupon.logic';
 import { Types } from 'mongoose';
 import { PaginatedCouponsResponseDto } from '../../dto/coupon.dto';
 import { ApiQuery, ApiResponse } from '@nestjs/swagger';
-
+import { AuthGuard } from '@nestjs/passport';
 class CreateCouponDto {
   code: string;
   discountPercent: number;
@@ -37,18 +38,34 @@ class UpdateCouponDto {
 export class CouponController {
   constructor(private couponLogicService: CouponLogicService) {}
 
-  @Get('validate')
-  async validate(
-    @Query('code') code: string,
-    @Query('courseId') courseId?: string,
-    @Query('batchId') batchId?: string,
-  ) {
-    return this.couponLogicService.validateCoupon(
-      code,
-      courseId ? new Types.ObjectId(courseId) : undefined,
-      batchId ? new Types.ObjectId(batchId) : undefined,
-    );
-  }
+ @Get('validate')
+async validate(
+  @Query('code') code: string,
+  @Query('courseId') courseId?: string,
+  @Query('batchId') batchId?: string,
+) {
+  const result = await this.couponLogicService.validateCoupon(
+    code,
+    courseId ? new Types.ObjectId(courseId) : undefined,
+    batchId ? new Types.ObjectId(batchId) : undefined,
+  );
+  return result;
+}
+
+@Get('coupon/validate')
+async couponValidate(
+  @Query('code') code: string,
+  @Query('courseId') courseId?: string,
+  @Query('batchId') batchId?: string,
+) {
+  const result = await this.couponLogicService.adminValidateCoupon(
+    code,
+    courseId ? new Types.ObjectId(courseId) : undefined,
+    batchId ? new Types.ObjectId(batchId) : undefined,
+  );
+  return result;
+}
+
 
   @Post()
   async createCoupon(@Body() body: CreateCouponDto) {
@@ -57,6 +74,7 @@ export class CouponController {
 
   // --- NEW: Get all coupons ---
   @Get()
+
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiResponse({ status: 200, type: PaginatedCouponsResponseDto })
@@ -66,6 +84,11 @@ export class CouponController {
   ): Promise<PaginatedCouponsResponseDto> {
     return this.couponLogicService.getAllCoupons(Number(page), Number(limit));
   }
+
+  @Get('by-course/:courseId')
+async getCouponsByCourse(@Param('courseId') courseId: string) {
+  return this.couponLogicService.getCouponsByCourse(courseId);
+}
 
   // --- NEW: Edit coupon by ID ---
   @Patch(':id')

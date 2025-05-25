@@ -112,10 +112,10 @@ export class UpdateJobDto {
   @IsEnum(['upskill', 'external'])
   source?: string;
 
-  @ApiProperty()
-  @IsOptional()
-  @IsBoolean()
-  isPublic: boolean;
+@ApiPropertyOptional()
+@IsOptional()
+@IsBoolean()
+isPublic?: boolean;
 }
 
 // For job.data.ts (database operations)

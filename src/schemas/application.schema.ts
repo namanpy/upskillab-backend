@@ -51,4 +51,3 @@ export const ApplicationSchema = SchemaFactory.createForClass(Application);
 
 // Add unique compound indexes
 ApplicationSchema.index({ email: 1, jobId: 1 }, { unique: true });
-ApplicationSchema.index({ phoneNumber: 1, jobId: 1 }, { unique: true });
