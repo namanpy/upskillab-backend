@@ -254,7 +254,17 @@ export class UpdateTeacherDetailsDTO {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  mobileNumber?: string;z
+  mobileNumber?: string;
+
+    @ApiPropertyOptional()
+    @IsOptional()
+  @IsString()
+  qualification: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  expertise: string;
 
   @ApiPropertyOptional()
   @IsOptional()

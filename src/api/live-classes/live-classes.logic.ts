@@ -184,7 +184,7 @@ export class LiveClassesLogicService {
   }
 
   async getUserAttendance(user: User): Promise<UserAttendanceResponseDto> {
-    const userId = user._id;
+    const userId = user._id.toString();
     const teacherId =
       user.userType === USER_TYPES.TEACHER
         ? await this.teacherDataService
@@ -198,7 +198,13 @@ export class LiveClassesLogicService {
       const orders = await this.orderDataService.getOrdersByUser(
         userId.toString(),
       );
-      batchIds = orders.map((order) => order.batch._id.toString());
+      console.log(orders)
+      batchIds = orders
+      .filter((order)=>order.status==="COMPLETED")
+      .map((order) => {
+  console.log(order);
+  return order.batch._id.toString(); // Must return the value
+});
     }
 
     const attendanceData = await this.liveClassesDataService.getUserAttendance(
