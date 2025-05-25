@@ -44,15 +44,8 @@ export class Job {
   @Prop({ required: false })
   ExtraLink: string;
 
-  @ApiProperty({
-    description: 'Source of the job (upskill or external)',
-    enum: ['upskill', 'external'],
-    required: false,
-  })
-
-  @ApiProperty()
-  @Prop({ default: false })
-  isPublic: boolean;
+@Prop({ default: false }) // Default is private
+isPublic: boolean;
 
 
   @Prop({ type: String, enum: ['upskill', 'external'], required: false })
