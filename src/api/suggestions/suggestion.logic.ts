@@ -330,7 +330,8 @@ export class SuggestionLogicService {
     }
 
     const orders = await this.orderDataService.getOrdersByUser(user._id);
-    const batchIds = orders.map((order) => order.batch._id.toString());
+    console.log(orders)
+    const batchIds = orders.map((order) => order?.batch?._id.toString());
     console.log(batchIds);
     const suggestions = await this.suggestionDataService.getSuggestionsByBatch(
       batchIds,
