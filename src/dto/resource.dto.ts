@@ -1,6 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsOptional, IsBoolean, IsArray, IsMongoId } from 'class-validator';
-
 export class CreateResourceDto {
   @ApiProperty({ description: 'Title of the resource' })
   @IsString()
@@ -26,8 +25,9 @@ export class CreateResourceDto {
   link?: string;
 
   @ApiProperty({ description: 'Approval status of the resource' })
-  @IsString()
-  isApproved: string;
+  @IsBoolean()
+  @IsOptional()
+  isApproved: boolean;
 
   @ApiProperty({ description: 'Tags associated with the resource', type: [String] })
   @IsArray()
@@ -65,8 +65,8 @@ export class UpdateResourceDto {
 
   @ApiPropertyOptional({ description: 'Approval status of the resource' })
   @IsOptional()
-  @IsBoolean()
-  isApproved?: boolean;
+  @IsString()
+  isApproved?: string;
 
   @ApiPropertyOptional({ description: 'Tags associated with the resource', type: [String] })
   @IsOptional()
@@ -100,7 +100,7 @@ export class Resource {
   link?: string;
 
   @ApiProperty()
-  isApproved: boolean;
+  isApproved: string;
 
   @ApiProperty({ type: [String] })
   tags: string[];
