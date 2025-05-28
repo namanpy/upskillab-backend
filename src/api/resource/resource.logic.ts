@@ -88,11 +88,17 @@ export class ResourceLogicService {
       );
     }
 
+    const resourceData = {
+    ...createResourceDto,
+    isApproved: user.userType === USER_TYPES.TEACHER ? false : createResourceDto.isApproved,
+  };
+
     const resourceDoc = await this.resourceDataService.createResource(
-      createResourceDto,
+      resourceData,
       user._id,
       pdfUrl,
       imageUrl,
+      
     );
 
     await this.notificationLogicService.createNotification({
