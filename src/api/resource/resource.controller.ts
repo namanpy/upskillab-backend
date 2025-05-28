@@ -146,6 +146,7 @@ export class ResourceController {
     @UploadedFiles()
     files: { pdf?: Express.Multer.File[]; image?: Express.Multer.File[] },
   ) {
+    console.log(updateResourceDto)
     return await this.resourceLogicService.updateResource(
       id,
       updateResourceDto,

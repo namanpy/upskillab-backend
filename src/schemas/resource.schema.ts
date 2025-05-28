@@ -39,7 +39,7 @@ export class Resource {
 
   @ApiProperty()
   @Prop({ default: false, required: false })
-  isApproved: string;
+  isApproved: boolean;
 
   @ApiProperty({ type: [String] })
   @Prop({ type: [String], default: [] })
