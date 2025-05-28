@@ -143,6 +143,11 @@ export class CreateTeacherDto {
   @IsOptional()
   @IsString()
   experience?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  image?: string;
 }
 
 export class Teacher {
@@ -174,6 +179,11 @@ export class Teacher {
 
   @ApiProperty()
   experience: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  image?: string;
 
   @ApiProperty()
   createdAt: Date;
@@ -231,6 +241,11 @@ export class TeacherDetailsResponseDTO {
   @ApiProperty()
   experience: string;
 
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  image?: string;
+
   @ApiProperty()
   createdAt: Date;
 
@@ -256,8 +271,8 @@ export class UpdateTeacherDetailsDTO {
   @IsString()
   mobileNumber?: string;
 
-    @ApiPropertyOptional()
-    @IsOptional()
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsString()
   qualification: string;
 
@@ -279,4 +294,9 @@ export class UpdateTeacherDetailsDTO {
   @IsOptional()
   @IsString()
   experience?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  image?: string;
 }

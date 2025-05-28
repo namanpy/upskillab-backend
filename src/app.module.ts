@@ -48,6 +48,7 @@ import { ResourceModule } from './api/resource/resource.module';
 import { StudentInfoModule } from './api/studentInfo/student-info.module';
 import { DoubtModule } from './api/doubtNew/doubt.module';
 import { AnnouncementModule } from './api/announcement/announcement.module';
+import { AssociationModule } from './api/admin/Associations/associations.module';
 // import { ConfigModule } from '@nestjs/config';
 //MongooseModule.forRoot('mongodb://localhost/nest')
 @Module({
@@ -100,9 +101,10 @@ import { AnnouncementModule } from './api/announcement/announcement.module';
     ResourceModule,
     StudentInfoModule,
     DoubtModule,
-AnnouncementModule,
+    AnnouncementModule,
+    AssociationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
