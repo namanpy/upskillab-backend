@@ -80,7 +80,7 @@ export class AssociationController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(USER_TYPES.ADMIN)
   @Delete(':id')
-  async deleteAssociation(@Param('id') id: string): Promise<void> {
+  async deleteAssociation(@Param('id') id: string): Promise<{ message: string }> {
     return await this.associationLogicService.deleteAssociation(id);
   }
 }

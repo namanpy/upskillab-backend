@@ -76,10 +76,10 @@ export class AssociationLogicService {
     };
   }
 
-  async deleteAssociation(id: string): Promise<void> {
+  async deleteAssociation(id: string): Promise<{ message: string } > {
     if (!Types.ObjectId.isValid(id)) {
       throw new NotFoundException('Invalid association ID');
     }
-    await this.associationDataService.deleteAssociation(id);
+    return await this.associationDataService.deleteAssociation(id);
   }
 }
