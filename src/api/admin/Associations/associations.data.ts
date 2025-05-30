@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model,Types } from 'mongoose';
 import { Association, AssociationDocument } from '../../../schemas/associations.schema';
 
 @Injectable()
@@ -19,19 +19,23 @@ export class AssociationDataService {
   }
 
   async getAssociationById(id: string): Promise<AssociationDocument | null> {
-    return await this.associationModel.findById(id).exec();
+    const objectId = new Types.ObjectId(id);
+    return await this.associationModel.findById(objectId).exec();
   }
 
   async updateAssociation(id: string, data: any): Promise<AssociationDocument | null> {
+    const objectId = new Types.ObjectId(id);
     return await this.associationModel
-      .findByIdAndUpdate(id, { $set: data }, { new: true })
+      .findByIdAndUpdate(objectId, { $set: data }, { new: true })
       .exec();
   }
 
-  async deleteAssociation(id: string): Promise<void> {
-    const result = await this.associationModel.findByIdAndDelete(id).exec();
-    if (!result) {
-      throw new NotFoundException(`Association with ID ${id} not found`);
-    }
+  async deleteAssociation(id: string): Promise<{ message: string }> {
+    const objectId = new Types.ObjectId(id);
+    const result = await this.associationModel.findByIdAndDelete(objectId).exec();
+    return {message : "Deleted Successfully"};
+    // if (!result) {
+    //   throw new NotFoundException(`Association with ID ${id} not found`);
+    // }
   }
 }
