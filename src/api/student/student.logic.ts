@@ -136,34 +136,40 @@ export class StudentLogicService {
     private orderDataService: OrderDataService,
   ) {}
 
-  async getStudentDetails(user: any): Promise<StudentDTO> {
-    if (user.userType !== USER_TYPES.STUDENT) {
-      throw new ForbiddenException('Only students can access their details');
-    }
-
-    const student = await this.studentDataService.getStudentByUserId(user._id);
-    if (!student) {
-      throw new NotFoundException('Student profile not found');
-    }
-
-    const userDoc = await this.userModel.findById(user._id).lean().exec();
-    const orders = await this.orderDataService.getOrdersByUser(user._id);
-    // Use latest order's mobileNumber
-    const latestOrder = orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
-    const mobileNumber = latestOrder ? latestOrder.mobileNumber : undefined;
-
-    return {
-      _id: student._id.toString(),
-      fullName: student.fullName,
-      college: student.college,
-      studentType: student.studentType,
-      image: student.image,
-      bio: student.bio,
-      skills: student.skills,
-      email: userDoc?.email,
-      mobileNumber,
-    };
+ async getStudentDetails(user: any): Promise<StudentDTO> {
+  if (user.userType !== USER_TYPES.STUDENT) {
+    throw new ForbiddenException('Only students can access their details');
   }
+
+  let student = await this.studentDataService.getStudentByUserId(user._id);
+
+  // ✅ Create default profile if not found
+  if (!student) {
+    const defaultStudent = {
+      user: user._id,
+      fullName: 'N/A',
+      studentType: 'REGULAR', // or whatever default type you want from STUDENT_TYPE
+    };
+    student = await this.studentDataService.createStudent(defaultStudent as any);
+  }
+
+  const userDoc = await this.userModel.findById(user._id).lean().exec();
+  const orders = await this.orderDataService.getOrdersByUser(user._id);
+  const latestOrder = orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+  const mobileNumber = latestOrder ? latestOrder.mobileNumber : undefined;
+
+  return {
+    _id: student._id.toString(),
+    fullName: student.fullName,
+    college: student.college,
+    studentType: student.studentType,
+    image: student.image,
+    bio: student.bio,
+    skills: student.skills,
+    email: userDoc?.email,
+    mobileNumber,
+  };
+}
 
   async updateStudentDetails(user: any, updateDto: UpdateStudentDTO, file?: Express.Multer.File): Promise<StudentDTO> {
     if (user.userType !== USER_TYPES.STUDENT) {

@@ -43,15 +43,60 @@ export class CouponLogicService {
 
   async validateCoupon(
     code: string,
-    courseId?: Types.ObjectId,
     batchId?: Types.ObjectId,
+    courseId?: Types.ObjectId,
   ) {
     return this.couponDataService.validateCoupon(code, courseId, batchId);
   }
 
+
+  async adminValidateCoupon(
+  code: string,
+  courseId?: Types.ObjectId,
+  batchId?: Types.ObjectId,
+): Promise<{ valid: boolean; message: string }> {
+  const coupon = await this.couponDataService.validateCouponRaw(code); // Use raw query first
+
+  if (!coupon) {
+    return { valid: false, message: 'Coupon not found or inactive' };
+  }
+
+  const now = new Date();
+
+  // Check validFrom / validTo
+  if (coupon.validFrom && coupon.validFrom > now) {
+    return { valid: false, message: 'Coupon is not yet valid' };
+  }
+
+  if (coupon.validTo && coupon.validTo < now) {
+    return { valid: false, message: 'Coupon has expired' };
+  }
+
+  // Check course/batch match
+  if (
+    (coupon.course && courseId && !coupon.course.equals(courseId)) ||
+    (coupon.batch && batchId && !coupon.batch.equals(batchId))
+  ) {
+    return { valid: false, message: 'Coupon does not match course or batch' };
+  }
+
+  return { valid: true, message: 'Coupon is valid' };
+}
+
   async getAllCoupons(page = 1, limit = 10) {
     return this.couponDataService.getAllCoupons(page, limit);
   }
+
+
+  async getCouponsByCourse(courseId: string) {
+  const course = await this.courseDataService.getCourseById(courseId);
+  if (!course) {
+    throw new BadRequestException(`Course with ID ${courseId} not found`);
+  }
+
+  return this.couponDataService.getCouponsByCourse(courseId);
+}
+
 
   async updateCoupon(
     id: string,

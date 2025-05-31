@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsOptional, IsArray, ValidateIf, IsEnum } from 'class-validator';
+import { IsString,IsBoolean, IsNotEmpty, IsOptional, IsArray, ValidateIf, IsEnum } from 'class-validator';
 
 // For controller (file upload)
 export class CreateJobDto {
@@ -51,6 +51,10 @@ export class CreateJobDto {
   @IsOptional()
   @IsEnum(['upskill', 'external'])
   source?: string;
+
+  @ApiProperty()
+  @IsBoolean()
+  isPublic: boolean;
 }
 
 // For controller (file upload)
@@ -107,6 +111,11 @@ export class UpdateJobDto {
   @IsOptional()
   @IsEnum(['upskill', 'external'])
   source?: string;
+
+@ApiPropertyOptional()
+@IsOptional()
+@IsBoolean()
+isPublic?: boolean;
 }
 
 // For job.data.ts (database operations)
@@ -119,6 +128,7 @@ export interface CreateJobData {
   skills: string[];
   ExtraLink?: string;
   source?: string;
+  isPublic?:boolean;
 }
 
 // For job.data.ts (database operations)
@@ -131,6 +141,7 @@ export interface UpdateJobData {
   skills?: string[];
   ExtraLink?: string;
   source?: string;
+  isPublic?:boolean;
 }
 
 export class JobResponse {
@@ -163,6 +174,9 @@ export class JobResponse {
     enum: ['upskill', 'external'],
   })
   source?: string;
+
+  @ApiProperty()
+  isPublic: boolean;
 
   @ApiProperty({ description: 'Creation timestamp' })
   createdAt: Date;

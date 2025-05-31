@@ -25,6 +25,28 @@ export class JobLogicService {
         source: job.source,
         createdAt: job.createdAt,
         updatedAt: job.updatedAt,
+        isPublic: job.isPublic,
+      })),
+    };
+  }
+
+  async getPublicJob(): Promise<GetJobsResponseDTO> {
+    const jobs = await this.jobDataService.getPublicJob();
+    console.log(jobs)
+    return {
+      jobs: jobs.map((job) => ({
+        _id: job._id.toString(),
+        title: job.title,
+        subtitle: job.subtitle,
+        description: job.description,
+        company: job.company,
+        logo: job.logo,
+        skills: job.skills,
+        ExtraLink: job.ExtraLink,
+        source: job.source,
+        createdAt: job.createdAt,
+        updatedAt: job.updatedAt,
+        isPublic:job.isPublic,
       })),
     };
   }
@@ -47,6 +69,7 @@ export class JobLogicService {
         source: job.source,
         createdAt: job.createdAt,
         updatedAt: job.updatedAt,
+        isPublic: job.isPublic,
       },
     };
   }
@@ -72,6 +95,7 @@ export class JobLogicService {
       skills: Array.isArray(createJobDto.skills) ? createJobDto.skills : [createJobDto.skills], // Handle string or array
       ExtraLink: createJobDto.ExtraLink,
       source: createJobDto.source,
+      isPublic:createJobDto.isPublic,
     };
 
     const job = await this.jobDataService.createJob(jobData);
@@ -88,6 +112,7 @@ export class JobLogicService {
         source: job.source,
         createdAt: job.createdAt,
         updatedAt: job.updatedAt,
+        isPublic:job.isPublic,
       },
     };
   }
@@ -117,6 +142,7 @@ export class JobLogicService {
         : undefined, // Handle string or array
       ExtraLink: updateJobDto.ExtraLink,
       source: updateJobDto.source,
+      isPublic: updateJobDto.isPublic,
     };
 
     const job = await this.jobDataService.updateJob(id, jobData);
@@ -136,11 +162,13 @@ export class JobLogicService {
         source: job.source,
         createdAt: job.createdAt,
         updatedAt: job.updatedAt,
+        isPublic: job.isPublic,
       },
     };
   }
 
-  async deleteJob(id: string): Promise<void> {
+  async deleteJob(id: string){
     await this.jobDataService.deleteJob(id);
+    return { message: 'Job deleted successfully' };
   }
 }

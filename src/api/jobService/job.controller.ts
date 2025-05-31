@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Put,
   Delete,
   Body,
@@ -29,11 +30,14 @@ import { AllowUserType, UserGuard } from '../../common/guard/user.guard';
 import { RolesGuard } from '../../common/guard/roles.guard';
 import { USER_TYPES } from '../../common/constants/user.constants';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { JobDataService } from './job.data';
 
 @ApiTags('jobs')
 @Controller('jobs')
 export class JobController {
-  constructor(private jobLogicService: JobLogicService) {}
+  constructor(private jobLogicService: JobLogicService,
+    private JobDataService: JobDataService
+  ) {}
 
   @ApiResponse({
     status: 200,
@@ -52,6 +56,11 @@ export class JobController {
   @Get(':id')
   async getJobById(@Param('id') id: string) {
     return await this.jobLogicService.getJobById(id);
+  }
+
+    @Get('public/job')
+  async getPublicJob(): Promise<GetJobsResponseDTO> {
+    return await this.jobLogicService.getPublicJob();
   }
 
   @ApiResponse({
@@ -97,8 +106,18 @@ export class JobController {
     }
 
     updateJobDto.logo = logo;
+    console.log(updateJobDto,"2",id)
     return await this.jobLogicService.updateJob(id, updateJobDto);
   }
+
+@Patch(':id/visibility')
+async updateVisibility(
+  @Param('id') id: string,
+  @Body('isPublic') isPublic: boolean
+) {
+  return this.JobDataService.toggleJobVisibility(id, isPublic);
+}
+
 
   @ApiResponse({
     status: 200,
