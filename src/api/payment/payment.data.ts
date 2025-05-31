@@ -41,9 +41,16 @@ export class PaymentDataService {
     return payment;
   }
 
-  async updatePaymentStatus(paymentId: Types.ObjectId, status: string) {
+  async updatePayment(
+    paymentId: Types.ObjectId,
+    data: {
+      status: string;
+      paymentMethod?: string;
+      cashfreePaymentId?: string;
+    },
+  ) {
     const payment = await this.paymentModel
-      .findByIdAndUpdate(paymentId, { status }, { new: true })
+      .findByIdAndUpdate(paymentId, data, { new: true })
       .populate<{
         order: Order | (undefined extends Payment['order'] ? undefined : never);
         user: User | (undefined extends Payment['user'] ? undefined : never);
