@@ -43,9 +43,12 @@ export interface OrderResponse {
   status: string;
   createdAt: Date;
   updatedAt: Date;
-  user: OrderUser;
+  user?: OrderUser;
   student?: OrderStudent;
-  batch: OrderBatch;
+  batch?: OrderBatch;
+  email?: string;
+  mobileNumber: string;
+  courseName?: string;
 }
 
 export interface GetAllOrdersResult {

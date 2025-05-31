@@ -48,10 +48,19 @@ export class PaymentLogicService {
       payment.order._id.toString(),
     );
 
-    const batch = await this.batchDataService.getBatchById(
-      order.batch._id.toString(),
-    );
+    if (order.batch && payment.user) {
+      const batch = await this.batchDataService.getBatchById(
+        order.batch._id.toString(),
+      );
 
+      await this.sendGridService.sendPaymentConfirmation({
+        to: payment.user.email,
+        name: payment.user.username,
+        courseName: batch?.course.courseName || 'Unknown',
+        amount: payment.amount,
+        orderId: order._id.toString(),
+      });
+    }
     // Map Cashfree status to internal payment status
     let orderStatus: string;
 
@@ -73,14 +82,6 @@ export class PaymentLogicService {
     await this.orderDataService.updateOrder(payment.order._id.toString(), {
       status: orderStatus,
       amountPaid: payment.amount,
-    });
-
-    await this.sendGridService.sendPaymentConfirmation({
-      to: payment.user.email,
-      name: payment.user.username,
-      courseName: batch?.course.courseName || 'Unknown',
-      amount: payment.amount,
-      orderId: order._id.toString(),
     });
 
     return { success: true, message: 'Webhook processed successfully' };

@@ -5,6 +5,8 @@ import { ERROR } from 'src/common/constants/error.constants';
 import {
   BatchRegistrationRequestDto,
   BatchRegistrationResponseDto,
+  NoBatchRegistrationRequestDto,
+  NoBatchRegistrationResponseDto,
 } from 'src/dto/registration.dto';
 import { RegistrationLogicService } from './registration.logic';
 
@@ -34,6 +36,19 @@ export class RegistrationController {
     @Body() registrationData: BatchRegistrationRequestDto,
   ): Promise<BatchRegistrationResponseDto> {
     return await this.registrationLogicService.registerForBatch(
+      registrationData,
+    );
+  }
+
+  @Post('no-batch')
+  @ApiResponse({
+    status: 200,
+    type: NoBatchRegistrationResponseDto,
+  })
+  async registerWithNoBatch(
+    @Body() registrationData: NoBatchRegistrationRequestDto,
+  ): Promise<NoBatchRegistrationResponseDto> {
+    return await this.registrationLogicService.registerNoBatch(
       registrationData,
     );
   }

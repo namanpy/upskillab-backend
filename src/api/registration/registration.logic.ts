@@ -9,7 +9,10 @@ import { CashfreeService } from '../payment/cashfree.logic';
 import { CustomError } from 'src/common/classes/error.class';
 import { ERROR } from 'src/common/constants/error.constants';
 import { ORDER_STATUS } from 'src/common/constants/order.constants';
-import { BatchRegistrationRequestDto } from 'src/dto/registration.dto';
+import {
+  BatchRegistrationRequestDto,
+  NoBatchRegistrationRequestDto,
+} from 'src/dto/registration.dto';
 import { SendGridService } from 'src/common/services/sendgrid.service';
 import { USER_TYPES } from 'src/common/constants/user.constants';
 import { StudentDataService } from '../student/student.data';
@@ -52,7 +55,7 @@ export class RegistrationLogicService {
     if (!user) {
       user = await this.userDataService.createUser({
         email: registrationData.email,
-        mobileNumber:registrationData.phone,
+        mobileNumber: registrationData.phone,
         username: `user_${Math.random().toString(36).substring(2, 10)}`,
         userType: USER_TYPES.STUDENT,
       });
@@ -87,7 +90,7 @@ export class RegistrationLogicService {
       batch.course.discountedPrice || batch.course.originalPrice;
     let discount = 0;
     let appliedCouponId: Types.ObjectId | undefined = undefined;
-    console.log(totalAmount,"1")
+    console.log(totalAmount, '1');
     // --- Coupon logic ---
     if (registrationData.couponCode) {
       const coupon = await this.CouponLogicService.validateCoupon(
@@ -116,8 +119,8 @@ export class RegistrationLogicService {
       coupon: appliedCouponId,
     });
 
-    console.log(appliedCouponId,totalAmount,"2")
-    console.log(order,"3")
+    console.log(appliedCouponId, totalAmount, '2');
+    console.log(order, '3');
     // Create Cashfree payment link
     const paymentLink = await this.cashfreeService.createPayment({
       orderId: order._id,
@@ -134,12 +137,51 @@ export class RegistrationLogicService {
     await this.notificationLogicService.createNotification({
       message: `New order Created By ${registrationData.name} email:${registrationData.email}`,
       role: 'admin',
-      type: 'Order'
+      type: 'Order',
     });
 
     return {
       orderId: order._id,
-      totalAmount:order.totalAmount,
+      totalAmount: order.totalAmount,
+      paymentSessionId: paymentLink.paymentSessionId!,
+    };
+  }
+
+  async registerNoBatch(registrationData: NoBatchRegistrationRequestDto) {
+    // Calculate base price
+    let totalAmount = registrationData.amount;
+
+    // Create order
+    const order = await this.orderDataService.createOrder({
+      amountPaid: 0,
+      totalAmount,
+      email: registrationData.email,
+      name: registrationData.name,
+      mobileNumber: registrationData.phone,
+      status: ORDER_STATUS.PENDING.code,
+    });
+
+    // Create Cashfree payment link
+    const paymentLink = await this.cashfreeService.createPayment({
+      orderId: order._id,
+      amount: order.totalAmount,
+      customerDetails: {
+        customerId: 'upskillab',
+        customerEmail: registrationData.email,
+        customerPhone: registrationData.phone,
+        customerName: registrationData.name,
+      },
+    });
+
+    await this.notificationLogicService.createNotification({
+      message: `New order Created By ${registrationData.name} email:${registrationData.email}`,
+      role: 'admin',
+      type: 'Order',
+    });
+
+    return {
+      orderId: order._id,
+      totalAmount: order.totalAmount,
       paymentSessionId: paymentLink.paymentSessionId!,
     };
   }
