@@ -19,6 +19,12 @@ export class Payment extends MongooseDocument {
   @Prop({ required: true, enum: Object.keys(PAYMENT_METHOD) })
   paymentMethod: string;
 
+  @Prop({ required: false })
+  paymentMode?: string;
+
+  @Prop({ required: false })
+  cashFreePaymentId?: string;
+
   @ApiProperty({
     description: 'The unique transaction ID',
   })

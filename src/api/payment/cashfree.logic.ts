@@ -122,9 +122,13 @@ export class CashfreeService {
       }
 
       // Update payment status
-      const updatedPayment = await this.paymentDataService.updatePaymentStatus(
+      const updatedPayment = await this.paymentDataService.updatePayment(
         payment._id,
-        paymentStatus,
+        {
+          status: paymentStatus,
+          paymentMode: orderData.payment_group,
+          cashfreePaymentId: orderData.cf_payment_id,
+        },
       );
 
       return updatedPayment;
