@@ -330,7 +330,7 @@ export class ClassSessionLogicService {
       const orders = await this.orderDataService.getOrdersByUser(
         user._id.toString(),
       );
-      const batchIds = orders.map((order) => order.batch.toString());
+      const batchIds = orders.map((order) => order?.batch?.toString());
       if (!batchIds.includes(session.batchId.toString())) {
         throw new ForbiddenException('You are not enrolled in this batch');
       }

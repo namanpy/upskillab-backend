@@ -200,11 +200,12 @@ export class LiveClassesLogicService {
       );
       console.log(orders)
       batchIds = orders
-      .filter((order)=>order.status==="COMPLETED")
+      .filter((order)=>order.status==="COMPLETED",) 
       .map((order) => {
   console.log(order);
-  return order.batch._id.toString(); // Must return the value
-});
+  return order?.batch?._id.toString(); // Must return the value
+})
+.filter((id): id is string => typeof id === 'string');
     }
 
     const attendanceData = await this.liveClassesDataService.getUserAttendance(
