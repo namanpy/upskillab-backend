@@ -10,6 +10,7 @@ import { FileUploaderService } from '../../common/services/file-uploader.service
 import { ConfigModule } from '@nestjs/config';
 import { BatchModule } from '../batch/batch.module';
 import { OrderModule } from '../order/order.module';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { OrderModule } from '../order/order.module';
     ConfigModule,
     BatchModule,
     OrderModule,
+    NotificationModule,
   ],
   controllers: [SuggestionController],
   providers: [

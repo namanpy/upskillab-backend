@@ -55,6 +55,10 @@ export class UpdateStudentDTO {
   @ApiPropertyOptional({ description: 'Type of student' })
   studentType?: string;
 
+  @ApiPropertyOptional({ description: 'Profile image URL of the student' })
+  image?: string;
+
+
   @ApiPropertyOptional({ description: 'Bio of the student' })
   bio?: string;
 

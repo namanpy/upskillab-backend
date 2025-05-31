@@ -22,6 +22,11 @@ export class RecordedVideo {
   @Prop({ required: true })
   title: string;
 
+   @ApiProperty()
+  @Prop({ required: true })
+  description: string;
+
+
   @ApiProperty()
   @Prop({ required: true })
   videoUrl: string;

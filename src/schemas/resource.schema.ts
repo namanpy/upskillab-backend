@@ -38,7 +38,7 @@ export class Resource {
   link?: string;
 
   @ApiProperty()
-  @Prop({ default: false })
+  @Prop({ default: false, required: false })
   isApproved: boolean;
 
   @ApiProperty({ type: [String] })

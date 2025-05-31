@@ -107,6 +107,36 @@ export class ApplicationController {
     return await this.applicationLogicService.getApplicationById(id);
   }
 
+    @ApiResponse({
+    status: 200,
+    description: 'Get applications by job ID',
+  })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), UserGuard, RolesGuard)
+  @AllowUserType(USER_TYPES.ADMIN)
+  @Roles(USER_TYPES.ADMIN)
+@Get('job/:jobId')
+  async getApplicationByJobId(@Param('jobId') jobId: string) {
+    return await this.applicationLogicService.getApplicationByJobId(jobId);
+  }
+
+
+  @Get('applied-jobs/:email')
+@UseGuards(AuthGuard('jwt'), UserGuard, RolesGuard)
+@AllowUserType(USER_TYPES.STUDENT)
+@Roles(USER_TYPES.STUDENT)
+@ApiBearerAuth()
+@ApiResponse({
+  status: 200,
+  description: 'Get all jobs applied by a student',
+})
+async getAppliedJobsByStudent(@Param('email') email: string) {
+  return await this.applicationLogicService.getAppliedJobsByStudent(email);
+}
+
+
+
+
   @ApiResponse({
     status: 200,
     description: 'Delete an application by ID',

@@ -8,6 +8,7 @@ import { ApplicationDataService } from './application.data';
 import { JobDataService } from '../jobService/job.data';
 import { Job, JobSchema } from '../../schemas/job.schema';
 import { FileUploaderService } from '../../common/services/file-uploader.service';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { FileUploaderService } from '../../common/services/file-uploader.service
       { name: Application.name, schema: ApplicationSchema },
       { name: Job.name, schema: JobSchema },
     ]),
+    NotificationModule,
   ],
   controllers: [ApplicationController],
   providers: [ApplicationLogicService, ApplicationDataService, JobDataService, FileUploaderService],

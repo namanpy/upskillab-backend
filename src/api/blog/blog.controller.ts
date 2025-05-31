@@ -111,6 +111,24 @@ export class BlogController {
     });
   }
 
+@ApiResponse({
+    status: 200,
+    description: 'Get all Student blogs',
+    type: GetBlogsResponseDTO,
+  })
+  @Get('students')
+  @UseGuards(AuthGuard('jwt'))
+  @AllowUserTypes([USER_TYPES.STUDENT])
+  async getStudentBlogs(@Request() req): Promise<GetBlogsResponseDTO> {
+    return await this.blogLogicService.getStudentBlogs({
+      userType: req.user.userType,
+      userId: req.user?._id,
+    });
+  }
+
+
+
+
   @ApiResponse({
     status: 201,
     description: 'Create a new blog with image upload',
@@ -132,7 +150,7 @@ export class BlogController {
       req.user.userType === USER_TYPES.STUDENT
         ? await this.studentDataService.getStudentByUserId(req.user._id)
         : undefined;
-
+    console.log(student)
     const image = await this.imageUploaderService.uploadImage(
       file,
       'blogs',

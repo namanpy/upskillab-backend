@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException,NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Job, JobDocument } from '../../schemas/job.schema';
@@ -11,7 +11,9 @@ export class JobDataService {
   async getJobs(): Promise<JobDocument[]> {
     return this.jobModel.find().exec();
   }
-
+  async getPublicJob(): Promise<JobDocument[]> {
+    return this.jobModel.find({isPublic:true}).exec();
+  }
   async getJobById(id: string): Promise<JobDocument | null> {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException('Invalid job ID');
@@ -37,6 +39,19 @@ export class JobDataService {
       .findByIdAndUpdate(id, updateJobData, { new: true })
       .exec();
   }
+
+  async toggleJobVisibility(id: string, isPublic: boolean): Promise<Job> {
+    console.log(id,isPublic)
+  const job = await this.jobModel.findByIdAndUpdate(
+    id,
+    { isPublic },
+    { new: true }
+  );
+  if (!job) {
+    throw new NotFoundException('Job not found');
+  }
+  return job;
+}
 
   async deleteJob(id: string): Promise<void> {
     if (!Types.ObjectId.isValid(id)) {

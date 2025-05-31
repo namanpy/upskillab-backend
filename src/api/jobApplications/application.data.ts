@@ -18,13 +18,14 @@ export class ApplicationDataService {
   ): Promise<ApplicationDocument> {
     try {
       const newApplication = new this.applicationModel(applicationData);
-      console.log(newApplication);
+      // console.log(newApplication);
       return await newApplication.save();
     } catch (error) {
       if (error.code === 11000) {
+        console.log(error)
         // Duplicate key error (unique constraint violation)
         throw new BadRequestException(
-          'You have already applied for this job with this email or phone number',
+          'You have already applied for this job with this email',
         );
       }
       throw error;
@@ -42,7 +43,18 @@ export class ApplicationDataService {
     return this.applicationModel.findById(id).exec();
   }
 
-  async deleteApplication(id: string): Promise<void> {
+async getApplicationsByJobId(jobId: Types.ObjectId): Promise<Application[]> {
+  return this.applicationModel.find({ jobId }).lean();
+}
+
+async getApplicationsByEmail(email: string) {
+  return this.applicationModel
+    .find({ email })
+    .populate('jobId') // Ensure it populates the job details
+    .exec();
+}
+
+async deleteApplication(id: string): Promise<void> {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException('Invalid application ID');
     }

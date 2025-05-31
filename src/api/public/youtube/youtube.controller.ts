@@ -21,6 +21,12 @@ export class YoutubeController {
     return await this.youtubeLogicService.getVideos(activeOnly);
   }
 
+  @ApiResponse({ status: 200, description: 'Get all YouTube videos', type: GetYoutubeVideosResponseDTO })
+  @Get('admin/all')
+  async getAllVideos(@Query('all') all?: string) {
+    return await this.youtubeLogicService.getAllVideos();
+  }
+
   @ApiResponse({ status: 200, description: 'Get a single YouTube video by ID' })
   @Get(':id')
   async getVideoById(@Param('id') id: string) {

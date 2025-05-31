@@ -46,6 +46,10 @@ export class Teacher {
   @ApiProperty()
   @Prop()
   experience: string;
+
+  @ApiProperty()
+  @Prop()
+  image: string;
 }
 
 export const TeacherSchema = SchemaFactory.createForClass(Teacher);

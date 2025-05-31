@@ -27,19 +27,20 @@ export class LiveClassesDataService {
   async getAttendanceForClass(userId: string, classId: string) {
     return this.attendanceModel
       .findOne({
-        classId,
-        userId,
+        classId: new Types.ObjectId(classId),
+        userId: new Types.ObjectId(userId),
       })
       .lean()
       .exec();
   }
+
   async getAttendanceForClasses(userId: string, classIds: string[]) {
     return this.attendanceModel
       .find({
         classId: {
-          $in: classIds,
+          $in: classIds.map((id) => new Types.ObjectId(id)),
         },
-        userId,
+        userId: new Types.ObjectId(userId),
       })
       .lean()
       .exec();
@@ -59,17 +60,14 @@ export class LiveClassesDataService {
   async getLiveClassById(
     classId: string,
   ): Promise<ClassSessionDocument | null> {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
     const liveClass = await this.classSessionModel
       .findOne({
-        _id: classId,
-        scheduledDate: { $gte: today },
+        _id: new Types.ObjectId(classId),
       })
       .exec();
     if (!liveClass) {
       throw new NotFoundException(
-        `Live class with ID ${classId} not found or not scheduled`,
+        `Live class with ID ${classId} not found`,
       );
     }
     return liveClass;
@@ -80,37 +78,23 @@ export class LiveClassesDataService {
     userId: string,
     markAttendanceDto: MarkAttendanceDto,
   ): Promise<AttendanceDocument> {
-    // Check if the class exists and is scheduled for today
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
-
     const liveClass = await this.classSessionModel
-      .findOne({
-        _id: classId,
-        scheduledDate: { $gte: today, $lt: tomorrow },
-      })
+      .findOne({ _id: new Types.ObjectId(classId) })
       .exec();
 
     if (!liveClass) {
-      console.log('Query failed:', {
-        classId,
-        scheduledDate: { $gte: today, $lt: tomorrow },
-      });
+      console.log('Query failed:', { classId });
       throw new BadRequestException(
-        `Live class with ID ${classId} not found or not scheduled for today`,
+        `Live class with ID ${classId} not found`,
       );
     }
 
-    // Skip enrollment check for now
     console.log(
       `Bypassing enrollment check for user ${userId} in class ${classId}`,
     );
 
-    // Check if attendance already marked
     const existingAttendance = await this.attendanceModel
-      .findOne({ classId, userId })
+      .findOne({ classId: new Types.ObjectId(classId), userId: new Types.ObjectId(userId) })
       .exec();
     if (existingAttendance) {
       throw new BadRequestException(
@@ -119,14 +103,13 @@ export class LiveClassesDataService {
     }
 
     const attendanceData = {
-      _id: new Types.ObjectId(), // Manually generate _id
-      classId: new Types.ObjectId(classId), // Ensure ObjectId type
-      userId: new Types.ObjectId(userId), // Ensure ObjectId type
+      _id: new Types.ObjectId(),
+      classId: new Types.ObjectId(classId),
+      userId: new Types.ObjectId(userId),
       isAttended: markAttendanceDto.isAttended,
     };
 
     console.log('attendanceData:', attendanceData);
-
     const newAttendance = new this.attendanceModel(attendanceData);
     return newAttendance.save();
   }
@@ -150,13 +133,12 @@ export class LiveClassesDataService {
 
     const classSessions = await this.classSessionModel
       .find({
-        // scheduledDate: { $gte: today },
-        ...('teacherId' in input && { teacherId: input.teacherId }), // Add teacherId condition
+        ...('teacherId' in input && { teacherId: input.teacherId }),
         ...('batchIds' in input && {
           batchId: {
             $in: (input.batchIds || []).map((b) => new Types.ObjectId(b)),
           },
-        }), // Add batchId condition
+        }),
       })
       .sort({ scheduledDate: 1, scheduledStartTime: 1 })
       .exec();
@@ -179,5 +161,12 @@ export class LiveClassesDataService {
         attendances: attendances_ || null,
       };
     });
+  }
+
+  async getAttendanceForClassAdmin(classId: string): Promise<AttendanceDocument[]> {
+    return this.attendanceModel
+      .find({ classId: new Types.ObjectId(classId) })
+      .lean()
+      .exec();
   }
 }

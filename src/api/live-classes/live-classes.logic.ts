@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { LiveClassesDataService } from './live-classes.data';
 import {
@@ -10,6 +11,7 @@ import {
   MarkAttendanceDto,
   MarkAttendanceResponseDto,
   UserAttendanceResponseDto,
+  ClassAttendanceResponseDto,
 } from '../../dto/live-classes.dto';
 import { ClassSessionDocument } from '../../schemas/class-session.schema';
 import { AttendanceDocument } from '../../schemas/attendance.schema';
@@ -182,7 +184,7 @@ export class LiveClassesLogicService {
   }
 
   async getUserAttendance(user: User): Promise<UserAttendanceResponseDto> {
-    const userId = user._id;
+    const userId = user._id.toString();
     const teacherId =
       user.userType === USER_TYPES.TEACHER
         ? await this.teacherDataService
@@ -196,7 +198,13 @@ export class LiveClassesLogicService {
       const orders = await this.orderDataService.getOrdersByUser(
         userId.toString(),
       );
-      batchIds = orders.map((order) => order.batch._id.toString());
+      console.log(orders)
+      batchIds = orders
+      .filter((order)=>order.status==="COMPLETED")
+      .map((order) => {
+  console.log(order);
+  return order.batch._id.toString(); // Must return the value
+});
     }
 
     const attendanceData = await this.liveClassesDataService.getUserAttendance(
@@ -265,6 +273,64 @@ export class LiveClassesLogicService {
           }
         }),
       ),
+    };
+  }
+
+  async getClassAttendance(
+    classId: string,
+    user: User,
+  ): Promise<ClassAttendanceResponseDto> {
+    console.log('getClassAttendance: Starting for classId:', classId, 'userId:', user._id.toString());
+    
+    if (user.userType !== USER_TYPES.TEACHER) {
+      console.log('getClassAttendance: User is not admin:', user._id.toString());
+      throw new ForbiddenException('Only admins can access class attendance');
+    }
+
+    if (!classId || !/^[0-9a-fA-F]{24}$/.test(classId)) {
+      console.log('getClassAttendance: Invalid classId format:', classId);
+      throw new BadRequestException('Invalid class ID');
+    }
+
+    console.log('getClassAttendance: Fetching class:', classId);
+    const liveClass = await this.liveClassesDataService.getLiveClassById(classId);
+    if (!liveClass) {
+      console.log('getClassAttendance: Class not found:', classId);
+      throw new NotFoundException(`Live class with ID ${classId} not found`);
+    }
+
+    console.log('getClassAttendance: Fetching attendance for classId:', classId);
+    const attendanceRecords = await this.liveClassesDataService.getAttendanceForClassAdmin(classId);
+    console.log(
+      'getClassAttendance: Attendance records:',
+      attendanceRecords.map((rec) => ({
+        userId: rec.userId.toString(),
+        isAttended: rec.isAttended,
+      })),
+    );
+
+    const students = await Promise.all(
+      attendanceRecords
+        .filter((rec) => rec.isAttended) // Only include students who attended
+        .map(async (rec) => {
+          const student = await this.studentDataService.getStudentByUserId(rec.userId);
+          return {
+            userId: rec.userId,
+            isAttended: rec.isAttended,
+            name: student ? student.fullName : 'Unknown',
+          };
+        }),
+    );
+
+    const totalAttended = students.length; // Since we filtered by isAttended: true
+
+    return {
+      _id: liveClass._id,
+      meetingLink: liveClass.meetingLink,
+      scheduledDate: liveClass.scheduledDate,
+      scheduledStartTime: liveClass.scheduledStartTime,
+      totalAttended,
+      students,
     };
   }
 }
