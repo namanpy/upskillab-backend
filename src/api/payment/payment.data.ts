@@ -45,7 +45,7 @@ export class PaymentDataService {
     paymentId: Types.ObjectId,
     data: {
       status: string;
-      paymentMethod?: string;
+      paymentMode?: string;
       cashfreePaymentId?: string;
     },
   ) {
