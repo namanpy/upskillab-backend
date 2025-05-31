@@ -40,7 +40,7 @@ export class CashfreeService {
 
   async createPayment(data: {
     orderId: Types.ObjectId;
-    userId: Types.ObjectId;
+    userId?: Types.ObjectId;
     amount: number;
     customerDetails: {
       customerId: string;

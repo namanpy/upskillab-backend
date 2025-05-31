@@ -44,8 +44,8 @@ export class Payment extends MongooseDocument {
   status: string;
 
   @ApiProperty({ description: 'The ID of the user who made the payment' })
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-  user: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'User', required: false })
+  user?: Types.ObjectId;
 }
 
 export const PaymentSchema = SchemaFactory.createForClass(Payment);

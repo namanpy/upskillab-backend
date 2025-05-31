@@ -15,8 +15,26 @@ export class Order extends MongooseDocument {
     description: 'Reference to the user who placed the order',
     type: String,
   })
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
-  user: Types.ObjectId;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false })
+  user?: Types.ObjectId;
+
+  @ApiProperty({
+    type: String,
+  })
+  @Prop({ type: String, required: false })
+  courseName?: string;
+
+  @ApiProperty({
+    type: String,
+  })
+  @Prop({ type: String, required: false })
+  name?: string;
+
+  @ApiProperty({
+    type: String,
+  })
+  @Prop({ type: String, required: false })
+  email?: string;
 
   @ApiProperty({
     description: 'Mobile number of the user',
@@ -50,8 +68,8 @@ export class Order extends MongooseDocument {
     description: 'Reference to the batch',
     type: String,
   })
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Batch', required: true })
-  batch: Types.ObjectId;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Batch', required: false })
+  batch?: Types.ObjectId;
 
   @ApiProperty({
     description: 'Reference to the coupon used',

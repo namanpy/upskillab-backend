@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Types } from 'mongoose';
 import {
   IsString,
   IsNumber,
@@ -95,10 +96,25 @@ export class GetOrderResponseDto {
   @ApiProperty()
   _id: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     type: User,
   })
-  user: User;
+  user?: User;
+
+  @ApiPropertyOptional({
+    type: String,
+  })
+  name?: string;
+
+  @ApiPropertyOptional({
+    type: String,
+  })
+  email?: string;
+
+  @ApiPropertyOptional({
+    type: String,
+  })
+  courseName?: string;
 
   @ApiProperty({
     type: String,
@@ -114,10 +130,10 @@ export class GetOrderResponseDto {
   @ApiProperty()
   status: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     type: Batch,
   })
-  batch: Batch;
+  batch?: Batch;
 }
 
 export class GetOrdersQueryDto {
@@ -153,8 +169,8 @@ export class GetOrdersQueryDto {
 }
 
 export class OrderUserDto {
-  @ApiProperty({ description: 'User ID' })
-  _id: string;
+  @ApiProperty({ type: String, description: 'User ID' })
+  _id: Types.ObjectId;
 
   @ApiProperty({ description: 'User email' })
   email: string;
@@ -201,9 +217,11 @@ export class GetOrdersResponseDto {
     status: string;
     createdAt: Date;
     updatedAt: Date;
-    user: OrderUserDto;
+    user?: OrderUserDto;
     student?: OrderStudentDto;
-    batch: OrderBatchDto;
+    email?: string;
+    courseName?: string;
+    batch?: OrderBatchDto;
   }[];
 
   @ApiProperty({ description: 'Total number of orders' })

@@ -44,8 +44,8 @@ export class OrderLogicService {
     return orders.map((order) => ({
       ...order,
       _id: order._id.toString(),
-      user: order.user._id.toString(),
-      batch: order.batch._id.toString(),
+      user: order.user?._id.toString(),
+      batch: order.batch?._id.toString(),
     }));
   }
 
@@ -61,14 +61,20 @@ export class OrderLogicService {
       orders: orders.map((order) => ({
         ...order,
         _id: order._id.toString(),
-        user: {
-          ...order.user,
-          _id: order.user._id.toString(),
-        },
-        batch: {
-          ...order.batch,
-          _id: order.batch._id.toString(),
-        },
+
+        user: order.user
+          ? {
+              ...order.user,
+              _id: order.user._id,
+            }
+          : undefined,
+
+        batch: order.batch
+          ? {
+              ...order.batch,
+              _id: order.batch._id.toString(),
+            }
+          : undefined,
         ...(order.student
           ? {
               student: {

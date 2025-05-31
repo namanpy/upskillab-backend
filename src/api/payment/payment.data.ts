@@ -20,9 +20,11 @@ export class PaymentDataService {
       order: Types.ObjectId.createFromHexString(
         createPaymentDto.order.toString(),
       ),
-      user: Types.ObjectId.createFromHexString(
-        createPaymentDto.user.toString(),
-      ),
+      ...(createPaymentDto.user && {
+        user: Types.ObjectId.createFromHexString(
+          createPaymentDto.user.toString(),
+        ),
+      }),
     });
     return payment.save().then((d) => d.toObject({}));
   }
