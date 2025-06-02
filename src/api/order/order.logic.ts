@@ -8,7 +8,7 @@ import { Types } from 'mongoose';
 
 @Injectable()
 export class OrderLogicService {
-  constructor(private orderDataService: OrderDataService) {}
+  constructor(private orderDataService: OrderDataService) { }
 
   async createOrder(createOrderDto: CreateOrderRequestDto) {
     await this.orderDataService.createOrder({
@@ -26,6 +26,8 @@ export class OrderLogicService {
       _id: order._id.toString(),
       user: order.user,
       batch: order.batch,
+      serialNumber:
+        order.status === 'COMPLETED' ? order.serialNumber : undefined,
     };
   }
 
@@ -46,6 +48,8 @@ export class OrderLogicService {
       _id: order._id.toString(),
       user: order.user?._id.toString(),
       batch: order.batch?._id.toString(),
+      serialNumber:
+        order.status === 'COMPLETED' ? order.serialNumber : undefined,
     }));
   }
 
@@ -64,25 +68,27 @@ export class OrderLogicService {
 
         user: order.user
           ? {
-              ...order.user,
-              _id: order.user._id,
-            }
+            ...order.user,
+            _id: order.user._id,
+          }
           : undefined,
 
         batch: order.batch
           ? {
-              ...order.batch,
-              _id: order.batch._id.toString(),
-            }
+            ...order.batch,
+            _id: order.batch._id.toString(),
+          }
           : undefined,
         ...(order.student
           ? {
-              student: {
-                ...order.student,
-                _id: order.student._id.toString(),
-              },
-            }
+            student: {
+              ...order.student,
+              _id: order.student._id.toString(),
+            },
+          }
           : { student: undefined }),
+        serialNumber:
+          order.status === 'COMPLETED' ? order.serialNumber : undefined,
       })),
       total,
     };

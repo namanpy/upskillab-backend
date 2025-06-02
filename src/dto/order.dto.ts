@@ -48,6 +48,10 @@ export class CreateOrderRequestDto {
   })
   status: string;
 
+  @IsString()
+  @IsOptional()
+  serialNumber?: string;
+
   @IsMongoId()
   @IsNotEmpty()
   @ApiProperty({
@@ -134,6 +138,9 @@ export class GetOrderResponseDto {
     type: Batch,
   })
   batch?: Batch;
+
+  @ApiProperty()
+  serialNumber?: string;
 }
 
 export class GetOrdersQueryDto {
