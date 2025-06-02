@@ -49,6 +49,7 @@ export interface OrderResponse {
   email?: string;
   mobileNumber: string;
   courseName?: string;
+  serialNumber?: string;
 }
 
 export interface GetAllOrdersResult {
@@ -202,6 +203,7 @@ export class OrderDataService {
           totalAmount: 1,
           amountPaid: 1,
           status: 1,
+          serialNumber: 1,
           createdAt: 1,
           updatedAt: 1,
           'user._id': 1,
