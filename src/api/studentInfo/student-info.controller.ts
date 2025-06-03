@@ -16,4 +16,5 @@ export class StudentInfoController {
   async getStudentInfo(@Req() req: any): Promise<StudentInfoResponseDTO> {
     return this.studentInfoLogicService.getStudentInfo(req.user);
   }
+  
 }
