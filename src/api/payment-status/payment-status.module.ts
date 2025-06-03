@@ -16,4 +16,4 @@ import { Student, StudentSchema } from '../../schemas/student.schema';
   controllers: [PaymentStatusController],
   providers: [PaymentStatusLogicService, PaymentStatusDataService],
 })
-export class PaymentStatusModule { }
+export class PaymentStatusModule {}

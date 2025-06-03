@@ -33,6 +33,9 @@ export class UserResponse {
 
   @ApiProperty({ description: 'Student details', type: StudentDetails })
   student: StudentDetails;
+
+  @ApiProperty({ description: 'Total paid amount for completed payments' })
+  totalPaid: number;
 }
 
 export class CourseResponse {
@@ -156,9 +159,6 @@ export class OrderResponse {
 
   @ApiProperty({ description: 'Order status' })
   status: string;
-
-  @ApiProperty({ description: 'serialNumber' })
-  serialNumber: string;
 
   @ApiProperty({ description: 'Batch details', type: BatchResponse })
   batch: BatchResponse;

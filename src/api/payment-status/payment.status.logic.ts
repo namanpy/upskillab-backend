@@ -45,10 +45,10 @@ export class PaymentStatusLogicService {
               studentType: payment.student?.studentType || 'REGULAR',
               image: payment.student?.image || '',
             },
+            totalPaid: payment.totalPaid || 0,
           },
           totalAmount: payment.order.totalAmount || 0,
           amountPaid: payment.order.amountPaid || 0,
-          serialNumber: payment.order.serialNumber || '',
           status: payment.order.status || '',
           batch: {
             _id: payment.order.batch._id.toString(),

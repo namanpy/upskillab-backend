@@ -1,18 +1,49 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Payment } from '../../schemas/payment.schema';
 import { USER_TYPES } from '../../common/constants/user.constants';
+
+// Interface for Student document
+interface Student {
+  user: Types.ObjectId;
+  fullName: string;
+  studentType: string;
+  image: string;
+  skills: string[];
+}
+
+// Interface for response shape
+interface PaymentWithDetails {
+  _id: string;
+  user: string;
+  order: any;
+  paymentMethod: string;
+  transactionId: string;
+  amount: number;
+  status: string;
+  paymentMode: string; // Changed to optional or handle undefined
+  createdAt: Date;
+  updatedAt: Date;
+  student: {
+    fullName: string;
+    studentType: string;
+    image: string;
+  } | null;
+  totalPaid: number;
+}
 
 @Injectable()
 export class PaymentStatusDataService {
   constructor(
     @InjectModel('Payment') private paymentModel: Model<Payment>,
-    @InjectModel('Student') private studentModel: Model<any>,
+    @InjectModel('Student') private studentModel: Model<Student>,
   ) {}
 
-  async getPaymentsByUser(userId: string): Promise<any[]> {
+  async getPaymentsByUser(userId: string): Promise<PaymentWithDetails[]> {
     console.log('getPaymentsByUser: Fetching for user:', userId);
+
+    // Fetch payments
     const payments = await this.paymentModel
       .find({ user: userId })
       .populate({
@@ -25,7 +56,7 @@ export class PaymentStatusDataService {
           },
           {
             path: 'batch',
-            select: '_id batchCode course startTime startDate totalSeats remainingSeats duration teacher imageUrl active createdAt updatedAt',
+            select: '_id batchCode course startTime startDate totalSeats remainingSeats Duration teacher imageUrl active createdAt updatedAt',
             populate: {
               path: 'course',
               select: '_id courseName courseCode courseImage courseMode courseDuration originalPrice discountedPrice youtubeUrl brochure courseLevel certificate active faqs shortDescription tags programDetails targetAudience featured courseRating certifierLogo',
@@ -33,22 +64,47 @@ export class PaymentStatusDataService {
           },
         ],
       })
+      .lean()
       .exec();
 
     // Fetch student details
-    return await Promise.all(
-      payments.map(async (payment) => {
-        const student = await this.studentModel
-          .findOne({ user: payment.user })
-          .select('fullName studentType image')
-          .exec();
-        return { ...payment.toObject(), student };
-      }),
-    );
+    const student = await this.studentModel
+      .findOne({ user: userId })
+      .select('fullName studentType image')
+      .lean()
+      .exec();
+
+    // Calculate totalPaid
+    const totalPaid = await this.paymentModel
+      .aggregate([
+        { $match: { user: new Types.ObjectId(userId), status: 'COMPLETED' } },
+        { $group: { _id: null, total: { $sum: '$amount' } } },
+      ])
+      .exec();
+
+    const totalPaidAmount = totalPaid.length > 0 ? totalPaid[0].total : 0;
+
+    // Attach student and totalPaid to each payment
+    return payments.map(payment => ({
+      ...payment,
+      _id: payment._id.toString(), // Convert ObjectId to string
+      user: payment.user?.toString() || '', // Handle undefined user
+      paymentMode: payment.paymentMode || '', // Handle undefined paymentMode
+      student: student
+        ? {
+            fullName: student.fullName,
+            studentType: student.studentType,
+            image: student.image || '',
+          }
+        : null,
+      totalPaid: totalPaidAmount,
+    }));
   }
 
-  async getAllPayments(): Promise<any[]> {
+  async getAllPayments(): Promise<PaymentWithDetails[]> {
     console.log('getAllPayments: Fetching all student payments');
+
+    // Fetch payments
     const payments = await this.paymentModel
       .find()
       .populate({
@@ -62,25 +118,65 @@ export class PaymentStatusDataService {
           },
           {
             path: 'batch',
-            select: '_id batchCode course startTime startDate totalSeats remainingSeats duration teacher imageUrl active createdAt updatedAt',
+            select: '_id batchCode course startTime startDate totalSeats remainingSeats Duration teacher imageUrl active createdAt updatedAt',
             populate: {
               path: 'course',
-              select: '_id courseName courseCode courseImage courseMode courseDuration originalPrice discountedPrice youtubeUrl brochure courseLevel certificate active faqs shortDescription tags programDetails targetAudience featured courseRating certifierLogo',
+              select: '_id courseName courseCode courseImage courseMode courseDuration originalPrice discountedPrice youtubeUrl brochure courseLevel certificate active faqs shortDescription tags programDetails targetAudience featured courseRating',
             },
           },
         ],
       })
+      .lean()
       .exec();
 
-    // Fetch student details
-    return await Promise.all(
-      payments.map(async (payment) => {
-        const student = await this.studentModel
-          .findOne({ user: payment.user })
-          .select('fullName studentType image')
-          .exec();
-        return { ...payment.toObject(), student };
-      }),
-    );
+    // Group payments by user
+    const paymentsByUser = payments.reduce((acc: { [key: string]: any[] }, payment) => {
+      const userId = payment.user?.toString();
+      if (userId) {
+        if (!acc[userId]) acc[userId] = [];
+        acc[userId].push(payment);
+      }
+      return acc;
+    }, {});
+
+    // Define result array
+    const result: PaymentWithDetails[] = [];
+
+    // Fetch student details and totalPaid for each user
+    for (const userId of Object.keys(paymentsByUser)) {
+      const student = await this.studentModel
+        .findOne({ user: userId })
+        .select('fullName studentType image')
+        .lean()
+        .exec();
+
+      const totalPaid = await this.paymentModel
+        .aggregate([
+          { $match: { user: new Types.ObjectId(userId), status: 'COMPLETED' } },
+          { $group: { _id: null, total: { $sum: '$amount' } } },
+        ])
+        .exec();
+
+      const totalPaidAmount = totalPaid.length > 0 ? totalPaid[0].total : 0;
+
+      paymentsByUser[userId].forEach(payment => {
+        result.push({
+          ...payment,
+          _id: payment._id.toString(), // Convert ObjectId to string
+          user: payment.user?.toString() || '', // Handle undefined user
+          paymentMode: payment.paymentMode || '', // Handle undefined paymentMode
+          student: student
+            ? {
+                fullName: student.fullName,
+                studentType: student.studentType,
+                image: student.image || '',
+              }
+            : null,
+          totalPaid: totalPaidAmount,
+        });
+      });
+    }
+
+    return result;
   }
 }
