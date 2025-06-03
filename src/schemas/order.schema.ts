@@ -93,17 +93,17 @@ export class Order extends MongooseDocument {
 export const OrderSchema = SchemaFactory.createForClass(Order);
 OrderSchema.pre<OrderDocument>('save', async function (next) {
   if (!this.serialNumber) {
-    const lastOrder = await mongoose
-      .model<OrderDocument>('Order')
+    const lastOrder = await this.constructor
       .findOne({})
       .sort({ createdAt: -1 })
       .select('serialNumber')
       .exec();
 
     let lastSerial = 0;
-    if (lastOrder && lastOrder.serialNumber) {
+    if (lastOrder?.serialNumber) {
       lastSerial = parseInt(lastOrder.serialNumber);
     }
+
     const newSerial = (lastSerial + 1).toString().padStart(6, '0');
     this.serialNumber = newSerial;
   }
