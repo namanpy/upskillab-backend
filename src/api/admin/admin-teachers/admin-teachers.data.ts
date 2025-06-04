@@ -39,6 +39,7 @@ export class AdminTeachersDataService {
 
     // Update user fields if provided
     if (updateTeacherDto.email || updateTeacherDto.mobileNumber || updateTeacherDto.isActive !== undefined) {
+      
       const userData = {
         ...(updateTeacherDto.email && { email: updateTeacherDto.email }),
         ...(updateTeacherDto.mobileNumber && { mobileNumber: updateTeacherDto.mobileNumber }),
@@ -57,6 +58,7 @@ export class AdminTeachersDataService {
 
     // Update teacher fields if provided
     const teacherData = {
+        ...(updateTeacherDto.image && { image: updateTeacherDto.image }),
       ...(updateTeacherDto.name && { name: updateTeacherDto.name }),
     };
 

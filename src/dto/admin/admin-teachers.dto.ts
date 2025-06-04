@@ -18,6 +18,12 @@ export class UpdateTeacherDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  @IsNotEmpty()
+  image?: string
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
   mobileNumber?: string;
 
   @ApiPropertyOptional()
@@ -33,6 +39,9 @@ export class TeacherResponseDto {
 
   @ApiProperty()
   name: string;
+
+  @ApiProperty()
+  image: string;
 
   @ApiProperty()
   email: string;
