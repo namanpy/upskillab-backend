@@ -1,7 +1,11 @@
 import { Injectable, ForbiddenException } from '@nestjs/common';
 import { PaymentStatusDataService } from './payment.status.data';
-import { GetPaymentStatusResponseDTO, PaymentStatusResponse } from '../../dto/payment-status.dto';
+import {
+  GetPaymentStatusResponseDTO,
+  PaymentStatusResponse,
+} from '../../dto/payment-status.dto';
 import { USER_TYPES } from '../../common/constants/user.constants';
+import { User } from 'src/schemas/user.schema';
 
 @Injectable()
 export class PaymentStatusLogicService {
@@ -14,17 +18,27 @@ export class PaymentStatusLogicService {
     }
 
     if (!payment.order || !payment.order._id) {
-      console.log('mapToResponse: Skipping payment with missing or invalid order:', payment._id?.toString() || 'unknown');
+      console.log(
+        'mapToResponse: Skipping payment with missing or invalid order:',
+        payment._id?.toString() || 'unknown',
+      );
       return null;
     }
 
-    if (!payment.order.user || !payment.order.batch || !payment.order.batch.course) {
-      console.log('mapToResponse: Skipping payment with missing nested fields:', {
-        paymentId: payment._id?.toString() || 'unknown',
-        hasUser: !!payment.order.user,
-        hasBatch: !!payment.order.batch,
-        hasCourse: !!payment.order.batch?.course,
-      });
+    if (
+      !payment.order.user ||
+      !payment.order.batch ||
+      !payment.order.batch.course
+    ) {
+      console.log(
+        'mapToResponse: Skipping payment with missing nested fields:',
+        {
+          paymentId: payment._id?.toString() || 'unknown',
+          hasUser: !!payment.order.user,
+          hasBatch: !!payment.order.batch,
+          hasCourse: !!payment.order.batch?.course,
+        },
+      );
       return null;
     }
 
@@ -107,7 +121,7 @@ export class PaymentStatusLogicService {
     }
   }
 
-  async getPaymentStatus(user: any): Promise<GetPaymentStatusResponseDTO> {
+  async getPaymentStatus(user: User): Promise<GetPaymentStatusResponseDTO> {
     console.log('getPaymentStatus: User:', JSON.stringify(user, null, 2));
     let payments;
     if (user.userType === USER_TYPES.ADMIN) {
@@ -115,17 +129,28 @@ export class PaymentStatusLogicService {
       payments = await this.paymentStatusDataService.getAllPayments();
     } else if (user.userType === USER_TYPES.STUDENT) {
       console.log('getPaymentStatus: Fetching payments for student:', user._id);
-      payments = await this.paymentStatusDataService.getPaymentsByUser(user._id);
+      payments = await this.paymentStatusDataService.getPaymentsByUser(
+        user._id.toString(),
+      );
     } else {
-      console.log('getPaymentStatus: Forbidden - Invalid user type:', user.userType);
-      throw new ForbiddenException('Only students and admins can access payment status');
+      console.log(
+        'getPaymentStatus: Forbidden - Invalid user type:',
+        user.userType,
+      );
+      throw new ForbiddenException(
+        'Only students and admins can access payment status',
+      );
     }
 
     const paymentResponses = payments
-      .map(payment => this.mapToResponse(payment))
-      .filter(response => response !== null);
+      .map((payment) => this.mapToResponse(payment))
+      .filter((response) => response !== null);
 
-    console.log('getPaymentStatus: Returning', paymentResponses.length, 'payments');
+    console.log(
+      'getPaymentStatus: Returning',
+      paymentResponses.length,
+      'payments',
+    );
     return {
       payments: paymentResponses,
     };

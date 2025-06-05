@@ -59,6 +59,7 @@ export class AdminTeachersLogicService {
       teachers: validTeachers.map((teacher: TeacherDocument & { user: UserDocument }) => ({
         _id: teacher._id,
         name: teacher.name,
+        image:teacher?.image,
         email: teacher.user?.email ?? 'N/A', // Default value if user is null
         mobileNumber: teacher.user?.mobileNumber ?? 'N/A',
         isActive: teacher.user?.isActive ?? false,
@@ -80,6 +81,7 @@ export class AdminTeachersLogicService {
     return {
       _id: teacher._id,
       name: teacher.name,
+      image:teacher.image,
       email: user.email,
       mobileNumber: user.mobileNumber,
       isActive: user.isActive,
