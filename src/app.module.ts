@@ -50,6 +50,7 @@ import { DoubtModule } from './api/doubtNew/doubt.module';
 import { AnnouncementModule } from './api/announcement/announcement.module';
 import { AssociationModule } from './api/admin/Associations/associations.module';
 import { PaymentStatusModule } from './api/payment-status/payment-status.module';
+import { MarketingPromptModule } from './api/marketing/marketing-prompt.module';
 // import { ConfigModule } from '@nestjs/config';
 //MongooseModule.forRoot('mongodb://localhost/nest')
 @Module({
@@ -105,6 +106,7 @@ import { PaymentStatusModule } from './api/payment-status/payment-status.module'
     AnnouncementModule,
     AssociationModule,
     PaymentStatusModule,
+    MarketingPromptModule,
   ],
   controllers: [AppController],
   providers: [AppService],
