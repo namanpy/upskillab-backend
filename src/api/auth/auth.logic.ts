@@ -75,11 +75,11 @@ export class AuthLogicService {
     const otp = this.generateOTP();
 
     // Send OTP email
-    await this.sendGridService.sendEmail({
-      to: email,
-      subject: 'Your OTP Code',
-      html: `<p>Your OTP is <strong>${otp}</strong>. It will expire in 5 minutes.</p>`,
-    });
+    // await this.sendGridService.sendEmail({
+    //   to: email,
+    //   subject: 'Your OTP Code',
+    //   html: `<p>Your OTP is <strong>${otp}</strong>. It will expire in 5 minutes.</p>`,
+    // });
 
     const attempt = await this.loginAttemptDataService.createLoginAttempt({
       user: user._id.toString(),
