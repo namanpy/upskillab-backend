@@ -67,10 +67,10 @@ export class RegistrationLogicService {
       });
 
       // Send welcome email
-      await this.sendGridService.sendWelcomeEmail({
-        to: user.email,
-        name: registrationData.name,
-      });
+      //   await this.sendGridService.sendWelcomeEmail({
+      //     to: user.email,
+      //     name: registrationData.name,
+      //   });
     }
 
     const courseId = batch.course._id;
