@@ -53,13 +53,13 @@ export class PaymentLogicService {
         order.batch._id.toString(),
       );
 
-      await this.sendGridService.sendPaymentConfirmation({
-        to: payment.user.email,
-        name: payment.user.username,
-        courseName: batch?.course.courseName || 'Unknown',
-        amount: payment.amount,
-        orderId: order._id.toString(),
-      });
+      //   await this.sendGridService.sendPaymentConfirmation({
+      //     to: payment.user.email,
+      //     name: payment.user.username,
+      //     courseName: batch?.course.courseName || 'Unknown',
+      //     amount: payment.amount,
+      //     orderId: order._id.toString(),
+      //   });
     }
     // Map Cashfree status to internal payment status
     let orderStatus: string;
