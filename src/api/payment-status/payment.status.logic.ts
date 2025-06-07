@@ -11,7 +11,7 @@ import { User } from 'src/schemas/user.schema';
 export class PaymentStatusLogicService {
   constructor(private paymentStatusDataService: PaymentStatusDataService) {}
 
-  private mapToResponse(payment: any): PaymentStatusResponse | null {
+  private mapToResponse(payment: any, grandTotal: number): PaymentStatusResponse | null {
     if (!payment) {
       console.log('mapToResponse: Skipping null payment');
       return null;
@@ -43,7 +43,7 @@ export class PaymentStatusLogicService {
     }
 
     try {
-      return {
+              return {
         _id: payment._id.toString(),
         order: {
           _id: payment.order._id.toString(),
@@ -59,7 +59,7 @@ export class PaymentStatusLogicService {
               studentType: payment.student?.studentType || 'REGULAR',
               image: payment.student?.image || '',
             },
-            totalPaid: payment.totalPaid || 0,
+            totalPaid: grandTotal, // Use the calculated grand total here
           },
           totalAmount: payment.order.totalAmount || 0,
           amountPaid: payment.order.amountPaid || 0,
@@ -70,36 +70,7 @@ export class PaymentStatusLogicService {
             course: {
               _id: payment.order.batch.course._id.toString(),
               courseName: payment.order.batch.course.courseName || '',
-              // courseCode: payment.order.batch.course.courseCode || '',
-              // courseImage: payment.order.batch.course.courseImage || '',
-              // courseMode: payment.order.batch.course.courseMode || '',
-              // courseDuration: payment.order.batch.course.courseDuration || 0,
-              // originalPrice: payment.order.batch.course.originalPrice || 0,
-              // discountedPrice: payment.order.batch.course.discountedPrice || 0,
-              // youtubeUrl: payment.order.batch.course.youtubeUrl || null,
-              // brochure: payment.order.batch.course.brochure || '',
-              // courseLevel: payment.order.batch.course.courseLevel || '',
-              // certificate: payment.order.batch.course.certificate || '',
-              // active: payment.order.batch.course.active ?? false,
-              // faqs: payment.order.batch.course.faqs || [],
-              // shortDescription: payment.order.batch.course.shortDescription || '',
-              // tags: payment.order.batch.course.tags || [],
-              // programDetails: payment.order.batch.course.programDetails || '',
-              // targetAudience: payment.order.batch.course.targetAudience || [],
-              // featured: payment.order.batch.course.featured ?? false,
-              // courseRating: payment.order.batch.course.courseRating || 0,
-              // certifierLogo: payment.order.batch.course.certifierLogo || '',
             },
-            // startTime: payment.order.batch.startTime || '',
-            // startDate: payment.order.batch.startDate || null,
-            // totalSeats: payment.order.batch.totalSeats || 0,
-            // remainingSeats: payment.order.batch.remainingSeats || 0,
-            // Duration: payment.order.batch.duration || 0,
-            // teacher: payment.order.batch.teacher?.toString() || '',
-            // imageUrl: payment.order.batch.imageUrl || '',
-            // active: payment.order.batch.active ?? false,
-            // createdAt: payment.order.batch.createdAt || null,
-            // updatedAt: payment.order.batch.updatedAt || null,
           },
           createdAt: payment.order.createdAt || null,
           updatedAt: payment.order.updatedAt || null,
@@ -124,14 +95,20 @@ export class PaymentStatusLogicService {
   async getPaymentStatus(user: User): Promise<GetPaymentStatusResponseDTO> {
     console.log('getPaymentStatus: User:', JSON.stringify(user, null, 2));
     let payments;
+    let grandTotal = 0;
+
     if (user.userType === USER_TYPES.ADMIN) {
       console.log('getPaymentStatus: Fetching all student payments for admin');
-      payments = await this.paymentStatusDataService.getAllPayments();
+      const result = await this.paymentStatusDataService.getAllPayments();
+      payments = result.payments;
+      grandTotal = result.grandTotal;
     } else if (user.userType === USER_TYPES.STUDENT) {
       console.log('getPaymentStatus: Fetching payments for student:', user._id);
-      payments = await this.paymentStatusDataService.getPaymentsByUser(
+      const result = await this.paymentStatusDataService.getPaymentsByUser(
         user._id.toString(),
       );
+      payments = result.payments;
+      grandTotal = result.grandTotal;
     } else {
       console.log(
         'getPaymentStatus: Forbidden - Invalid user type:',
@@ -143,16 +120,19 @@ export class PaymentStatusLogicService {
     }
 
     const paymentResponses = payments
-      .map((payment) => this.mapToResponse(payment))
+      .map((payment) => this.mapToResponse(payment, grandTotal))
       .filter((response) => response !== null);
 
     console.log(
       'getPaymentStatus: Returning',
       paymentResponses.length,
-      'payments',
+      'payments with grand total:',
+      grandTotal,
     );
+    
     return {
       payments: paymentResponses,
+      grandTotal: grandTotal, // Include grand total in response
     };
   }
 }

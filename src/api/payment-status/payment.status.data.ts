@@ -33,6 +33,11 @@ interface PaymentWithDetails {
   totalPaid: number;
 }
 
+interface PaymentResult {
+  payments: PaymentWithDetails[];
+  grandTotal: number;
+}
+
 @Injectable()
 export class PaymentStatusDataService {
   constructor(
@@ -40,14 +45,14 @@ export class PaymentStatusDataService {
     @InjectModel('Student') private studentModel: Model<Student>,
   ) {}
 
-  async getPaymentsByUser(userId: string): Promise<PaymentWithDetails[]> {
+  async getPaymentsByUser(userId: string): Promise<PaymentResult> {
     console.log('=== CORRECT APPROACH getPaymentsByUser ===');
     console.log('Input userId:', userId);
 
     try {
       if (!Types.ObjectId.isValid(userId)) {
         console.log('❌ Invalid ObjectId format');
-        return [];
+        return { payments: [], grandTotal: 0 };
       }
 
       const objectId = new Types.ObjectId(userId);
@@ -107,7 +112,7 @@ export class PaymentStatusDataService {
 
       if (payments.length === 0) {
         console.log('❌ No payments found for user through aggregation');
-        return [];
+        return { payments: [], grandTotal: 0 };
       }
 
       // Fetch student details
@@ -119,43 +124,37 @@ export class PaymentStatusDataService {
 
       console.log('👨‍🎓 Student found:', !!student);
 
-      // Calculate totalPaid - need to use aggregation on orders, not payments
-      const totalPaidFromOrders = await this.paymentModel.db.collection('orders')
-        .aggregate([
-          { 
-            $match: { 
-              user: objectId,
-              status: 'COMPLETED' // or whatever your completed order status is
-            } 
-          },
-          { $group: { _id: null, total: { $sum: '$amountPaid' } } }
-        ]).toArray();
+      // Calculate grand total from COMPLETED orders using aggregation
+      const grandTotalAggregation = await this.paymentModel.aggregate([
+        {
+          $lookup: {
+            from: 'orders',
+            localField: 'order',
+            foreignField: '_id',
+            as: 'orderData'
+          }
+        },
+        {
+          $match: {
+            'orderData.user': objectId,
+            'orderData.status': 'COMPLETED' // Only sum amountPaid from COMPLETED orders
+          }
+        },
+        {
+          $unwind: '$orderData'
+        },
+        {
+          $group: {
+            _id: null,
+            grandTotal: { $sum: '$orderData.amountPaid' } // Sum the amountPaid field
+          }
+        }
+      ]).exec();
 
-      // Also check totalPaid from payments with COMPLETED status
-      const totalPaidFromPayments = await this.paymentModel
-        .aggregate([
-          {
-            $lookup: {
-              from: 'orders',
-              localField: 'order',
-              foreignField: '_id',
-              as: 'orderData'
-            }
-          },
-          {
-            $match: {
-              'orderData.user': objectId,
-              status: 'COMPLETED'
-            }
-          },
-          { $group: { _id: null, total: { $sum: '$amount' } } }
-        ])
-        .exec();
+      const grandTotal = grandTotalAggregation.length > 0 ? grandTotalAggregation[0].grandTotal : 0;
+      console.log('💰 Grand Total (amountPaid from COMPLETED orders):', grandTotal);
 
-      const totalPaidAmount = totalPaidFromPayments.length > 0 ? totalPaidFromPayments[0].total : 0;
-      console.log('💰 Total paid amount:', totalPaidAmount);
-
-      // Attach student and totalPaid to each payment
+      // Format the payments data
       const result = payments.map(payment => ({
         _id: payment._id.toString(),
         user: payment.userData?.[0]?._id?.toString() || '',
@@ -197,13 +196,13 @@ export class PaymentStatusDataService {
               image: student.image || '',
             }
           : null,
-        totalPaid: totalPaidAmount,
+        totalPaid: grandTotal, // This will be the same for all payments for this user
       }));
 
       console.log('✅ Final result length:', result.length);
       console.log('=== END CORRECT APPROACH ===');
       
-      return result;
+      return { payments: result, grandTotal };
 
     } catch (error) {
       console.error('❌ Error in getPaymentsByUser:', error);
@@ -211,101 +210,12 @@ export class PaymentStatusDataService {
     }
   }
 
-  async getAllPayments(): Promise<PaymentWithDetails[]> {
+  async getAllPayments(): Promise<PaymentResult> {
     console.log('getAllPayments: Fetching all student payments');
 
-    // Fetch payments
-    const payments = await this.paymentModel
-      .find()
-      .populate({
-        path: 'order',
-        select: '_id user totalAmount amountPaid status batch createdAt updatedAt',
-        populate: [
-          {
-            path: 'user',
-            match: { userType: USER_TYPES.STUDENT },
-            select: '_id email username isActive mobileNumber userType',
-          },
-          {
-            path: 'batch',
-            select: '_id batchCode course startTime startDate totalSeats remainingSeats Duration teacher imageUrl active createdAt updatedAt',
-            populate: {
-              path: 'course',
-              select: '_id courseName courseCode courseImage courseMode courseDuration originalPrice discountedPrice youtubeUrl brochure courseLevel certificate active faqs shortDescription tags programDetails targetAudience featured courseRating',
-            },
-          },
-        ],
-      })
-      .lean()
-      .exec();
-
-    // Group payments by user
-    const paymentsByUser = payments.reduce((acc: { [key: string]: any[] }, payment) => {
-      const userId = payment.user?.toString();
-      if (userId) {
-        if (!acc[userId]) acc[userId] = [];
-        acc[userId].push(payment);
-      }
-      return acc;
-    }, {});
-
-    // Define result array
-    const result: PaymentWithDetails[] = [];
-
-    // Fetch student details and totalPaid for each user
-    for (const userId of Object.keys(paymentsByUser)) {
-      const student = await this.studentModel
-        .findOne({ user: userId })
-        .select('fullName studentType image')
-        .lean()
-        .exec();
-
-      const totalPaid = await this.paymentModel
-        .aggregate([
-          { $match: { user: new Types.ObjectId(userId), status: 'COMPLETED' } },
-          { $group: { _id: null, total: { $sum: '$amount' } } },
-        ])
-        .exec();
-
-      const totalPaidAmount = totalPaid.length > 0 ? totalPaid[0].total : 0;
-
-      paymentsByUser[userId].forEach(payment => {
-        result.push({
-          ...payment,
-          _id: payment._id.toString(),
-          user: payment.user?.toString() || '',
-          paymentMode: payment.paymentMode || '',
-          student: student
-            ? {
-                fullName: student.fullName,
-                studentType: student.studentType,
-                image: student.image || '',
-              }
-            : null,
-          totalPaid: totalPaidAmount,
-        });
-      });
-    }
-
-    return result;
-  }
-
-  // BEST APPROACH: Using aggregation pipeline
-  async getPaymentsByUserOptimized(userId: string): Promise<PaymentWithDetails[]> {
-    console.log('=== OPTIMIZED APPROACH ===');
-    console.log('Input userId:', userId);
-
     try {
-      if (!Types.ObjectId.isValid(userId)) {
-        console.log('❌ Invalid ObjectId format');
-        return [];
-      }
-
-      const objectId = new Types.ObjectId(userId);
-
-      // Use aggregation to get payments with order details in one query
-      const paymentsAggregation = await this.paymentModel.aggregate([
-        // Lookup order details
+      // Fetch payments using aggregation for better performance
+      const payments = await this.paymentModel.aggregate([
         {
           $lookup: {
             from: 'orders',
@@ -314,17 +224,9 @@ export class PaymentStatusDataService {
             as: 'orderData'
           }
         },
-        // Filter by user
-        {
-          $match: {
-            'orderData.user': objectId
-          }
-        },
-        // Unwind order data
         {
           $unwind: '$orderData'
         },
-        // Lookup user details
         {
           $lookup: {
             from: 'users',
@@ -333,7 +235,11 @@ export class PaymentStatusDataService {
             as: 'userData'
           }
         },
-        // Lookup batch details
+        {
+          $match: {
+            'userData.userType': USER_TYPES.STUDENT
+          }
+        },
         {
           $lookup: {
             from: 'batches',
@@ -342,7 +248,6 @@ export class PaymentStatusDataService {
             as: 'batchData'
           }
         },
-        // Lookup course details
         {
           $lookup: {
             from: 'courses',
@@ -350,54 +255,11 @@ export class PaymentStatusDataService {
             foreignField: '_id',
             as: 'courseData'
           }
-        },
-        // Project the required fields
-        {
-          $project: {
-            _id: 1,
-            paymentMethod: 1,
-            transactionId: 1,
-            amount: 1,
-            status: 1,
-            paymentMode: 1,
-            createdAt: 1,
-            updatedAt: 1,
-            order: {
-              _id: '$orderData._id',
-              user: { $arrayElemAt: ['$userData', 0] },
-              totalAmount: '$orderData.totalAmount',
-              amountPaid: '$orderData.amountPaid',
-              status: '$orderData.status',
-              batch: {
-                _id: { $arrayElemAt: ['$batchData._id', 0] },
-                batchCode: { $arrayElemAt: ['$batchData.batchCode', 0] },
-                course: { $arrayElemAt: ['$courseData', 0] }
-              },
-              createdAt: '$orderData.createdAt',
-              updatedAt: '$orderData.updatedAt'
-            }
-          }
         }
       ]).exec();
 
-      console.log('📊 Aggregation payments found:', paymentsAggregation.length);
-
-      if (paymentsAggregation.length === 0) {
-        console.log('❌ No payments found through aggregation');
-        return [];
-      }
-
-      // Fetch student details
-      const student = await this.studentModel
-        .findOne({ user: objectId })
-        .select('fullName studentType image')
-        .lean()
-        .exec();
-
-      console.log('👨‍🎓 Student found:', !!student);
-
-      // Calculate totalPaid using aggregation
-      const totalPaidAggregation = await this.paymentModel.aggregate([
+      // Calculate grand total from ALL COMPLETED orders
+      const grandTotalAggregation = await this.paymentModel.aggregate([
         {
           $lookup: {
             from: 'orders',
@@ -407,45 +269,92 @@ export class PaymentStatusDataService {
           }
         },
         {
-          $match: {
-            'orderData.user': objectId,
-            status: 'COMPLETED'
+          $lookup: {
+            from: 'users',
+            localField: 'orderData.user',
+            foreignField: '_id',
+            as: 'userData'
           }
+        },
+        {
+          $match: {
+            'orderData.status': 'COMPLETED',
+            'userData.userType': USER_TYPES.STUDENT
+          }
+        },
+        {
+          $unwind: '$orderData'
         },
         {
           $group: {
             _id: null,
-            total: { $sum: '$amount' }
+            grandTotal: { $sum: '$orderData.amountPaid' }
           }
         }
       ]).exec();
 
-      const totalPaidAmount = totalPaidAggregation.length > 0 ? totalPaidAggregation[0].total : 0;
-      console.log('💰 Total paid amount:', totalPaidAmount);
+      const grandTotal = grandTotalAggregation.length > 0 ? grandTotalAggregation[0].grandTotal : 0;
+      console.log('💰 Grand Total for all students (COMPLETED orders):', grandTotal);
+
+      // Group payments by user for student details
+      const userIds = [...new Set(payments.map(p => p.userData?.[0]?._id?.toString()).filter(Boolean))];
+      
+      // Fetch all student details in one query
+      const students = await this.studentModel
+        .find({ user: { $in: userIds.map(id => new Types.ObjectId(id)) } })
+        .select('user fullName studentType image')
+        .lean()
+        .exec();
+
+      const studentMap = students.reduce((acc, student) => {
+        acc[student.user.toString()] = student;
+        return acc;
+      }, {});
 
       // Format the result
-      const result = paymentsAggregation.map(payment => ({
-        ...payment,
-        _id: payment._id.toString(),
-        user: payment.order?.user?._id?.toString() || '',
-        paymentMode: payment.paymentMode || '',
-        student: student
-          ? {
-              fullName: student.fullName,
-              studentType: student.studentType,
-              image: student.image || '',
-            }
-          : null,
-        totalPaid: totalPaidAmount,
-      }));
+      const result: PaymentWithDetails[] = payments.map(payment => {
+        const userId = payment.userData?.[0]?._id?.toString();
+        const student = userId ? studentMap[userId] : null;
 
-      console.log('✅ Final optimized result length:', result.length);
-      console.log('=== END OPTIMIZED APPROACH ===');
-      
-      return result;
+        return {
+          _id: payment._id.toString(),
+          user: userId || '',
+          order: {
+            _id: payment.orderData._id.toString(),
+            user: payment.userData?.[0] || null,
+            totalAmount: payment.orderData.totalAmount || 0,
+            amountPaid: payment.orderData.amountPaid || 0,
+            status: payment.orderData.status || '',
+            batch: {
+              _id: payment.batchData?.[0]?._id?.toString() || '',
+              batchCode: payment.batchData?.[0]?.batchCode || '',
+              course: payment.courseData?.[0] || null,
+            },
+            createdAt: payment.orderData.createdAt || null,
+            updatedAt: payment.orderData.updatedAt || null,
+          },
+          paymentMethod: payment.paymentMethod || '',
+          transactionId: payment.transactionId || '',
+          amount: payment.amount || 0,
+          status: payment.status || '',
+          paymentMode: payment.paymentMode || '',
+          createdAt: payment.createdAt || null,
+          updatedAt: payment.updatedAt || null,
+          student: student
+            ? {
+                fullName: student.fullName,
+                studentType: student.studentType,
+                image: student.image || '',
+              }
+            : null,
+          totalPaid: grandTotal,
+        };
+      });
+
+      return { payments: result, grandTotal };
 
     } catch (error) {
-      console.error('❌ Error in optimized getPaymentsByUser:', error);
+      console.error('❌ Error in getAllPayments:', error);
       throw error;
     }
   }
