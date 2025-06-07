@@ -197,9 +197,11 @@ export class PaymentStatusResponse {
 
   @ApiProperty({ description: 'Last update timestamp' })
   updatedAt: string;
+
 }
 
 export class GetPaymentStatusResponseDTO {
   @ApiProperty({ type: [PaymentStatusResponse], description: 'List of payment statuses' })
   payments: PaymentStatusResponse[];
+  grandTotal?: number;
 }
