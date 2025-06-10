@@ -37,5 +37,6 @@ import { EnrollmentModule } from '../enrollment/enrollment.module';
   ],
   controllers: [ClassSessionController],
   // exports: [ClassSessionDataService],
+  exports: [ClassSessionDataService],
 })
 export class ClassSessionModule {}
