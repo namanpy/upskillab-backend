@@ -60,7 +60,6 @@ export class OrderLogicService {
     sortByDate?: 'asc' | 'desc';
   }) {
     const { orders, total } = await this.orderDataService.getAllOrders(params);
-
     return {
       orders: orders.map((order) => ({
         ...order,

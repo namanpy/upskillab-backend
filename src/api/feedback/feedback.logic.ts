@@ -21,7 +21,12 @@ import { ClassSessionDataService } from '../scheduler/class-session.data';
 import { TeacherDataService } from '../teachers/teacher.data';
 import { EnrollmentDataService } from '../enrollment/enrollment.data';
 import { USER_TYPES } from '../../common/constants/user.constants';
-
+import { Student } from 'src/schemas/student.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Batch, BatchDocument } from '../../schemas/course/batch.schema';
+import { Course } from '../../schemas/course/course.schema';
+import { Teacher, TeacherDocument } from '../../schemas/teacher.schema';
 @Injectable()
 export class FeedbackLogicService {
   constructor(
@@ -29,9 +34,12 @@ export class FeedbackLogicService {
     private classSessionDataService: ClassSessionDataService,
     private teacherDataService: TeacherDataService,
     private enrollmentDataService: EnrollmentDataService,
+    @InjectModel(Student.name) private studentModel: Model<Student>,
+    @InjectModel(Batch.name) private batchModel: Model<BatchDocument>,
+    
   ) { }
 
-  private mapToDto(feedback: FeedbackDocument): FeedbackDto {
+ private async mapToDto(feedback: FeedbackDocument): Promise<FeedbackDto> {
     // Helper function to safely extract ID
     const extractId = (field: any): string => {
       if (!field) return '';
@@ -51,6 +59,31 @@ export class FeedbackLogicService {
       return '';
     };
 
+  const extractStudentName = async (userId: Types.ObjectId): Promise<string | null> => {
+  const student = await this.studentModel
+    .findOne({ user: userId })
+    .lean()
+    .exec();
+  return student?.fullName || null; // return the name or null if not found
+};
+
+  const extractCourseName = async (id: any): Promise<string | null> => {
+  const courseName= await this.batchModel
+        .findById(id)
+        .populate<{
+          course:
+            | Course
+            | (undefined extends Batch['course'] ? undefined : never);
+        }>(['course'])
+        .exec();
+
+        return courseName?.course?.courseName || null;
+};
+
+
+     const studentName = await extractStudentName(feedback.studentId);
+     const courseName = await extractCourseName(feedback.batchId);
+
     return {
       _id: extractId(feedback._id),
       studentId: extractId(feedback.studentId),
@@ -61,9 +94,9 @@ export class FeedbackLogicService {
       message: feedback.message,
       createdAt: feedback.createdAt,
       updatedAt: feedback.updatedAt,
-      studentName: extractName(feedback.studentId, 'username'),
-      teacherName: extractName(feedback.teacherId, 'username'),
-      batchName: extractName(feedback.batchId, 'name'),
+      studentName:studentName?.toString(),
+      teacherName: extractName(feedback.teacherId, 'name'),
+      batchName: courseName?.toString(),
       sessionTitle: extractName(feedback.classSessionId, 'title'),
     };
   }
@@ -154,9 +187,15 @@ export class FeedbackLogicService {
     }
 
     const feedbacks = await this.feedbackDataService.getFeedbacksByStudent(user._id);
-    return {
-      feedbacks: feedbacks.map(feedback => this.mapToDto(feedback)),
-    };
+  
+  // Map each feedback to DTO and await all promises
+  const feedbackDtos = await Promise.all(
+    feedbacks.map(feedback => this.mapToDto(feedback))
+  );
+
+  return {
+    feedbacks: feedbackDtos,
+  };
   }
 
   // Student updates their feedback
@@ -213,9 +252,14 @@ export class FeedbackLogicService {
     }
 
     const feedbacks = await this.feedbackDataService.getAllFeedbacks();
-    return {
-      feedbacks: feedbacks.map(feedback => this.mapToDto(feedback)),
-    };
+   // Map each feedback to DTO and await all promises
+  const feedbackDtos = await Promise.all(
+    feedbacks.map(feedback => this.mapToDto(feedback))
+  );
+
+  return {
+    feedbacks: feedbackDtos,
+  };
   }
 
   // Admin gets teacher feedback summary
@@ -260,7 +304,7 @@ export class FeedbackLogicService {
       totalFeedbacks: summaryData.totalFeedbacks,
       averageRating: Math.round(summaryData.averageRating * 100) / 100, // Round to 2 decimal places
       ratingDistribution,
-      recentFeedbacks: recentFeedbacks.map(feedback => this.mapToDto(feedback)),
+      recentFeedbacks: await Promise.all(recentFeedbacks.map(feedback => this.mapToDto(feedback)))
     };
 
     return { summary };

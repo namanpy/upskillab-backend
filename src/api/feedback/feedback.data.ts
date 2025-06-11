@@ -49,7 +49,7 @@ export class FeedbackDataService {
   async getFeedbacksByStudent(studentId: string): Promise<FeedbackDocument[]> {
     return this.feedbackModel
       .find({ studentId: new Types.ObjectId(studentId) })
-      .populate('teacherId', 'username')
+      .populate('teacherId', 'name')
       .populate('batchId', 'name')
       .populate('classSessionId', 'title')
       .sort({ createdAt: -1 })
