@@ -29,30 +29,60 @@ export class FeedbackLogicService {
     private classSessionDataService: ClassSessionDataService,
     private teacherDataService: TeacherDataService,
     private enrollmentDataService: EnrollmentDataService,
-  ) {}
+  ) { }
 
   private mapToDto(feedback: FeedbackDocument): FeedbackDto {
+    // Helper function to safely extract ID
+    const extractId = (field: any): string => {
+      if (!field) return '';
+      if (typeof field === 'string') return field;
+      if (field._id) return field._id.toString();
+      if (field.toString && typeof field.toString === 'function') {
+        return field.toString();
+      }
+      return '';
+    };
+
+    // Helper function to extract name/title
+    const extractName = (field: any, property: string): string => {
+      if (!field) return '';
+      if (typeof field === 'string') return field;
+      if (field[property]) return field[property];
+      return '';
+    };
+
     return {
-      _id: (feedback._id as Types.ObjectId).toString(),
-      studentId: (feedback.studentId as Types.ObjectId).toString(),
-      teacherId: (feedback.teacherId as Types.ObjectId).toString(),
-      classSessionId: (feedback.classSessionId as Types.ObjectId).toString(),
-      batchId: (feedback.batchId as Types.ObjectId).toString(),
+      _id: extractId(feedback._id),
+      studentId: extractId(feedback.studentId),
+      teacherId: extractId(feedback.teacherId),
+      classSessionId: extractId(feedback.classSessionId),
+      batchId: extractId(feedback.batchId),
       rating: feedback.rating,
       message: feedback.message,
       createdAt: feedback.createdAt,
       updatedAt: feedback.updatedAt,
-      studentName: (feedback.studentId as any)?.username || '',
-      teacherName: (feedback.teacherId as any)?.username || '',
-      batchName: (feedback.batchId as any)?.name || '',
-      sessionTitle: (feedback.classSessionId as any)?.title || '',
+      studentName: extractName(feedback.studentId, 'username'),
+      teacherName: extractName(feedback.teacherId, 'username'),
+      batchName: extractName(feedback.batchId, 'name'),
+      sessionTitle: extractName(feedback.classSessionId, 'title'),
     };
   }
 
-  // Student creates feedback
+  // Fixed createFeedback method - Ensures one feedback per student per class session
   async createFeedback(createFeedbackDto: CreateFeedbackDto, user: any) {
     if (user.userType !== USER_TYPES.STUDENT) {
       throw new ForbiddenException('Only students can give feedback');
+    }
+
+    // FIRST: Check if feedback already exists for this student and class session
+    // This should be the first check to prevent duplicate feedback
+    const existingFeedback = await this.feedbackDataService.checkExistingFeedback(
+      user._id,
+      createFeedbackDto.classSessionId
+    );
+    
+    if (existingFeedback) {
+      throw new BadRequestException('You have already given feedback for this class session');
     }
 
     // Check if class session exists and is approved
@@ -74,33 +104,37 @@ export class FeedbackLogicService {
       throw new NotFoundException('Teacher not found');
     }
 
-    // Verify teacher is assigned to this session
-    if (classSession.teacherId.toString() !== createFeedbackDto.teacherId) {
+    // Fix: Handle populated teacherId object safely
+    const sessionTeacherId = (classSession.teacherId as any)?._id
+      ? (classSession.teacherId as any)._id.toString()
+      : classSession.teacherId.toString();
+
+    if (sessionTeacherId !== createFeedbackDto.teacherId) {
       throw new BadRequestException('Teacher is not assigned to this session');
     }
 
     // Check if student is enrolled in the batch
     const enrollment = await this.enrollmentDataService.getEnrollmentByUserId(user._id);
+    if (!enrollment || !enrollment.order || enrollment.order.length === 0) {
+      throw new ForbiddenException('You are not enrolled in any batch');
+    }
+
     const enrolledBatchIds = enrollment.order.map(order => order.batch._id.toString());
-    
-    if (!enrolledBatchIds.includes(classSession.batchId.toString())) {
+
+    // Fix: Handle populated batchId object safely
+    const sessionBatchId = (classSession.batchId as any)?._id
+      ? (classSession.batchId as any)._id.toString()
+      : classSession.batchId.toString();
+
+    if (!enrolledBatchIds.includes(sessionBatchId)) {
       throw new ForbiddenException('You are not enrolled in this batch');
     }
 
-    // Check if feedback already exists for this session
-    const existingFeedback = await this.feedbackDataService.checkExistingFeedback(
-      user._id,
-      createFeedbackDto.classSessionId
-    );
-    if (existingFeedback) {
-      throw new BadRequestException('You have already given feedback for this session');
-    }
-
-    // Create feedback
+    // Create feedback - by this point we're sure no duplicate exists
     const feedbackData = {
       ...createFeedbackDto,
       studentId: user._id,
-      batchId: classSession.batchId.toString(),
+      batchId: sessionBatchId,
     };
 
     const feedback = await this.feedbackDataService.createFeedback(feedbackData);
