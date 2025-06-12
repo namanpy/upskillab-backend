@@ -106,7 +106,7 @@ export class FeedbackLogicService {
     if (user.userType !== USER_TYPES.STUDENT) {
       throw new ForbiddenException('Only students can give feedback');
     }
-
+    console.log(user,createFeedbackDto)
     // FIRST: Check if feedback already exists for this student and class session
     // This should be the first check to prevent duplicate feedback
     const existingFeedback = await this.feedbackDataService.checkExistingFeedback(
@@ -152,7 +152,7 @@ export class FeedbackLogicService {
       throw new ForbiddenException('You are not enrolled in any batch');
     }
 
-    const enrolledBatchIds = enrollment.order.map(order => order.batch._id.toString());
+    const enrolledBatchIds = enrollment.order.map(order => order?.batch?._id.toString());
 
     // Fix: Handle populated batchId object safely
     const sessionBatchId = (classSession.batchId as any)?._id
@@ -175,9 +175,9 @@ export class FeedbackLogicService {
       (feedback._id as Types.ObjectId).toString()
     );
 
-    return {
-      feedback: this.mapToDto(populatedFeedback!),
-    };
+   return {
+  feedback: await this.mapToDto(populatedFeedback!),
+};
   }
 
   // Student gets their own feedbacks
@@ -209,7 +209,7 @@ export class FeedbackLogicService {
       throw new NotFoundException('Feedback not found');
     }
 
-    if ((feedback.studentId as Types.ObjectId).toString() !== user._id) {
+    if ((feedback.studentId._id).toString() !== user._id.toString()) {
       throw new ForbiddenException('You can only update your own feedback');
     }
 

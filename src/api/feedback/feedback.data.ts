@@ -22,13 +22,14 @@ export class FeedbackDataService {
 
   // Check if student already gave feedback for this session
   async checkExistingFeedback(
-    studentId: string,
+    studentId: any,
     classSessionId: string
   ): Promise<FeedbackDocument | null> {
+    console.log(studentId,classSessionId)
     return this.feedbackModel
       .findOne({ 
-        studentId: new Types.ObjectId(studentId), 
-        classSessionId: new Types.ObjectId(classSessionId) 
+        studentId,
+        classSessionId 
       })
       .exec();
   }
@@ -37,8 +38,8 @@ export class FeedbackDataService {
   async getFeedbackById(id: string): Promise<FeedbackDocument | null> {
     return this.feedbackModel
       .findById(new Types.ObjectId(id))
-      .populate('studentId', 'username')
-      .populate('teacherId', 'username')
+      .populate('studentId', 'fullName')
+      .populate('teacherId', 'name')
       .populate('batchId', 'name')
       .populate('classSessionId', 'title')
       .lean()

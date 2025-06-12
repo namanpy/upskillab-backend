@@ -31,16 +31,17 @@ export class FeedbackController {
   constructor(private feedbackLogicService: FeedbackLogicService) {}
 
   // Student endpoints
-  @Post()
-  @Roles('STUDENT')
-  @ApiOperation({ summary: 'Student gives feedback to teacher for a class session' })
-  @ApiResponse({ status: 201, description: 'Feedback created successfully' })
-  async createFeedback(
-    @Body() createFeedbackDto: CreateFeedbackDto,
-    @Request() req
-  ) {
-    return this.feedbackLogicService.createFeedback(createFeedbackDto, req.user);
-  }
+@Post()
+@Roles('STUDENT')
+@ApiOperation({ summary: 'Student gives feedback to teacher for a class session' })
+@ApiResponse({ status: 201, description: 'Feedback created successfully' })
+async createFeedback(
+  @Body() createFeedbackDto: CreateFeedbackDto,
+  @Request() req
+) {
+  const res = await this.feedbackLogicService.createFeedback(createFeedbackDto, req.user);
+  return res;
+}
 
   @Get('my-feedbacks')
   @Roles('STUDENT')
