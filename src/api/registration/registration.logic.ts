@@ -148,8 +148,6 @@ export class RegistrationLogicService {
   }
 
   async registerNoBatch(registrationData: NoBatchRegistrationRequestDto) {
-    // Calculate base price
-    let totalAmount = registrationData.amount;
     // Check if batch exists and is active
     const batch = await this.batchDataService.getBatchById(
       registrationData.batchId,
@@ -162,6 +160,9 @@ export class RegistrationLogicService {
     if (batch.remainingSeats <= 0) {
       throw new CustomError(ERROR.BATCH_FULL);
     }
+
+    // Get course total amount (original price of the course)
+    const totalAmount = batch.course.discountedPrice || batch.course.originalPrice;
 
     // Create or get user
     let user = await this.userDataService.getUserByEmail({
@@ -192,7 +193,7 @@ export class RegistrationLogicService {
     const courseId = batch.course._id;
     const userId = user._id;
 
-    // Check if user has already registered for the cours
+    // Check if user has already registered for the course
     const existingOrder = await this.orderDataService.checkExistingOrder(
       userId,
       courseId,
@@ -201,19 +202,13 @@ export class RegistrationLogicService {
     if (existingOrder && existingOrder.status === ORDER_STATUS.COMPLETED.code) {
       throw new CustomError(ERROR.ALREADY_REGISTERED_FOR_COURSE);
     }
-    // Calculate base price
-    // let totalAmount =
-    //   batch.course.discountedPrice || batch.course.originalPrice;
-    // let discount = 0;
-    // let appliedCouponId: Types.ObjectId | undefined = undefined;
-    // console.log(totalAmount, '1');
 
     // Create order
     const order = await this.orderDataService.createOrder({
       user: user._id,
       batch: batch._id,
-      amountPaid: 0,
-      totalAmount,
+      amountPaid: registrationData.amount, // Amount user has paid
+      totalAmount, // Batch amount + user paid amount
       email: registrationData.email,
       name: registrationData.name,
       mobileNumber: registrationData.phone,
@@ -221,17 +216,6 @@ export class RegistrationLogicService {
     });
 
     // Create Cashfree payment link
-    // const paymentLink = await this.cashfreeService.createPayment({
-    //   orderId: order._id,
-    //   amount: order.totalAmount,
-    //   customerDetails: {
-    //     customerId: 'upskillab',
-    //     customerEmail: registrationData.email,
-    //     customerPhone: registrationData.phone,
-    //     customerName: registrationData.name,
-    //   },
-    // });
-
     const paymentLink = await this.cashfreeService.createPayment({
       orderId: order._id,
       userId: user._id,
@@ -252,7 +236,8 @@ export class RegistrationLogicService {
 
     return {
       orderId: order._id,
-      totalAmount: order.totalAmount,
+      totalAmount: order.totalAmount, 
+      amountPaying: registrationData.amount, 
       paymentSessionId: paymentLink.paymentSessionId!,
     };
   }

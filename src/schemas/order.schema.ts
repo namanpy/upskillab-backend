@@ -88,6 +88,13 @@ export class Order extends MongooseDocument {
   })
   @Prop({ required: false, unique: true })
   serialNumber?: string;
+
+  @ApiProperty({
+    description: '6 digit serial number of the order',
+    type: String,
+  })
+  @Prop({ required: false })
+  initialPaymentAmount?: string;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
