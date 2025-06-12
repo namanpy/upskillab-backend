@@ -83,6 +83,9 @@ export class NoBatchRegistrationRequestDto {
   @IsNotEmpty()
   @ApiProperty()
   amount: number;
+
+  @ApiProperty()
+  batchId: string;
 }
 
 export class NoBatchRegistrationResponseDto {
