@@ -52,7 +52,6 @@ export class BatchRegistrationResponseDto {
   })
   paymentSessionId: string;
 }
-
 export class NoBatchRegistrationRequestDto {
   @IsString()
   @IsNotEmpty()
@@ -67,30 +66,29 @@ export class NoBatchRegistrationRequestDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
   @Matches(/^\d+$/, { message: 'Phone number must contain only digits' })
   @Length(10, 10)
   phone: string;
 
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  courseName: string;
-
   @IsNumber()
   @IsNotEmpty()
-  @ApiProperty()
+  @ApiProperty({ description: 'Amount user is paying' })
   amount: number;
+
+  @ApiProperty()
+  batchId: string;
 }
 
 export class NoBatchRegistrationResponseDto {
   @ApiProperty({ type: String })
   orderId: Types.ObjectId;
 
-  @ApiProperty({
-    type: String,
-  })
+  @ApiProperty({ type: String })
   paymentSessionId: string;
+
+  @ApiProperty({ type: Number, description: 'Total course amount' })
+  totalAmount: number;
+
+  @ApiProperty({ type: Number, description: 'Amount user is paying' })
+  amountPaying: number;
 }
