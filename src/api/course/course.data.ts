@@ -111,22 +111,7 @@ export class CourseDataService {
 
   async getCourseById(courseId: string) {
     return this.courseModel
-      .findById(courseId)
-      .populate<{
-        category:
-          | Category
-          | (undefined extends Course['category'] ? undefined : never);
-        language:
-          | Language
-          | (undefined extends Course['language'] ? undefined : never);
-      }>([
-        {
-          path: 'category',
-        },
-        {
-          path: 'language',
-        },
-      ])
+      .findById(new Object(courseId))
       .lean()
       .exec();
   }

@@ -267,4 +267,82 @@ export class CourseLogicService {
       weeks: formattedWeeks,
     };
   }
+
+
+
+  async getCourseById(id: string) {
+    const course = await this.courseDataService.getCourseById(id);
+    if (!course) throw new CustomError(ERROR.COURSE_NOT_FOUND);
+
+    const chapters = await this.chapterDataService.getChapters(
+      course._id.toString(),
+    );
+
+    const category = await this.categoryDataService.getCategoryById(
+      course.category.toString(),
+    );
+
+    const language = await this.languageDataService.getLanguageById(
+      course.language.toString(),
+    );
+
+    const chaptersWithTopics = await Promise.all(
+      chapters.map(async (chapter) => {
+        const topics = await this.topicDataService.getTopics(
+          chapter._id.toString(),
+        );
+
+        const formattedTopics = topics.map((topic) => ({
+          ...topic,
+          _id: topic._id.toString(),
+        }));
+
+        return {
+          ...chapter,
+          _id: chapter._id.toString(),
+          topics: formattedTopics,
+        };
+      }),
+    );
+
+    const batch = await this.batchDataService.getLatestBatchForCourse(
+      course._id.toString(),
+    );
+
+    // Format chapters and topics into weeks and sessions
+    const formattedWeeks = chaptersWithTopics.reduce(
+      (weeks, chapter, chapterIndex) => {
+        const weekNumber = chapter.week;
+
+        const weekExists = weeks.find((w) => w.week === `Week ${weekNumber}`);
+
+        const session = {
+          title: `Session ${chapter.session}: ${chapter.name}`,
+          topics: chapter.topics.map((topic) => topic.topicName),
+        };
+
+        if (weekExists) {
+          weekExists.sessions.push(session);
+        } else {
+          weeks.push({
+            week: `Week ${weekNumber}`,
+            sessions: [session],
+          });
+        }
+
+        return weeks;
+      },
+      [] as { week: string; sessions: { title: string; topics: string[] }[] }[],
+    );
+    return {
+      ...course,
+      courseLevel: COURSE_LEVELS[course.courseLevel],
+      category: category._id.toString(),
+      categoryName: category.categoryName,
+      batch: batch ? batch : undefined,
+      language,
+      chapters: chaptersWithTopics,
+      weeks: formattedWeeks,
+    };
+  }
 }

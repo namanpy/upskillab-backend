@@ -490,6 +490,13 @@ export class GetCourseByCodeRequestDto {
   courseCode: string;
 }
 
+export class GetCourseByIdRequestDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  id: string;
+}
+
 export class SessionDto {
   @ApiProperty()
   title: string;

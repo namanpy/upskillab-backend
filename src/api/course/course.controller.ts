@@ -133,6 +133,7 @@ import {
   GetCourseDisplayResponseDto,
   UpdateCourseRequestDto,
   UpdateCourseRequestParamDto,
+  GetCourseByIdRequestDto,
   UpdateCourseResponseDto,
 } from 'src/dto/course/course.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -240,5 +241,22 @@ export class CourseController {
     @Param() params: GetCourseByCodeRequestDto,
   ): Promise<GetCourseByCodeResponseDto> {
     return await this.courseLogicService.getCourseByCode(params.courseCode);
+  }
+
+  @Get(':id')
+  @ApiResponse({
+    status: 200,
+    description: 'Get course by code',
+    type: GetCourseByCodeResponseDto,
+  })
+  @ApiResponse({
+    status: ERROR.COURSE_NOT_FOUND.code,
+    description: ERROR.COURSE_NOT_FOUND.message,
+    example: ERROR.COURSE_NOT_FOUND,
+  })
+  async getCourseById(
+    @Param() params: GetCourseByIdRequestDto,
+  ): Promise<GetCourseByCodeResponseDto> {
+    return await this.courseLogicService.getCourseById(params.id);
   }
 }
