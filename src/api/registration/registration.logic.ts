@@ -220,7 +220,7 @@ export class RegistrationLogicService {
     const paymentLink = await this.cashfreeService.createPayment({
       orderId: order._id,
       userId: user._id,
-      amount: order.totalAmount,
+      amount: order.amountPaid,
       customerDetails: {
         customerId: user._id.toString(),
         customerEmail: user.email,
@@ -276,7 +276,7 @@ export class RegistrationLogicService {
 
     return {
       orderId: order._id,
-      totalAmount: order.totalAmount,
+      amountPaying: order.totalAmount,
       paymentSessionId: paymentLink.paymentSessionId!,
     };
   }

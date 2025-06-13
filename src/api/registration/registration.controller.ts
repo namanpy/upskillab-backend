@@ -50,6 +50,7 @@ export class RegistrationController {
   async registerWithNoBatch(
     @Body() registrationData: NoBatchRegistrationRequestDto,
   ): Promise<NoBatchRegistrationResponseDto> {
+    console.log(registrationData)
     return await this.registrationLogicService.registerNoBatch(
       registrationData,
     );
