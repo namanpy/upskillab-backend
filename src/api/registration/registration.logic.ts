@@ -12,6 +12,7 @@ import { ORDER_STATUS } from 'src/common/constants/order.constants';
 import {
   BatchRegistrationRequestDto,
   NoBatchRegistrationRequestDto,
+  NoBatchsRegistrationRequestDto,
 } from 'src/dto/registration.dto';
 import { SendGridService } from 'src/common/services/sendgrid.service';
 import { USER_TYPES } from 'src/common/constants/user.constants';
@@ -31,7 +32,7 @@ export class RegistrationLogicService {
     private studentDataService: StudentDataService,
     private notificationLogicService: NotificationLogicService,
     private CouponLogicService: CouponLogicService, // <-- Add this
-  ) {}
+  ) { }
 
   async registerForBatch(registrationData: BatchRegistrationRequestDto) {
     // Check if batch exists and is active
@@ -236,8 +237,46 @@ export class RegistrationLogicService {
 
     return {
       orderId: order._id,
-      totalAmount: order.totalAmount, 
-      amountPaying: registrationData.amount, 
+      totalAmount: order.totalAmount,
+      amountPaying: registrationData.amount,
+      paymentSessionId: paymentLink.paymentSessionId!,
+    };
+  }
+  async registerNoBatchs(registrationData: NoBatchsRegistrationRequestDto) {
+    // Calculate base price
+    let totalAmount = registrationData.amount;
+
+    // Create order
+    const order = await this.orderDataService.createOrder({
+      amountPaid: 0,
+      totalAmount,
+      email: registrationData.email,
+      name: registrationData.name,
+      mobileNumber: registrationData.phone,
+      status: ORDER_STATUS.PENDING.code,
+    });
+
+    // Create Cashfree payment link
+    const paymentLink = await this.cashfreeService.createPayment({
+      orderId: order._id,
+      amount: order.totalAmount,
+      customerDetails: {
+        customerId: 'upskillab',
+        customerEmail: registrationData.email,
+        customerPhone: registrationData.phone,
+        customerName: registrationData.name,
+      },
+    });
+
+    await this.notificationLogicService.createNotification({
+      message: `New order Created By ${registrationData.name} email:${registrationData.email}`,
+      role: 'admin',
+      type: 'Order',
+    });
+
+    return {
+      orderId: order._id,
+      totalAmount: order.totalAmount,
       paymentSessionId: paymentLink.paymentSessionId!,
     };
   }

@@ -7,6 +7,8 @@ import {
   BatchRegistrationResponseDto,
   NoBatchRegistrationRequestDto,
   NoBatchRegistrationResponseDto,
+  NoBatchsRegistrationRequestDto,
+  NoBatchsRegistrationResponseDto,
 } from 'src/dto/registration.dto';
 import { RegistrationLogicService } from './registration.logic';
 
@@ -40,7 +42,7 @@ export class RegistrationController {
     );
   }
 
-  @Post('no-batch')
+  @Post('with-batch')
   @ApiResponse({
     status: 200,
     type: NoBatchRegistrationResponseDto,
@@ -49,6 +51,19 @@ export class RegistrationController {
     @Body() registrationData: NoBatchRegistrationRequestDto,
   ): Promise<NoBatchRegistrationResponseDto> {
     return await this.registrationLogicService.registerNoBatch(
+      registrationData,
+    );
+  }
+
+  @Post('no-batch')
+  @ApiResponse({
+    status: 200,
+    type: NoBatchsRegistrationResponseDto,
+  })
+  async registerWithNoBatchs(
+    @Body() registrationData: NoBatchsRegistrationRequestDto,
+  ): Promise<NoBatchsRegistrationResponseDto> {
+    return await this.registrationLogicService.registerNoBatchs(
       registrationData,
     );
   }

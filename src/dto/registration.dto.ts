@@ -92,3 +92,45 @@ export class NoBatchRegistrationResponseDto {
   @ApiProperty({ type: Number, description: 'Amount user is paying' })
   amountPaying: number;
 }
+
+export class NoBatchsRegistrationRequestDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  name: string;
+
+  @IsEmail()
+  @IsNotEmpty()
+  @ApiProperty()
+  email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  @Matches(/^\d+$/, { message: 'Phone number must contain only digits' })
+  @Length(10, 10)
+  phone: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  courseName: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  @ApiProperty()
+  amount: number;
+}
+
+export class NoBatchsRegistrationResponseDto {
+  @ApiProperty({ type: String })
+  orderId: Types.ObjectId;
+
+  @ApiProperty({
+    type: String,
+  })
+  paymentSessionId: string;
+}
