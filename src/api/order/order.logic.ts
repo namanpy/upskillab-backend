@@ -92,4 +92,29 @@ export class OrderLogicService {
       total,
     };
   }
+
+  async getManualOrdersOnly(params: {
+    skip?: number;
+    limit?: number;
+    search?: string;
+    sortByDate?: 'asc' | 'desc';
+  }) {
+    const { orders, total } = await this.orderDataService.getManualOrdersOnly(params);
+    
+    return {
+      orders: orders.map((order: any) => ({ // ✅ Added 'any' type
+        _id: order._id.toString(),
+        name: order.name, // ✅ Now this will work
+        email: order.email || '', 
+        mobileNumber: order.mobileNumber,
+        totalAmount: order.totalAmount,
+        amountPaid: order.amountPaid,
+        status: order.status,
+        serialNumber: order.serialNumber || '', // ✅ Handle undefined
+        createdAt: order.createdAt,
+        updatedAt: order.updatedAt,
+      })),
+      total,
+    };
+  }
 }

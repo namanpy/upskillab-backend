@@ -16,6 +16,8 @@ import {
   UpdateOrderRequestDto,
   UpdateOrderResponseDto,
   GetOrderResponseDto,
+  GetManualOrdersQueryDto,
+  GetManualOrdersResponseDto
 } from '../../dto/order.dto';
 import { ERROR } from 'src/common/constants/error.constants';
 import { Query } from '@nestjs/common';
@@ -27,7 +29,7 @@ import { USER_TYPES } from 'src/common/constants/user.constants';
 @ApiTags('orders')
 @Controller('orders')
 export class OrderController {
-  constructor(private orderLogicService: OrderLogicService) {}
+  constructor(private orderLogicService: OrderLogicService) { }
 
   @Post()
   @ApiResponse({
@@ -106,6 +108,25 @@ export class OrderController {
       limit: Number(query.limit),
       search: query.search,
       sortByDate: query.sortByDate,
+    });
+  }
+
+  @Get('admin/manual-orders')
+  @ApiResponse({
+    status: 200,
+    type: GetManualOrdersResponseDto,
+    description: 'Get all manual orders for admin panel'
+  })
+  @UseGuards(AuthGuard('jwt'), UserGuard)
+  @AllowUserType(USER_TYPES.ADMIN)
+  async getManualOrdersForAdmin(
+    @Query() query: GetManualOrdersQueryDto,
+  ): Promise<GetManualOrdersResponseDto> {
+    return await this.orderLogicService.getManualOrdersOnly({
+      skip: Number(query.skip) || 0,
+      limit: Number(query.limit) || 10,
+      search: query.search,
+      sortByDate: query.sortByDate || 'desc',
     });
   }
 }
