@@ -59,7 +59,7 @@ export interface GetAllOrdersResult {
 
 @Injectable()
 export class OrderDataService {
-  constructor(@InjectModel(Order.name) private orderModel: Model<Order>) {}
+  constructor(@InjectModel(Order.name) private orderModel: Model<Order>) { }
 
   async createOrder(createOrderDto: Omit<Order, keyof MongooseDocument>) {
     const newOrder = new this.orderModel(createOrderDto);
@@ -256,4 +256,79 @@ export class OrderDataService {
       total: total[0]?.total || 0,
     };
   }
+
+  // Add this method to your OrderDataService class:
+
+async getManualOrdersOnly(params: GetAllOrdersParams): Promise<GetAllOrdersResult> {
+  const { skip = 0, limit = 10, search, sortByDate = 'desc' } = params;
+
+  // Use any[] type to avoid TypeScript inference issues with aggregation pipeline
+  const pipeline: any[] = [
+    // Match only manual orders (orders without user field)
+    {
+      $match: {
+        user: { $exists: false }, // Only get orders that don't have user field
+        name: { $exists: true }    // Ensure they have name field
+      }
+    },
+
+    // Project only the fields we need
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        email: 1,
+        mobileNumber: 1,
+        totalAmount: 1,
+        amountPaid: 1,
+        status: 1,
+        serialNumber: 1,
+        createdAt: 1,
+        updatedAt: 1,
+      }
+    }
+  ];
+
+  // Add search functionality for manual orders
+  if (search) {
+    pipeline.push({
+      $match: {
+        $or: [
+          { name: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } },
+          { mobileNumber: { $regex: search, $options: 'i' } },
+          { serialNumber: { $regex: search, $options: 'i' } },
+        ],
+      },
+    });
+  }
+
+  // Get total count
+  const countPipeline = [...pipeline, { $count: 'total' }];
+  const totalResult = await this.orderModel.aggregate(countPipeline);
+
+  // Add sorting, skip, and limit
+  pipeline.push(
+    {
+      $sort: {
+        createdAt: sortByDate === 'asc' ? 1 : -1,
+      },
+    },
+    {
+      $skip: skip,
+    },
+    {
+      $limit: limit,
+    }
+  );
+
+  const orders = await this.orderModel.aggregate(pipeline);
+
+  return {
+    orders,
+    total: totalResult[0]?.total || 0,
+  };
 }
+}
+
+

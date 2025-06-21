@@ -12,6 +12,7 @@ import { ORDER_STATUS } from 'src/common/constants/order.constants';
 import { STUDENT_TYPE } from 'src/common/constants/student.constants';
 import { Batch } from 'src/schemas/course/batch.schema';
 import { User } from 'src/schemas/user.schema';
+import { Type } from 'class-transformer';
 
 export class CreateOrderRequestDto {
   @IsMongoId()
@@ -232,5 +233,88 @@ export class GetOrdersResponseDto {
   }[];
 
   @ApiProperty({ description: 'Total number of orders' })
+  total: number;
+}
+
+
+// Add these DTOs to your order.dto.ts file:
+
+export class ManualOrderDto {
+  @ApiProperty({ description: 'Order ID' })
+  _id: string;
+
+  @ApiProperty({ description: 'Customer name' })
+  name: string;
+
+  @ApiProperty({ description: 'Customer email' })
+  email: string;
+
+  @ApiProperty({ description: 'Customer mobile number' })
+  mobileNumber: string;
+
+  @ApiProperty({ description: 'Total amount' })
+  totalAmount: number;
+
+  @ApiProperty({ description: 'Amount paid' })
+  amountPaid: number;
+
+  @ApiProperty({ description: 'Order status' })
+  status: string;
+
+  @ApiProperty({ description: 'Serial number' })
+  serialNumber: string;
+
+  @ApiProperty({ description: 'Created date' })
+  createdAt: Date;
+
+  @ApiProperty({ description: 'Updated date' })
+  updatedAt: Date;
+}
+
+export class GetManualOrdersQueryDto {
+  @ApiPropertyOptional({
+    description: 'Number of records to skip',
+    example: 0,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  skip?: number = 0;
+
+  @ApiPropertyOptional({
+    description: 'Number of records to return',
+    example: 10,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  limit?: number = 10;
+
+  @ApiPropertyOptional({
+    description: 'Search in name, email, mobile number, serial number',
+    example: 'Brij Kumar',
+  })
+  @IsString()
+  @IsOptional()
+  search?: string;
+
+  @ApiPropertyOptional({
+    description: 'Sort by date (asc/desc)',
+    example: 'desc',
+    enum: ['asc', 'desc'],
+  })
+  @IsString()
+  @IsOptional()
+  sortByDate?: 'asc' | 'desc' = 'desc';
+}
+
+export class GetManualOrdersResponseDto {
+  @ApiProperty({ 
+    type: [ManualOrderDto],
+    description: 'List of manual orders'
+  })
+  orders: ManualOrderDto[];
+
+  @ApiProperty({ description: 'Total number of manual orders' })
   total: number;
 }
