@@ -41,6 +41,10 @@ export class BatchRegistrationRequestDto {
   @IsString()
   @IsOptional()
   couponCode?: string;
+
+  @IsString()
+  @IsOptional()
+  referralCode?: string;
 }
 
 export class BatchRegistrationResponseDto {
