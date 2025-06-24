@@ -20,7 +20,8 @@ import { StudentDataService } from '../student/student.data';
 import { STUDENT_TYPE } from 'src/common/constants/student.constants';
 import { NotificationLogicService } from '../notification/notification.logic';
 import { CouponLogicService } from '../coupon/coupon.logic';
-
+import { ReferralLogicService } from '../referral/referral.logic';
+import { ReferralDataService } from '../referral/referral.data';
 @Injectable()
 export class RegistrationLogicService {
   constructor(
@@ -31,6 +32,8 @@ export class RegistrationLogicService {
     private sendGridService: SendGridService,
     private studentDataService: StudentDataService,
     private notificationLogicService: NotificationLogicService,
+    private referralLogicService: ReferralLogicService,
+    private referralDataService: ReferralDataService,
     private CouponLogicService: CouponLogicService, // <-- Add this
   ) { }
 
@@ -47,6 +50,8 @@ export class RegistrationLogicService {
     if (batch.remainingSeats <= 0) {
       throw new CustomError(ERROR.BATCH_FULL);
     }
+
+
 
     // Create or get user
     let user = await this.userDataService.getUserByEmail({
@@ -109,6 +114,25 @@ export class RegistrationLogicService {
       appliedCouponId = coupon._id;
     }
 
+
+if (registrationData.referralCode) {
+  const referralResult = await this.referralLogicService.validateReferralCode(
+    registrationData.referralCode,
+    courseId);
+
+  // Apply discount logic here, subtract from totalAmount
+  const referralDiscount = (totalAmount * referralResult.discountValue) / 100;
+  totalAmount -= referralDiscount;
+    console.log(referralDiscount,totalAmount)
+  // Save referred user for tracking
+  await this.referralDataService.addReferredUser(
+    registrationData.referralCode,
+    userId,
+    courseId,
+    'pending',
+  );
+}
+
     // Create order
     const order = await this.orderDataService.createOrder({
       user: user._id,
@@ -126,7 +150,7 @@ export class RegistrationLogicService {
     const paymentLink = await this.cashfreeService.createPayment({
       orderId: order._id,
       userId: user._id,
-      amount: order.totalAmount,
+      amount: Number(totalAmount.toFixed(2)),
       customerDetails: {
         customerId: user._id.toString(),
         customerEmail: user.email,
@@ -143,7 +167,7 @@ export class RegistrationLogicService {
 
     return {
       orderId: order._id,
-      totalAmount: order.totalAmount,
+      totalAmount: Number(order.totalAmount.toFixed(2)),
       paymentSessionId: paymentLink.paymentSessionId!,
     };
   }

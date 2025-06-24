@@ -9,7 +9,7 @@ import { PaymentModule } from '../payment/payment.module';
 import { StudentModule } from '../student/student.module';
 import { CouponModule } from '../coupon/coupon.module';
 import { NotificationModule } from '../notification/notification.module';
-
+import { ReferralModule } from '../referral/referral.module';
 @Module({
   imports: [
     UsersModule,
@@ -19,6 +19,7 @@ import { NotificationModule } from '../notification/notification.module';
     StudentModule,
     CouponModule,
     NotificationModule,
+ReferralModule,
   ],
   controllers: [RegistrationController],
   providers: [RegistrationLogicService],
