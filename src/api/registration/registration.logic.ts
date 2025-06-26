@@ -13,6 +13,7 @@ import {
   BatchRegistrationRequestDto,
   NoBatchRegistrationRequestDto,
   NoBatchsRegistrationRequestDto,
+  registerExternelPaymentDto,
 } from 'src/dto/registration.dto';
 import { SendGridService } from 'src/common/services/sendgrid.service';
 import { USER_TYPES } from 'src/common/constants/user.constants';
@@ -269,13 +270,32 @@ if (registrationData.referralCode) {
   async registerNoBatchs(registrationData: NoBatchsRegistrationRequestDto) {
     // Calculate base price
     let totalAmount = registrationData.amount;
+    let user = await this.userDataService.getUserByEmail({
+      email: registrationData.email,
+    });
 
+    if (!user) {
+      user = await this.userDataService.createUser({
+        email: registrationData.email,
+        mobileNumber: registrationData.phone,
+        username: `user_${Math.random().toString(36).substring(2, 10)}`,
+        userType: USER_TYPES.STUDENT,
+      });
+
+      await this.studentDataService.createStudent({
+        user: user._id,
+        fullName: registrationData.name,
+        studentType: STUDENT_TYPE.REGULAR.code,
+      });
+    }
     // Create order
     const order = await this.orderDataService.createOrder({
       amountPaid: 0,
       totalAmount,
+      user: user._id,
       email: registrationData.email,
       name: registrationData.name,
+      courseName: registrationData.courseName,
       mobileNumber: registrationData.phone,
       status: ORDER_STATUS.PENDING.code,
     });
@@ -304,4 +324,129 @@ if (registrationData.referralCode) {
       paymentSessionId: paymentLink.paymentSessionId!,
     };
   }
+
+
+  async registerExternelPayment(registrationData: registerExternelPaymentDto) {
+    // Calculate base price
+    if(registrationData?.batchId){ 
+    const batch = await this.batchDataService.getBatchById(
+      registrationData.batchId,
+    );
+    if (!batch || new Date(batch.startDate) < new Date() || !batch.active) {
+      throw new CustomError(ERROR.BATCH_NOT_ACTIVE);
+    }
+
+    // Check if seats are available
+    if (batch.remainingSeats <= 0) {
+      throw new CustomError(ERROR.BATCH_FULL);
+    }
+
+
+     
+
+    // Create or get user
+    let user = await this.userDataService.getUserByEmail({
+      email: registrationData.email,
+    });
+
+    if (!user) {
+      user = await this.userDataService.createUser({
+        email: registrationData.email,
+        mobileNumber: registrationData.phone,
+        username: `user_${Math.random().toString(36).substring(2, 10)}`,
+        userType: USER_TYPES.STUDENT,
+      });
+
+      await this.studentDataService.createStudent({
+        user: user._id,
+        fullName: registrationData.name,
+        studentType: STUDENT_TYPE.REGULAR.code,
+      });
+
+      // Send welcome email
+      //   await this.sendGridService.sendWelcomeEmail({
+      //     to: user.email,
+      //     name: registrationData.name,
+      //   });
+    }
+
+    const courseId = batch.course._id;
+    const userId = user._id;
+
+    // Check if user has already registered for the cours
+    const existingOrder = await this.orderDataService.checkExistingOrder(
+      userId,
+      courseId,
+    );
+let totalAmount = registrationData.amount;
+  
+    if (existingOrder && existingOrder.status === ORDER_STATUS.COMPLETED.code) {
+      console.log(existingOrder)
+  //     totalAmount: 19999,
+  // amountPaid: 19999,
+  // status: 'COMPLETED',
+      if(existingOrder.totalAmount===existingOrder.amountPaid){
+        throw new CustomError(ERROR.ALREADY_REGISTERED_FOR_COURSE);
+      }else{
+        totalAmount=existingOrder.amountPaid+totalAmount
+        await this.orderDataService.updateOrder(existingOrder._id,{amountPaid:totalAmount})
+      }
+    }
+    totalAmount = batch.course.discountedPrice || batch.course.originalPrice;
+  
+const order = await this.orderDataService.createOrder({
+      user: user._id,
+      batch: batch._id,
+      amountPaid: registrationData.amount, // Amount user has paid
+      totalAmount, // Batch amount + user paid amount
+      email: registrationData.email,
+      mode:registrationData.mode,
+      name: registrationData.name,
+      mobileNumber: registrationData.phone,
+      status:"COMPLETED",
+    });
+
+    }
+else{
+
+
+    let totalAmount = registrationData.amount;
+    let user = await this.userDataService.getUserByEmail({
+      email: registrationData.email,
+    });
+
+    if (!user) {
+      user = await this.userDataService.createUser({
+        email: registrationData.email,
+        mobileNumber: registrationData.phone,
+        username: `user_${Math.random().toString(36).substring(2, 10)}`,
+        userType: USER_TYPES.STUDENT,
+      });
+
+      await this.studentDataService.createStudent({
+        user: user._id,
+        fullName: registrationData.name,
+        studentType: STUDENT_TYPE.REGULAR.code,
+      });
+    }
+    const order = await this.orderDataService.createOrder({
+      amountPaid: totalAmount,
+      user:user._id,
+      totalAmount,
+      email: registrationData.email,
+      name: registrationData.name,
+      courseName: registrationData.courseName,
+      mode: registrationData.mode,
+      mobileNumber: registrationData.phone,
+      status: "COMPLETED",
+    });
+
+    }
+
+    // Create Cashfree payment link
+
+    return {"message":"Register Succesfull"};
+  }
+
+
 }

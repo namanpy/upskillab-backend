@@ -53,6 +53,14 @@ export class CreateOrderRequestDto {
   @IsOptional()
   serialNumber?: string;
 
+    @IsString()
+  @IsOptional()
+  courseName?: string;
+
+  @IsString()
+  @IsOptional()
+  mode?: string;
+
   @IsMongoId()
   @IsNotEmpty()
   @ApiProperty({
@@ -90,6 +98,12 @@ export class UpdateOrderRequestDto {
     description: 'Amount paid by the user',
   })
   amountPaid?: number;
+
+  @IsMongoId()
+  @ApiPropertyOptional({
+    description: 'Batch ID',
+  })
+  batch?: string;
 }
 
 export class UpdateOrderResponseDto {
