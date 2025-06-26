@@ -24,6 +24,13 @@ export class Order extends MongooseDocument {
   @Prop({ type: String, required: false })
   courseName?: string;
 
+    @ApiProperty({
+    type: String,
+  })
+  @Prop({ type: String, required: false })
+  mode?: string;
+
+
   @ApiProperty({
     type: String,
   })

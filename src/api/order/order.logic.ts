@@ -32,7 +32,11 @@ export class OrderLogicService {
   }
 
   async updateOrder(id: string, updateOrderDto: UpdateOrderRequestDto) {
-    await this.orderDataService.updateOrder(id, updateOrderDto);
+    const updatedOrder = {
+  ...updateOrderDto,
+  batch: updateOrderDto.batch ? new Types.ObjectId(updateOrderDto.batch) : undefined,
+};
+    await this.orderDataService.updateOrder(id, updatedOrder);
     return { isSuccess: true };
   }
 

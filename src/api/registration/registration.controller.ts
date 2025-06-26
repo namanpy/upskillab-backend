@@ -9,8 +9,10 @@ import {
   NoBatchRegistrationResponseDto,
   NoBatchsRegistrationRequestDto,
   NoBatchsRegistrationResponseDto,
+  registerExternelPaymentDto,
 } from 'src/dto/registration.dto';
 import { RegistrationLogicService } from './registration.logic';
+import { bool } from 'aws-sdk/clients/redshiftdata';
 
 @ApiTags('registration')
 @Controller('registration')
@@ -65,6 +67,18 @@ export class RegistrationController {
     @Body() registrationData: NoBatchsRegistrationRequestDto,
   ): Promise<NoBatchsRegistrationResponseDto> {
     return await this.registrationLogicService.registerNoBatchs(
+      registrationData,
+    );
+  }
+
+  @Post('externel_payment')
+  @ApiResponse({
+    status: 200,
+  })
+  async registerExternelPayment(
+    @Body() registrationData: registerExternelPaymentDto,
+  ): Promise<any> {
+    return await this.registrationLogicService.registerExternelPayment(
       registrationData,
     );
   }

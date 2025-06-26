@@ -129,6 +129,51 @@ export class NoBatchsRegistrationRequestDto {
   amount: number;
 }
 
+
+export class registerExternelPaymentDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  name: string;
+
+  @IsMongoId()
+  @IsNotEmpty()
+  @ApiProperty()
+  @IsOptional()
+  batchId?: string;
+
+  @IsEmail()
+  @IsNotEmpty()
+  @ApiProperty()
+  email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  @Matches(/^\d+$/, { message: 'Phone number must contain only digits' })
+  @Length(10, 10)
+  phone: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  @IsOptional()
+  courseName?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  mode: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  @ApiProperty()
+  amount: number;
+}
+
 export class NoBatchsRegistrationResponseDto {
   @ApiProperty({ type: String })
   orderId: Types.ObjectId;
