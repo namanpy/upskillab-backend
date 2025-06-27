@@ -39,4 +39,19 @@ async updateSettings(discountPercentage: number,isActive: boolean): Promise<Refe
   async getAllSettings(): Promise<ReferralSettings[]> {
     return await this.referralSettingsModel.find().sort({ createdAt: -1 });
   }
+
+  async upsertSettings(discountPercentage: number, isActive:boolean): Promise<ReferralSettings> {
+  const active = await this.referralSettingsModel.findOne({ isActive: true });
+
+  if (active) {
+    active.discountPercentage = discountPercentage;
+    active.isActive=isActive
+    return await active.save();
+  }
+
+  return await this.referralSettingsModel.create({
+    discountPercentage,
+    isActive: true,
+  });
+}
 }

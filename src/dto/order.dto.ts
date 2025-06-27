@@ -85,21 +85,21 @@ export class CreateOrderResponseDto {
 
 export class UpdateOrderRequestDto {
   @IsString()
-  @IsNotEmpty()
-  @IsEnum(ORDER_STATUS)
+  @IsOptional()
   @ApiPropertyOptional({
     description: 'Order status',
-    enum: Object.keys(ORDER_STATUS),
   })
   status?: string;
 
   @IsNumber()
+  @IsOptional()
   @ApiPropertyOptional({
     description: 'Amount paid by the user',
   })
   amountPaid?: number;
 
   @IsMongoId()
+  @IsOptional()
   @ApiPropertyOptional({
     description: 'Batch ID',
   })
@@ -257,8 +257,18 @@ export class ManualOrderDto {
   @ApiProperty({ description: 'Order ID' })
   _id: string;
 
+    @ApiPropertyOptional({
+    type: User,
+  })
+  user?: User;
+
   @ApiProperty({ description: 'Customer name' })
   name: string;
+
+   @ApiPropertyOptional({
+    type: Batch,
+  })
+  batch?: Batch;
 
   @ApiProperty({ description: 'Customer email' })
   email: string;
@@ -268,6 +278,9 @@ export class ManualOrderDto {
 
   @ApiProperty({ description: 'Total amount' })
   totalAmount: number;
+
+  @ApiProperty({ description: 'Source', default:"manual" })
+  source: string;
 
   @ApiProperty({ description: 'Amount paid' })
   amountPaid: number;

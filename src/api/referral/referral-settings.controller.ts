@@ -1,6 +1,6 @@
-import { Body, Controller, Post, Get, UseGuards } from '@nestjs/common';
+import { Body, Patch, Controller, Post, Get, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { SetReferralDiscountDto } from 'src/dto/referral-settings.dto';
+import { SetReferralDiscountDto,UpdateReferralSettingsDto } from 'src/dto/referral-settings.dto';
 import { ReferralSettingsService } from './referral.settings';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/common/guard/roles.guard';
@@ -23,6 +23,11 @@ export class ReferralSettingsController {
   @Roles('ADMIN')
   async getAllSettings() {
     return this.referralSettingsService.getAllSettings();
+  }
+ @Patch('update')
+  @Roles('ADMIN')
+  async update(@Body() dto: UpdateReferralSettingsDto) {
+    return this.referralSettingsService.upsertSettings(dto.discountPercentage,dto.isActive);
   }
 
   @Get('active')

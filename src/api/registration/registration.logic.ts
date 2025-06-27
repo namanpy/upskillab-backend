@@ -239,6 +239,7 @@ if (registrationData.referralCode) {
       name: registrationData.name,
       mobileNumber: registrationData.phone,
       status: ORDER_STATUS.PENDING.code,
+      source:"manual"
     });
 
     // Create Cashfree payment link
@@ -298,6 +299,7 @@ if (registrationData.referralCode) {
       courseName: registrationData.courseName,
       mobileNumber: registrationData.phone,
       status: ORDER_STATUS.PENDING.code,
+      source:"manual"
     });
 
     // Create Cashfree payment link
@@ -332,14 +334,14 @@ if (registrationData.referralCode) {
     const batch = await this.batchDataService.getBatchById(
       registrationData.batchId,
     );
-    if (!batch || new Date(batch.startDate) < new Date() || !batch.active) {
-      throw new CustomError(ERROR.BATCH_NOT_ACTIVE);
+    if (!batch) {
+      throw new CustomError(ERROR.BATCH_NOT_FOUND);
     }
 
-    // Check if seats are available
-    if (batch.remainingSeats <= 0) {
-      throw new CustomError(ERROR.BATCH_FULL);
-    }
+    // // Check if seats are available
+    // if (batch.remainingSeats <= 0) {
+    //   throw new CustomError(ERROR.BATCH_FULL);
+    // }
 
 
      
@@ -404,6 +406,7 @@ const order = await this.orderDataService.createOrder({
       name: registrationData.name,
       mobileNumber: registrationData.phone,
       status:"COMPLETED",
+      source:"manual"
     });
 
     }
@@ -439,6 +442,7 @@ else{
       mode: registrationData.mode,
       mobileNumber: registrationData.phone,
       status: "COMPLETED",
+      source:"manual"
     });
 
     }

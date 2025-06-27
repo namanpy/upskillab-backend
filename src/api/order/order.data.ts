@@ -43,6 +43,7 @@ export interface OrderResponse {
   status: string;
   createdAt: Date;
   updatedAt: Date;
+  mode?: string;
   user?: OrderUser;
   student?: OrderStudent;
   batch?: OrderBatch;
@@ -88,6 +89,7 @@ export class OrderDataService {
   }
 
   async updateOrder(id: string, updateOrderDto: Partial<Order>) {
+    console.log(updateOrderDto,id)
     const order = await this.orderModel
       .findByIdAndUpdate(id, updateOrderDto, { new: true })
       .populate('user')
@@ -228,6 +230,10 @@ export class OrderDataService {
           $or: [
             { 'user.username': { $regex: search, $options: 'i' } },
             { 'student.fullName': { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } },
+          { status: { $regex: search, $options: 'i' } },
+          { mobileNumber: { $regex: search, $options: 'i' } },
+          { serialNumber: { $regex: search, $options: 'i' } },
           ],
         },
       });
@@ -267,8 +273,8 @@ async getManualOrdersOnly(params: GetAllOrdersParams): Promise<GetAllOrdersResul
     // Match only manual orders (orders without user field)
     {
       $match: {
-        user: { $exists: false }, // Only get orders that don't have user field
-        name: { $exists: true }    // Ensure they have name field
+        name: { $exists: true }  ,  // Ensure they have name field
+        source: { $exists: true }    // Ensure they have source field
       }
     },
 
@@ -277,6 +283,7 @@ async getManualOrdersOnly(params: GetAllOrdersParams): Promise<GetAllOrdersResul
       $project: {
         _id: 1,
         name: 1,
+        mode:1,
         email: 1,
         mobileNumber: 1,
         totalAmount: 1,
@@ -296,6 +303,7 @@ async getManualOrdersOnly(params: GetAllOrdersParams): Promise<GetAllOrdersResul
         $or: [
           { name: { $regex: search, $options: 'i' } },
           { email: { $regex: search, $options: 'i' } },
+          { status: { $regex: search, $options: 'i' } },
           { mobileNumber: { $regex: search, $options: 'i' } },
           { serialNumber: { $regex: search, $options: 'i' } },
         ],

@@ -12,4 +12,6 @@ export class ReferralSettings {
   isActive: boolean;
 }
 
+
+
 export const ReferralSettingsSchema = SchemaFactory.createForClass(ReferralSettings);
