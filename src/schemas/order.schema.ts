@@ -30,6 +30,8 @@ export class Order extends MongooseDocument {
   @Prop({ type: String, required: false })
   mode?: string;
 
+  @Prop({ type: String, required: false })
+  source?: string;
 
   @ApiProperty({
     type: String,

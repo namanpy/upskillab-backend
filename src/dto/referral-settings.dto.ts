@@ -14,3 +14,15 @@ export class SetReferralDiscountDto {
   @IsOptional()
   isActive: boolean;
 }
+
+export class UpdateReferralSettingsDto {
+  @ApiProperty({ example: 10, description: 'Discount percentage to apply via referral' })
+  @IsNumber()
+  @Min(0)
+  discountPercentage: number;
+
+  @ApiProperty({ example: 10, description: 'Actived or deactivate' })
+  @IsBoolean()
+  @IsOptional()
+  isActive: boolean;
+}

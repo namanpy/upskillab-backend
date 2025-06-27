@@ -104,16 +104,30 @@ export class OrderLogicService {
     sortByDate?: 'asc' | 'desc';
   }) {
     const { orders, total } = await this.orderDataService.getManualOrdersOnly(params);
-    
+    console.log(orders,"1")
     return {
       orders: orders.map((order: any) => ({ // ✅ Added 'any' type
         _id: order._id.toString(),
+        user: order.user
+          ? {
+            ...order.user,
+            _id: order.user._id,
+          }
+          : undefined,
+          batch: order.batch
+          ? {
+            ...order.batch,
+            _id: order.batch._id.toString(),
+          }
+          : undefined,
         name: order.name, // ✅ Now this will work
         email: order.email || '', 
         mobileNumber: order.mobileNumber,
         totalAmount: order.totalAmount,
         amountPaid: order.amountPaid,
         status: order.status,
+        source:order.source,
+        mode:order.mode,
         serialNumber: order.serialNumber || '', // ✅ Handle undefined
         createdAt: order.createdAt,
         updatedAt: order.updatedAt,
