@@ -10,7 +10,6 @@ export class RecordingController {
   async getLatestRecording() {
     const teacherEmail = process.env.TEACHER_EMAIL;
     if(teacherEmail){
-
         return await this.recordingService.fetchLatestRecording(teacherEmail);
     }
     return null

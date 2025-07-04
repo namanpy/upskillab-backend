@@ -9,20 +9,22 @@ import * as path from 'path';
 export class RecordingService {
   async fetchLatestRecording(teacherEmail: string): Promise<{ filePath: string; fileName: string }> {
     const auth = getGoogleAuth(teacherEmail);
+    console.log(auth,"1")
     const drive = google.drive({ version: 'v3', auth });
-
+    console.log(drive,"2")
     const res = await drive.files.list({
       q: "mimeType='video/mp4' and name contains 'Meet Recording'",
       fields: 'files(id, name, createdTime)',
       orderBy: 'createdTime desc',
       pageSize: 1,
     });
+    console.log(res,"3")
 
     const file = res.data.files?.[0];
     if (!file || !file.id || !file.name) {
       throw new Error('No valid Meet recording file found');
     }
-
+console.log(file,"4")
     const destPath = path.join(__dirname, '../../temp', file.name);
     const dest = fs.createWriteStream(destPath);
 

@@ -160,10 +160,17 @@ export class ClassSessionLogicService {
       );
     }
 
-    const scheduledDate = new Date(createClassSessionDto.scheduledDate);
-    if (scheduledDate < new Date()) {
-      throw new BadRequestException('Scheduled date must be in the future');
-    }
+const { scheduledDate, scheduledStartTime } = createClassSessionDto;
+
+// Combine date and time into a single Date object
+const scheduledDateTime = new Date(`${scheduledDate}T${scheduledStartTime}:00Z`);
+
+// Optional: adjust timezone to your local (e.g., IST = UTC+5:30)
+const now = new Date();
+
+if (scheduledDateTime <= now) {
+  throw new BadRequestException('Scheduled date and time must be in the future');
+}
 
     const startTime = this.parseTime(createClassSessionDto.scheduledStartTime);
     const endTime = this.parseTime(createClassSessionDto.scheduledEndTime);
@@ -173,7 +180,7 @@ export class ClassSessionLogicService {
 
     const conflict = await this.classSessionDataService.checkTeacherConflict(
       createClassSessionDto.teacherId,
-      scheduledDate,
+      new Date(scheduledDate),
       createClassSessionDto.scheduledStartTime,
       createClassSessionDto.scheduledEndTime,
     );
