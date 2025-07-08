@@ -178,7 +178,7 @@ if (registrationData.referralCode) {
     const batch = await this.batchDataService.getBatchById(
       registrationData.batchId,
     );
-    if (!batch || new Date(batch.startDate) < new Date() || !batch.active) {
+    if (!batch || !batch.active) {
       throw new CustomError(ERROR.BATCH_NOT_ACTIVE);
     }
 
