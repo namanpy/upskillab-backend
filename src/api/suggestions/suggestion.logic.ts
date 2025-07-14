@@ -217,7 +217,7 @@ export class SuggestionLogicService {
       description: suggestion.description,
       type: suggestion.type,
       content: suggestion.content,
-      batchId: suggestion.batchId._id.toString(),
+      batchId: suggestion?.batchId?._id.toString() || null,
       teacherId: suggestion.teacherId._id.toString(),
       teacherName: teacher?.username || teacher?.name || 'Unknown',
       isApproved: suggestion.isApproved,
@@ -230,44 +230,37 @@ export class SuggestionLogicService {
     return Promise.all(suggestions.map((s) => this.mapToDto(s)));
   }
 
-  async createSuggestion(
-    user: any,
-    createSuggestionDto: CreateSuggestionDTO,
-    file?: Express.Multer.File,
-  ): Promise<SuggestionDTO> {
-    console.log('createSuggestion: User:', JSON.stringify(user, null, 2));
-    if (user.userType !== USER_TYPES.TEACHER) {
-      console.log(
-        'createSuggestion: Forbidden - User is not a teacher:',
-        user.userType,
-      );
-      throw new ForbiddenException('Only teachers can create suggestions');
-    }
+async createSuggestion(
+  user: any,
+  createSuggestionDto: CreateSuggestionDTO,
+  file?: Express.Multer.File,
+): Promise<SuggestionDTO> {
+  console.log('createSuggestion: User:', JSON.stringify(user, null, 2));
 
-    const batch = await this.batchDataService.getBatchById(
-      createSuggestionDto.batchId,
+  if (user.userType !== USER_TYPES.TEACHER) {
+    console.log('createSuggestion: Forbidden - User is not a teacher:', user.userType);
+    throw new ForbiddenException('Only teachers can create suggestions');
+  }
+
+  // Fetch teacher profile
+  const teacher = await this.teacherModel.findOne({ user: user._id }).exec();
+  if (!teacher) {
+    console.log('createSuggestion: Teacher not found for user ID:', user._id);
+    throw new NotFoundException(
+      'Teacher profile not found for this user. Please create a teacher profile.',
     );
+  }
+
+  let batch;
+  if (createSuggestionDto.batchId) {
+    // Validate batch if batchId is provided
+    batch = await this.batchDataService.getBatchById(createSuggestionDto.batchId);
     if (!batch) {
-      console.log(
-        'createSuggestion: Batch not found:',
-        createSuggestionDto.batchId,
-      );
-      throw new BadRequestException(
-        `Batch with ID ${createSuggestionDto.batchId} not found`,
-      );
+      console.log('createSuggestion: Batch not found:', createSuggestionDto.batchId);
+      throw new BadRequestException(`Batch with ID ${createSuggestionDto.batchId} not found`);
     }
 
-    const teacher = await this.teacherModel.findOne({ user: user._id }).exec();
-    if (!teacher) {
-      console.log('createSuggestion: Teacher not found for user ID:', user._id);
-      throw new NotFoundException(
-        'Teacher profile not found for this user. Please create a teacher profile.',
-      );
-    }
-
-    const batchTeacherId = batch.teacher?._id
-      ? batch.teacher._id.toString()
-      : batch.teacher?.toString();
+    const batchTeacherId = batch.teacher?._id?.toString() || batch.teacher?.toString();
     console.log(
       'createSuggestion: Batch ID:',
       createSuggestionDto.batchId,
@@ -278,10 +271,7 @@ export class SuggestionLogicService {
     );
 
     if (!batchTeacherId) {
-      console.log(
-        'createSuggestion: Batch has no assigned teacher:',
-        createSuggestionDto.batchId,
-      );
+      console.log('createSuggestion: Batch has no assigned teacher:', createSuggestionDto.batchId);
       throw new BadRequestException(
         `Batch ${createSuggestionDto.batchId} has no assigned teacher`,
       );
@@ -300,54 +290,55 @@ export class SuggestionLogicService {
         `You are not assigned to batch ${createSuggestionDto.batchId}. Assigned teacher ID: ${batchTeacherId}`,
       );
     }
-
-    let content = createSuggestionDto.content || '';
-    const suggestionData = {
-      ...createSuggestionDto,
-      teacherId: user._id,
-      content,
-    };
-
-    const suggestion =
-      await this.suggestionDataService.createSuggestion(suggestionData);
-    
-    await this.notificationLogicService.createNotification({
-      message: `New Suggestions Created on ${suggestion.title}`,
-      role: 'admin',
-      type: 'suggestion'
-    });
-    return this.mapToDto(suggestion);
   }
 
-  async getStudentSuggestions(user: any): Promise<GetSuggestionsResponseDTO> {
-    console.log('getStudentSuggestions: User:', JSON.stringify(user, null, 2));
-    if (user.userType !== USER_TYPES.STUDENT) {
-      console.log(
-        'getStudentSuggestions: Forbidden - User is not a student:',
-        user.userType,
-      );
-      throw new ForbiddenException('Only students can access suggestions');
-    }
+  let content = createSuggestionDto.content || '';
+  const suggestionData: any = {
+  ...createSuggestionDto,
+  teacherId: user._id,
+  content,
+};
 
-    const orders = await this.orderDataService.getOrdersByUser(user._id);
-    console.log(orders)
-    const batchIds = orders
-  .map((order) => order?.batch?._id?.toString())
-  .filter((id): id is string => typeof id === 'string');
+if (!createSuggestionDto.batchId) {
+  delete suggestionData.batchId;
+}
 
-    console.log(batchIds);
-    const suggestions = await this.suggestionDataService.getSuggestionsByBatch(
-      batchIds,
-      true,
-    );
+  const suggestion = await this.suggestionDataService.createSuggestion(suggestionData);
 
+  await this.notificationLogicService.createNotification({
+    message: `New Suggestions Created on ${suggestion.title}`,
+    role: 'admin',
+    type: 'suggestion',
+  });
 
+  return this.mapToDto(suggestion);
+}
 
 
-    return {
-      suggestions: await this.mapToDtoArray(suggestions),
-    };
+async getStudentSuggestions(user: any): Promise<GetSuggestionsResponseDTO> {
+  console.log('getStudentSuggestions: User:', JSON.stringify(user, null, 2));
+
+  if (user.userType !== USER_TYPES.STUDENT) {
+    console.log('getStudentSuggestions: Forbidden - User is not a student:', user.userType);
+    throw new ForbiddenException('Only students can access suggestions');
   }
+
+  const orders = await this.orderDataService.getOrdersByUser(user._id);
+  console.log('orders', orders);
+
+  const batchIds = orders
+    .map((order) => order?.batch?._id?.toString())
+    .filter((id): id is string => typeof id === 'string');
+
+  console.log('student batchIds', batchIds);
+
+  const suggestions = await this.suggestionDataService.getSuggestionsForStudent(batchIds);
+
+  return {
+    suggestions: await this.mapToDtoArray(suggestions),
+  };
+}
+
 
   async getTeacherSuggestions(user: any): Promise<GetSuggestionsResponseDTO> {
     console.log('getTeacherSuggestions: User:', JSON.stringify(user, null, 2));

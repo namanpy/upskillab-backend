@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional } from 'class-validator';
 
 export class CreateSuggestionDTO {
   @ApiProperty({ description: 'Title of the suggestion' })
@@ -15,6 +16,7 @@ export class CreateSuggestionDTO {
   @ApiProperty({ description: 'Content of the suggestion (URL for POST, ignored for PDF)' })
   content?: string;
 
+  @IsOptional()
   @ApiProperty({ description: 'Reference to the batch' })
   batchId: string;
 }
@@ -54,6 +56,7 @@ export class SuggestionDTO {
   @ApiProperty({ description: 'Content of the suggestion (URL or PDF S3 URL)' })
   content: string;
 
+  @IsOptional()
   @ApiProperty({ description: 'Reference to the batch' })
   batchId: string;
 

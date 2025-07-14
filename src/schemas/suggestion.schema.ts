@@ -26,7 +26,7 @@ export class Suggestion extends MongooseDocument {
   content: string;
 
   @ApiProperty({ description: 'Reference to the batch' })
-  @Prop({ ref: 'Batch', required: true })
+  @Prop({ ref: 'Batch', required: false })
   batchId: Types.ObjectId;
 
   @ApiProperty({ description: 'Reference to the teacher' })

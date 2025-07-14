@@ -18,20 +18,27 @@ export class SuggestionDataService {
   ) {}
 
   async createSuggestion(
-    createSuggestionDto: CreateSuggestionDTO & {
-      teacherId: string;
-      content: string;
-    },
-  ): Promise<SuggestionDocument> {
-    const suggestion = new this.suggestionModel({
-      ...createSuggestionDto,
-      teacherId: new Types.ObjectId(createSuggestionDto.teacherId),
-      batchId: new Types.ObjectId(createSuggestionDto.batchId),
-      isApproved: false,
-    });
-    const savedSuggestion = await suggestion.save();
-    return savedSuggestion.populate(['batchId', 'teacherId']);
+  createSuggestionDto: CreateSuggestionDTO & {
+    teacherId: string;
+    content: string;
+  },
+): Promise<SuggestionDocument> {
+  const suggestionData: any = {
+    ...createSuggestionDto,
+    teacherId: new Types.ObjectId(createSuggestionDto.teacherId),
+    isApproved: false,
+  };
+
+  if (createSuggestionDto.batchId) {
+    suggestionData.batchId = new Types.ObjectId(createSuggestionDto.batchId);
   }
+
+  const suggestion = new this.suggestionModel(suggestionData);
+  const savedSuggestion = await suggestion.save();
+
+  return savedSuggestion.populate(['batchId', 'teacherId']);
+}
+
 
   async getSuggestionsByBatch(
     batchIds: string[] = [],
@@ -47,6 +54,33 @@ export class SuggestionDataService {
       .lean()
       .exec();
   }
+
+  async getSuggestionsForStudent(batchIds: string[]): Promise<SuggestionDocument[]> {
+  const conditions: any[] = [];
+
+  if (batchIds.length > 0) {
+    conditions.push({
+      batchId: { $in: batchIds.map((id) => new Types.ObjectId(id)) },
+    });
+  }
+
+  // Include suggestions with no batchId assigned (public)
+  conditions.push({
+    batchId: { $exists: false },
+  }, {
+    batchId: null,
+  });
+
+  return this.suggestionModel
+    .find({
+      isApproved: true,
+      $or: conditions,
+    })
+    .populate(['batchId', 'teacherId'])
+    .lean()
+    .exec();
+}
+
 
   async getSuggestionsByTeacher(
     teacherId: string,
