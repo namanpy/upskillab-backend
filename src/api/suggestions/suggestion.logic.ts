@@ -211,6 +211,7 @@ export class SuggestionLogicService {
   private async mapToDto(suggestion: any): Promise<SuggestionDTO> {
     const batch = suggestion.batchId;
     const teacher = suggestion.teacherId;
+  const teacherdetals = await this.teacherModel.findOne({ user: teacher }).exec();
     return {
       _id: suggestion._id.toString(),
       title: suggestion.title,
@@ -219,7 +220,7 @@ export class SuggestionLogicService {
       content: suggestion.content,
       batchId: suggestion?.batchId?._id.toString() || null,
       teacherId: suggestion.teacherId._id.toString(),
-      teacherName: teacher?.username || teacher?.name || 'Unknown',
+      teacherName: teacherdetals?.name || 'Unknown',
       isApproved: suggestion.isApproved,
       createdAt: suggestion.createdAt.toISOString(),
       updatedAt: suggestion.updatedAt.toISOString(),
@@ -236,7 +237,6 @@ async createSuggestion(
   file?: Express.Multer.File,
 ): Promise<SuggestionDTO> {
   console.log('createSuggestion: User:', JSON.stringify(user, null, 2));
-
   if (user.userType !== USER_TYPES.TEACHER) {
     console.log('createSuggestion: Forbidden - User is not a teacher:', user.userType);
     throw new ForbiddenException('Only teachers can create suggestions');
@@ -333,7 +333,7 @@ async getStudentSuggestions(user: any): Promise<GetSuggestionsResponseDTO> {
   console.log('student batchIds', batchIds);
 
   const suggestions = await this.suggestionDataService.getSuggestionsForStudent(batchIds);
-
+  console.log(suggestions)
   return {
     suggestions: await this.mapToDtoArray(suggestions),
   };
