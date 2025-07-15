@@ -38,7 +38,6 @@ export class NotificationGateway implements OnGatewayConnection, OnGatewayDiscon
     : payload.roles?.split('+') || [];
 
   this.logger.log(`Registering client ${client.id} as user ${payload.userId} with roles ${rolesArray}`);
-
   this.connectedUsers.set(client.id, {
     userId: payload.userId,
     roles: rolesArray,

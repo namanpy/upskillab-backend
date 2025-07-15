@@ -7,6 +7,7 @@ import { ApiTags,ApiOperation, ApiParam, ApiBody, ApiResponse } from '@nestjs/sw
 
 @ApiTags('notifications')
 @Controller('notifications')
+@UseGuards(AuthGuard('jwt'))
 export class NotificationController {
   constructor(private readonly notificationLogicService: NotificationLogicService) {}
 
@@ -16,15 +17,16 @@ export class NotificationController {
 @ApiResponse({ status: 201, description: 'Notification created successfully' })
   @Post()
   async createNotification(@Body() dto: CreateNotificationDto) {
+    console.log(dto,"2")
     return this.notificationLogicService.createNotification(dto);
   }
 
 //   @UseGuards(AuthGuard)
 @ApiOperation({ summary: 'Get notifications by user ID' })
-@ApiParam({ name: 'id', description: 'User ID' })
-@Get('user/:id')
-async getNotificationsForUserById(@Param('id') id: string) {
-  return this.notificationLogicService.getNotificationsByUserId(id);
+@Get('user')
+async getNotificationsForUserById(@Req() req: any) {
+  console.log(req.user._id,"1")
+  return this.notificationLogicService.getNotificationsByUserId(req.user._id);
 }
 
 @ApiOperation({ summary: 'Get notifications by role' })

@@ -139,6 +139,7 @@ export class SuggestionController {
   async getStudentSuggestions(@User() user: any): Promise<GetSuggestionsResponseDTO> {
     return await this.suggestionLogicService.getStudentSuggestions(user);
   }
+  
 
   @ApiResponse({
     status: 200,

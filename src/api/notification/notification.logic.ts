@@ -3,35 +3,89 @@ import { NotificationDataService } from './notification.data';
 import { CreateNotificationDto } from '../../dto/notification.dto';
 import { Notification } from '../../schemas/notification.schema';
 import { NotificationGateway } from './notification.gateway';
-
+import { User } from 'src/schemas/user.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 @Injectable()
 export class NotificationLogicService {
   constructor(
     private notificationDataService: NotificationDataService,
     private notificationGateway: NotificationGateway,
+    @InjectModel('User') private userModel: Model<User>,
   ) {}
 
- async createNotification(dto: CreateNotificationDto): Promise<Notification> {
-    const notification = await this.notificationDataService.createNotification(dto);
+//  async createNotification(dto: CreateNotificationDto): Promise<Notification> {
+//     const notification = await this.notificationDataService.createNotification(dto);
     
-    // Emit notification to socket
-    if (dto.recipient) {
-      this.notificationGateway.sendToUser(dto.recipient, notification);
-    } else if (dto.role) {
-      this.notificationGateway.sendToRole(dto.role, notification);
-    }
-    return notification;
-  }
-  
-//   async getNotificationsForUser(user: any): Promise<Notification[]> {
-//     if (user.role) {
-//       return this.notificationDataService.getNotificationsByRole(user.role);
+//     // Emit notification to socket
+//     if (dto.recipient) {
+//       this.notificationGateway.sendToUser(dto.recipient, notification);
+//     } else if (dto.role) {
+//       this.notificationGateway.sendToRole(dto.role, notification);
 //     }
-//     return [];
+//     return notification;
 //   }
 
+
+async createNotification(dto: CreateNotificationDto): Promise<any> {
+    // 1. If a recipient is provided → single notification
+    console.log(dto,"3")
+    if (dto.recipient) {
+      const notification = await this.notificationDataService.createNotification(dto);
+      this.notificationGateway.sendToUser(dto.recipient, notification);
+      return notification;
+    }
+
+    // 2. If role is provided → multi-user notification
+    if (dto.role) {
+      const roleMap = {
+        admin: ['ADMIN'],
+        teacher: ['TEACHER'],
+        student: ['STUDENT'],
+        adminTeacher: ['ADMIN', 'TEACHER'],
+        adminStudent: ['ADMIN', 'STUDENT'],
+        teacherStudent: ['TEACHER', 'STUDENT'],
+      };
+
+      const roles = roleMap[dto.role] || [];
+      console.log(roles,"4")
+      const users = await this.userModel.find({
+        userType: { $in: roles },
+        isActive: true,
+      });
+      console.log(users,"5")
+
+      const notifications: Notification[] = [];
+
+      for (const user of users) {
+        const notificationData: CreateNotificationDto = {
+          message: dto.message,
+          // type: dto.type,
+          recipient: user._id.toString(),
+        };
+
+        const notification = await this.notificationDataService.createNotification(notificationData);
+        notifications.push(notification);
+
+        // Emit via socket
+        this.notificationGateway.sendToUser(user._id.toString(), notification);
+        console.log("done")
+      }
+
+      return {
+        message: `Sent notification to ${notifications.length} users.`,
+        notifications,
+      };
+    }
+
+    throw new Error('Either recipient or role must be provided.');
+  }
+
   async getNotificationsByUserId(userId: string) {
-    return this.notificationDataService.getNotificationsByUserId(userId);
+
+    const res = await this.notificationDataService.getNotificationsByUserId(userId);
+    console.log(res)
+    return res
   }
   
   async getNotificationsByRole(role: string) {

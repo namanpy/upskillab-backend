@@ -44,7 +44,7 @@ export class SuggestionDataService {
     batchIds: string[] = [],
     isApproved: boolean,
   ): Promise<SuggestionDocument[]> {
-    console.log('batchIds', batchIds, isApproved);
+
     return this.suggestionModel
       .find({
         batchId: { $in: batchIds.map((b) => new Types.ObjectId(b)) },
