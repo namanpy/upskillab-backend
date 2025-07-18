@@ -53,6 +53,7 @@ import { PaymentStatusModule } from './api/payment-status/payment-status.module'
 import { MarketingPromptModule } from './api/marketing/marketing-prompt.module';
 import { FeedbackModule } from './api/feedback/feedback.module';
 import { ReferralModule } from './api/referral/referral.module';
+import { VideoModule } from './api/video-storage/video.module';
 // import { ScheduleMeetingModule } from './api/schedule-meeting/schedule-meeting.module';
 // import { RecordedModule } from './api/recording/recording.module';
 // import { ConfigModule } from '@nestjs/config';
@@ -112,7 +113,8 @@ import { ReferralModule } from './api/referral/referral.module';
     PaymentStatusModule,
     MarketingPromptModule,
     FeedbackModule,
-ReferralModule,
+    ReferralModule,
+    VideoModule,
 // ScheduleMeetingModule,
 // RecordedModule,
   ],
