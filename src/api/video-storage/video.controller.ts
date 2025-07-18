@@ -15,7 +15,7 @@ export class VideoController {
   constructor(private readonly videoUploaderService: VideoUploaderService) {}
 
   @Post('upload')
-  @Roles('admin')
+//   @Roles('ADMIN')
   @UseGuards(RolesGuard)
   @UseInterceptors(FileInterceptor('file'))
   async uploadVideo(@UploadedFile() file: Express.Multer.File) {
