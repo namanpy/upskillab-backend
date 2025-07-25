@@ -16,7 +16,7 @@ export class MailService {
       port: 465,
       secure: true,
       auth: {
-        user: "admission@upskillab.com",
+        user: "info@upskillab.com",
         pass:"Upskillab@123"
       },
     });
