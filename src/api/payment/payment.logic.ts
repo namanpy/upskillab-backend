@@ -8,7 +8,7 @@ import {
   PAYMENT_STATUS,
 } from 'src/common/constants/payment.constants';
 import { BatchDataService } from '../batch/batch.data';
-import { SendGridService } from 'src/common/services/sendgrid.service';
+import { MailService } from 'src/common/services/sendgrid.service';
 
 @Injectable()
 export class PaymentLogicService {
@@ -16,7 +16,7 @@ export class PaymentLogicService {
     private batchDataService: BatchDataService,
     private orderDataService: OrderDataService,
     private cashfreeService: CashfreeService,
-    private sendGridService: SendGridService,
+    private MailService: MailService,
   ) {}
 
   async handleCashfreeWebhook(webhookData: {
@@ -53,13 +53,13 @@ export class PaymentLogicService {
         order.batch._id.toString(),
       );
 
-      //   await this.sendGridService.sendPaymentConfirmation({
-      //     to: payment.user.email,
-      //     name: payment.user.username,
-      //     courseName: batch?.course.courseName || 'Unknown',
-      //     amount: payment.amount,
-      //     orderId: order._id.toString(),
-      //   });
+        await this.MailService.sendPaymentConfirmation({
+          to: payment.user.email,
+          name: payment.user.username,
+          courseName: batch?.course.courseName || 'Unknown',
+          amount: payment.amount,
+          orderId: order._id.toString(),
+        });
     }
     // Map Cashfree status to internal payment status
     let orderStatus: string;

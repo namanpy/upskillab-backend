@@ -15,7 +15,7 @@ import {
   NoBatchsRegistrationRequestDto,
   registerExternelPaymentDto,
 } from 'src/dto/registration.dto';
-import { SendGridService } from 'src/common/services/sendgrid.service';
+import { MailService } from 'src/common/services/sendgrid.service';
 import { USER_TYPES } from 'src/common/constants/user.constants';
 import { StudentDataService } from '../student/student.data';
 import { STUDENT_TYPE } from 'src/common/constants/student.constants';
@@ -30,7 +30,7 @@ export class RegistrationLogicService {
     private orderDataService: OrderDataService,
     private batchDataService: BatchDataService,
     private cashfreeService: CashfreeService,
-    private sendGridService: SendGridService,
+    private MailService: MailService,
     private studentDataService: StudentDataService,
     private notificationLogicService: NotificationLogicService,
     private referralLogicService: ReferralLogicService,
@@ -74,10 +74,10 @@ export class RegistrationLogicService {
       });
 
       // Send welcome email
-      //   await this.sendGridService.sendWelcomeEmail({
-      //     to: user.email,
-      //     name: registrationData.name,
-      //   });
+        await this.MailService.sendWelcomeEmail({
+          to: user.email,
+          name: registrationData.name,
+        });
     }
 
     const courseId = batch.course._id;
@@ -210,10 +210,10 @@ if (registrationData.referralCode) {
       });
 
       // Send welcome email
-      //   await this.sendGridService.sendWelcomeEmail({
-      //     to: user.email,
-      //     name: registrationData.name,
-      //   });
+        await this.MailService.sendWelcomeEmail({
+          to: user.email,
+          name: registrationData.name,
+        });
     }
 
     const courseId = batch.course._id;
@@ -366,10 +366,10 @@ if (registrationData.referralCode) {
       });
 
       // Send welcome email
-      //   await this.sendGridService.sendWelcomeEmail({
-      //     to: user.email,
-      //     name: registrationData.name,
-      //   });
+        await this.MailService.sendWelcomeEmail({
+          to: user.email,
+          name: registrationData.name,
+        });
     }
 
     const courseId = batch.course._id;

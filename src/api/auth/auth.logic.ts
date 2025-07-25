@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { SendGridService } from 'src/common/services/sendgrid.service';
+import { MailService } from 'src/common/services/sendgrid.service';
 
 import { UserDataService } from '../user/users.data';
 import { CustomError } from 'src/common/classes/error.class';
@@ -15,7 +15,7 @@ export class AuthLogicService {
   constructor(
     private userDataService: UserDataService,
     private jwtService: JwtService,
-    private sendGridService: SendGridService,
+    private MailService: MailService,
     private loginAttemptDataService: LoginAttemptDataService,
     private userSessionDataService: UserSessionDataService, // Injected
   ) {}
@@ -75,11 +75,11 @@ export class AuthLogicService {
     const otp = this.generateOTP();
 
     // Send OTP email
-    // await this.sendGridService.sendEmail({
-    //   to: email,
-    //   subject: 'Your OTP Code',
-    //   html: `<p>Your OTP is <strong>${otp}</strong>. It will expire in 5 minutes.</p>`,
-    // });
+    await this.MailService.sendEmail({
+      to: email,
+      subject: 'Your OTP Code',
+      html: `<p>Your OTP is <strong>${otp}</strong>. It will expire in 5 minutes.</p>`,
+    });
 
     const attempt = await this.loginAttemptDataService.createLoginAttempt({
       user: user._id.toString(),
@@ -104,7 +104,7 @@ export class AuthLogicService {
 
     const user = attempt.user;
 
-    if (attempt.otpCode === Number(otpCode) || true) {
+    if (attempt.otpCode === Number(otpCode)) {
       const payload = {
         userId: user._id,
         email: user.email,
