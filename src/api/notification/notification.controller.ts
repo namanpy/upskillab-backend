@@ -17,7 +17,6 @@ export class NotificationController {
 @ApiResponse({ status: 201, description: 'Notification created successfully' })
   @Post()
   async createNotification(@Body() dto: CreateNotificationDto) {
-    console.log(dto,"2")
     return this.notificationLogicService.createNotification(dto);
   }
 
@@ -25,7 +24,6 @@ export class NotificationController {
 @ApiOperation({ summary: 'Get notifications by user ID' })
 @Get('user')
 async getNotificationsForUserById(@Req() req: any) {
-  console.log(req.user._id,"1")
   return this.notificationLogicService.getNotificationsByUserId(req.user._id);
 }
 

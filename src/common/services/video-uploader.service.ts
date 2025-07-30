@@ -1,6 +1,8 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
 import { ConfigService } from '@nestjs/config';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class VideoUploaderService {
@@ -31,6 +33,7 @@ export class VideoUploaderService {
     ];
 
     if (!allowedMimeTypes.includes(file.mimetype)) {
+      fs.unlinkSync(file.path); // Clean up
       throw new BadRequestException(
         `File type ${file.originalname} (${file.mimetype}) not allowed. Only video files are supported.`,
       );
@@ -38,29 +41,37 @@ export class VideoUploaderService {
 
     const bucketName = this.configService.get<string>('AWS_S3_BUCKET');
     if (!bucketName) {
+      fs.unlinkSync(file.path); // Clean up
       throw new BadRequestException('S3 bucket name not configured');
     }
 
     const fileId = Date.now().toString() + Math.random().toString(36).substring(2, 15);
     const key = `${folder}/${fileId}-${file.originalname}`;
 
+    const filePath = path.resolve(file.path);
+    const fileStream = fs.createReadStream(filePath);
+
     const params: S3.Types.PutObjectRequest = {
       Bucket: bucketName,
       Key: key,
-      Body: file.buffer,
+      Body: fileStream,
       ContentType: file.mimetype,
     };
 
     try {
       const data = await this.s3.upload(params).promise();
+      fs.unlinkSync(filePath); // Clean up temp file
       return (
         data.Location ||
-        `https://${bucketName}.s3.${this.configService.get<string>('AWS_REGION')}.amazonaws.com/${key}`
+        `https://${bucketName}.s3.${this.configService.get<string>(
+          'AWS_REGION',
+        )}.amazonaws.com/${key}`
       );
     } catch (error) {
+      fs.unlinkSync(filePath); // Clean up temp file
       throw new BadRequestException(
         `Failed to upload video ${file.originalname}: ${error.message}`,
       );
     }
   }
-} 
+}

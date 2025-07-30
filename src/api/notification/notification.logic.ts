@@ -28,8 +28,6 @@ export class NotificationLogicService {
 
 
 async createNotification(dto: CreateNotificationDto): Promise<any> {
-    // 1. If a recipient is provided → single notification
-    console.log(dto,"3")
     if (dto.recipient) {
       const notification = await this.notificationDataService.createNotification(dto);
       this.notificationGateway.sendToUser(dto.recipient, notification);
@@ -48,12 +46,10 @@ async createNotification(dto: CreateNotificationDto): Promise<any> {
       };
 
       const roles = roleMap[dto.role] || [];
-      console.log(roles,"4")
       const users = await this.userModel.find({
         userType: { $in: roles },
         isActive: true,
       });
-      console.log(users,"5")
 
       const notifications: Notification[] = [];
 
@@ -69,7 +65,6 @@ async createNotification(dto: CreateNotificationDto): Promise<any> {
 
         // Emit via socket
         this.notificationGateway.sendToUser(user._id.toString(), notification);
-        console.log("done")
       }
 
       return {
@@ -84,7 +79,6 @@ async createNotification(dto: CreateNotificationDto): Promise<any> {
   async getNotificationsByUserId(userId: string) {
 
     const res = await this.notificationDataService.getNotificationsByUserId(userId);
-    console.log(res)
     return res
   }
   

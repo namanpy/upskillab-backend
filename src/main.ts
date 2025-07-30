@@ -3,12 +3,14 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { GlobalExceptionFilter } from './common/classes/exception-filter.class';
 import { ValidationPipe } from '@nestjs/common';
+import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Error Setup
   app.useGlobalFilters(new GlobalExceptionFilter());
+
   // CORS enabled
   app.enableCors();
   // Validation
@@ -22,8 +24,8 @@ async function bootstrap() {
   );
 
   // Set file size limit for uploads
-  // app.useBodyParser('json', { limit: '10mb' });
-  // app.useBodyParser('urlencoded', { limit: '10mb', extended: true });
+  app.use(bodyParser.json({ limit: '20gb' }));
+  app.use(bodyParser.urlencoded({ limit: '20gb', extended: true }));
   // Swagger setup
   const config = new DocumentBuilder()
     .setTitle('Upskillab.com Backend')
