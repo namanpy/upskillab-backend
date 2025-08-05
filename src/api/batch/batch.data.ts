@@ -106,20 +106,26 @@ async createBatch(createBatchDto: CreateBatchDto): Promise<BatchDocument> {
   }
 
   async getUpcomingBatches(input: { skip: number; limit: number }) {
-    const { skip, limit } = input;
-    const batches = await this.batchModel
-      .find()
-      .skip(skip)
-      .limit(limit)
-      .populate<{
-        course:
-          | Course
-          | (undefined extends Batch['course'] ? undefined : never);
-      }>({
-        path: 'course',
-      })
-      .lean()
-      .exec();
-    return batches;
-  }
+  const { skip, limit } = input;
+
+  const batches = await this.batchModel
+    .find()
+    .skip(skip)
+    .limit(limit)
+    .populate<{
+      course:
+        | Course
+        | (undefined extends Batch['course'] ? undefined : never);
+    }>({
+      path: 'course',
+      populate: {
+        path: 'category',
+      },
+    })
+    .lean()
+    .exec();
+
+  return batches;
+}
+
 }

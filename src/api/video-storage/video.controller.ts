@@ -10,8 +10,8 @@ export class VideoController {
   @Post('upload')
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: memoryStorage(), // ⚠️ Don't save to disk
-      limits: { fileSize: 1024 * 1024 * 1024 * 10 }, // 10GB
+      storage: memoryStorage(),
+      limits: { fileSize: 1024 * 1024 * 1024 * 10 },
     }),
   )
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
