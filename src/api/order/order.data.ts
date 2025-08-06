@@ -88,6 +88,27 @@ export class OrderDataService {
     return order;
   }
 
+    async getOrderByBatchId(batchId: string) {
+    const order = await this.orderModel
+      .find({batch:batchId,status:"COMPLETED"})
+      .populate<{
+        user: User | (undefined extends Order['user'] ? undefined : never);
+        batch: Batch | (undefined extends Order['batch'] ? undefined : never);
+      }>([
+        {
+          path: 'user',
+        },
+        {
+          path: 'batch',
+        },
+      ])
+      .lean()
+      .exec();
+
+    if (!order) throw new CustomError(ERROR.ORDER_NOT_FOUND);
+    return order;
+  }
+
   async updateOrder(id: string, updateOrderDto: Partial<Order>) {
     console.log(updateOrderDto,id)
     const order = await this.orderModel

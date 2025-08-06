@@ -55,6 +55,19 @@ export class OrderController {
     return await this.orderLogicService.getOrderById(id);
   }
 
+   @Get('order/:batchid')
+  @ApiResponse({
+    status: 200,
+    type: GetOrderResponseDto,
+  })
+  @ApiResponse({
+    status: ERROR.ORDER_NOT_FOUND.code,
+    description: ERROR.ORDER_NOT_FOUND.message,
+  })
+  async getOrderByBatchId(@Param('batchid') batchid: string){
+    return await this.orderLogicService.getOrderByBatchId(batchid);
+  }
+
   @Put(':id')
   @ApiResponse({
     status: 200,

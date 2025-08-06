@@ -234,10 +234,10 @@ export class CreateClassSessionDto {
   @IsNotEmpty()
   scheduledEndTime: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsString()
-  @IsNotEmpty()
-  meetingLink: string;
+  @IsOptional()
+  meetingLink?: string;
 
   @ApiPropertyOptional()
   @IsString()

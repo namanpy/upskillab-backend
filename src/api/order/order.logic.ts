@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { OrderDataService } from './order.data';
 import {
   CreateOrderRequestDto,
+  GetOrderResponseDto,
   UpdateOrderRequestDto,
 } from '../../dto/order.dto';
 import { Types } from 'mongoose';
@@ -30,6 +31,26 @@ export class OrderLogicService {
         order.status === 'COMPLETED' ? order.serialNumber : undefined,
     };
   }
+
+async getOrderByBatchId(batchId: string): Promise<GetOrderResponseDto[]> {
+  const orders = await this.orderDataService.getOrderByBatchId(batchId);
+
+  return orders
+  .filter(order=>order.user?.isActive==true)
+  .map(order => ({
+    _id: order._id.toString(),
+    user: order.user,
+    batch: order.batch,
+    serialNumber: order.status === 'COMPLETED' ? order.serialNumber : undefined,
+    totalAmount: order.totalAmount,
+    amountPaid: order.amountPaid,
+    status: order.status,
+    name: order.name,
+    email: order.email,
+    mobileNumber: order.mobileNumber,
+    courseName: order.courseName,
+  }));
+}
 
   async updateOrder(id: string, updateOrderDto: UpdateOrderRequestDto) {
     const updatedOrder = {

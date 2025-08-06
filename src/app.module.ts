@@ -54,7 +54,7 @@ import { MarketingPromptModule } from './api/marketing/marketing-prompt.module';
 import { FeedbackModule } from './api/feedback/feedback.module';
 import { ReferralModule } from './api/referral/referral.module';
 import { VideoModule } from './api/video-storage/video.module';
-// import { ScheduleMeetingModule } from './api/schedule-meeting/schedule-meeting.module';
+import { ScheduleMeetingModule } from './api/schedule-meeting/schedule-meeting.module';
 // import { RecordedModule } from './api/recording/recording.module';
 // import { ConfigModule } from '@nestjs/config';
 //MongooseModule.forRoot('mongodb://localhost/nest')
@@ -115,7 +115,7 @@ import { VideoModule } from './api/video-storage/video.module';
     FeedbackModule,
     ReferralModule,
     VideoModule,
-// ScheduleMeetingModule,
+ScheduleMeetingModule,
 // RecordedModule,
   ],
   controllers: [AppController],

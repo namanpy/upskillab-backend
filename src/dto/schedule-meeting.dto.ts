@@ -1,11 +1,8 @@
-// src/schedule-meeting/dto/schedule-meeting.dto.ts
 export class ScheduleMeetingDto {
-  studentEmails: string[];
-  date: string; // 'YYYY-MM-DD'
-  time: string; // 'HH:mm'
-  duration: number; // minutes
-  topic: string;
+  summary: string;
   description: string;
-  courseName: string;
-  chapterName: string;
+  startTime: string; // ISO string
+  endTime: string;   // ISO string
+  teacherEmail: string;
+  studentEmails: string[];
 }

@@ -21,8 +21,10 @@ import { User, UserDocument } from '../../schemas/user.schema';
 import { Model } from 'mongoose';
 import { TeacherDataService } from '../teachers/teacher.data';
 import { EnrollmentDataService } from '../enrollment/enrollment.data';
-// import { log } from 'console';
+import { ScheduleMeetingService } from '../schedule-meeting/schedule-meeting.service';
+import { OrderLogicService } from '../order/order.logic';
 
+// import { log } from 'console';
 @Injectable()
 export class ClassSessionLogicService {
   constructor(
@@ -31,6 +33,8 @@ export class ClassSessionLogicService {
     private orderDataService: OrderDataService,
     private teacherDataService: TeacherDataService,
     private enrollmentDataService: EnrollmentDataService,
+    private readonly scheduleMeetingService: ScheduleMeetingService,
+    private  OrderLogicService: OrderLogicService,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
 
@@ -131,68 +135,80 @@ export class ClassSessionLogicService {
   }
 
   // For Admins: Create session directly (approved)
-  async createClassSession(
-    createClassSessionDto: CreateClassSessionDto,
-    user: any,
-  ) {
+  async createClassSession(createClassSessionDto: CreateClassSessionDto, user: any) {
     if (user.userType !== USER_TYPES.ADMIN) {
-      throw new ForbiddenException(
-        'Only admins can create class sessions directly',
-      );
+      throw new ForbiddenException('Only admins can create class sessions directly');
     }
-
-    const batch = await this.batchDataService.getBatchById(
-      createClassSessionDto.batchId,
-    );
+    const batch = await this.batchDataService.getBatchById(createClassSessionDto.batchId);
     if (!batch) {
-      throw new BadRequestException(
-        `Batch with ID ${createClassSessionDto.batchId} not found`,
-      );
+      throw new BadRequestException(`Batch with ID ${createClassSessionDto.batchId} not found`);
     }
 
-    const teacher = await this.teacherDataService.getTeacherById(
-      createClassSessionDto.teacherId,
-    );
-
+    const teacher = await this.teacherDataService.getTeacherById(createClassSessionDto.teacherId);
     if (!teacher) {
-      throw new BadRequestException(
-        `Teacher with ID ${createClassSessionDto.teacherId} not found`,
-      );
+      throw new BadRequestException(`Teacher with ID ${createClassSessionDto.teacherId} not found`);
     }
-
-const { scheduledDate, scheduledStartTime } = createClassSessionDto;
-
-// Combine date and time into a single Date object
-const scheduledDateTime = new Date(`${scheduledDate}T${scheduledStartTime}:00Z`);
-
-// Optional: adjust timezone to your local (e.g., IST = UTC+5:30)
-const now = new Date();
-
-if (scheduledDateTime <= now) {
-  throw new BadRequestException('Scheduled date and time must be in the future');
-}
-
+    
+    const students = await this.OrderLogicService.getOrderByBatchId(createClassSessionDto.batchId)
+    const studentEmails = students.map(order => order.user?.email)  
+      .filter(email => !!email);   
+    // Validate timing
     const startTime = this.parseTime(createClassSessionDto.scheduledStartTime);
     const endTime = this.parseTime(createClassSessionDto.scheduledEndTime);
     if (endTime <= startTime) {
       throw new BadRequestException('End time must be after start time');
     }
 
+    const scheduledDateTime = new Date(`${createClassSessionDto.scheduledDate}T${createClassSessionDto.scheduledStartTime}:00Z`);
+    const now = new Date();
+    if (scheduledDateTime <= now) {
+      throw new BadRequestException('Scheduled date and time must be in the future');
+    }
+
     const conflict = await this.classSessionDataService.checkTeacherConflict(
       createClassSessionDto.teacherId,
-      new Date(scheduledDate),
+      new Date(createClassSessionDto.scheduledDate),
       createClassSessionDto.scheduledStartTime,
       createClassSessionDto.scheduledEndTime,
     );
     if (conflict) {
-      throw new BadRequestException(
-        'Teacher is already scheduled for this time',
-      );
+      throw new BadRequestException('Teacher is already scheduled for this time');
     }
 
+    // 🔹 If Google Meet, auto-generate meeting link
+    if (createClassSessionDto.meetingPlatform === 'google_meet') {
+  const startISO = `${createClassSessionDto.scheduledDate}T${createClassSessionDto.scheduledStartTime}:00+05:30`;
+  const endISO = `${createClassSessionDto.scheduledDate}T${createClassSessionDto.scheduledEndTime}:00+05:30`;
+
+  // ✅ Ensure teacher email is string
+  const teacherEmail: string = teacher.user?.email || '';
+  if (!teacherEmail) {
+    throw new BadRequestException('Teacher does not have a valid email');
+  }
+
+  // ✅ Filter out undefined/null from student emails
+  const validStudentEmails: string[] = (studentEmails || []).filter(
+    (email): email is string => !!email
+  );
+
+  const meeting = await this.scheduleMeetingService.createMeeting({
+    summary: createClassSessionDto.title,
+    description: createClassSessionDto.description || '',
+    startTime: startISO,
+    endTime: endISO,
+    teacherEmail: teacherEmail,
+    studentEmails: validStudentEmails,
+  });
+
+  // ✅ Ensure meetingLink is string
+  createClassSessionDto.meetingLink = meeting.meetLink || '';
+}
+
+
+    // Save to DB
     const sessionData = { ...createClassSessionDto, isApproved: true };
-    const session =
-      await this.classSessionDataService.createClassSession(sessionData);
+    const session = await this.classSessionDataService.createClassSession(sessionData);
+
     return {
       classSession: await this.mapToDto(session),
     };

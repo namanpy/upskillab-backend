@@ -13,6 +13,7 @@ import { TeacherModule } from '../teachers/teacher.module';
 import { OrderModule } from '../order/order.module';
 import { User, UserSchema } from '../../schemas/user.schema';
 import { EnrollmentModule } from '../enrollment/enrollment.module';
+import { ScheduleMeetingService } from '../schedule-meeting/schedule-meeting.service';
 // import { UsersModule } from '../user/users.module';
 
 @Module({
@@ -31,6 +32,7 @@ import { EnrollmentModule } from '../enrollment/enrollment.module';
   providers: [
     ClassSessionDataService,
     ClassSessionLogicService,
+    ScheduleMeetingService,
     // BatchDataService,
     // CourseDataService,
     // TeacherDataService,
