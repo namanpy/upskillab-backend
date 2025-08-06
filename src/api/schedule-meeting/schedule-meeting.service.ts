@@ -6,7 +6,7 @@ import { ScheduleMeetingDto } from 'src/dto/schedule-meeting.dto';
 @Injectable()
 export class ScheduleMeetingService {
   async createMeeting(dto: ScheduleMeetingDto) {
-    const auth = getGoogleAuth(dto.teacherEmail);
+    const auth = getGoogleAuth();
     const calendar = google.calendar({ version: 'v3', auth });
 
     const attendees = [

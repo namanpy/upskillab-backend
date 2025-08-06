@@ -55,6 +55,8 @@ import { FeedbackModule } from './api/feedback/feedback.module';
 import { ReferralModule } from './api/referral/referral.module';
 import { VideoModule } from './api/video-storage/video.module';
 import { ScheduleMeetingModule } from './api/schedule-meeting/schedule-meeting.module';
+import { DriveModule } from './api/drive/driver.module';
+import { AwsModule } from './api/aws-upload/aws.module';
 // import { RecordedModule } from './api/recording/recording.module';
 // import { ConfigModule } from '@nestjs/config';
 //MongooseModule.forRoot('mongodb://localhost/nest')
@@ -116,6 +118,8 @@ import { ScheduleMeetingModule } from './api/schedule-meeting/schedule-meeting.m
     ReferralModule,
     VideoModule,
 ScheduleMeetingModule,
+DriveModule,
+AwsModule,
 // RecordedModule,
   ],
   controllers: [AppController],
