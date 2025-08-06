@@ -17,7 +17,7 @@ export class MailService {
       secure: true,
       auth: {
         user: "info@upskillab.com",
-        pass:"Upskillab@123"
+        pass:"Upskillab@@0609"
       },
     });
   }
