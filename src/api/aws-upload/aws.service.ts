@@ -33,7 +33,9 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { S3Client, PutObjectCommand, ObjectCannedACL, ListObjectsV2Command, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import axios from 'axios';
 import * as path from 'path';
-
+import { google } from 'googleapis';
+import { Readable } from 'stream';
+import { getGoogleAuth } from 'src/common/google-auth';
 @Injectable()
 export class AwsService {
   private s3: S3Client;
@@ -50,26 +52,35 @@ export class AwsService {
     this.bucket = process.env.AWS_S3_BUCKET || '';
   }
 
-  async uploadDriveFileToS3(fileUrl: string, fileName?: string): Promise<string> {
-    // Download file as stream from Google Drive
-    const response = await axios.get(fileUrl, { responseType: 'arraybuffer' });
+async uploadDriveFileToS3(fileId: string, fileName?: string): Promise<string> {
+  const auth = getGoogleAuth(); // your service account auth
+  const token = await auth.getAccessToken();
 
-    // Default file name if not provided
-    const finalName = fileName || path.basename(fileUrl);
+  // 1️⃣ Download video from Google Drive using auth
+  const response = await axios.get(
+    `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+    {
+      headers: { Authorization: `Bearer ${token.token}` },
+      responseType: 'arraybuffer',
+    },
+  );
 
-    // Upload to S3
-    const uploadParams = {
-      Bucket: this.bucket,
-      Key: `videos/${finalName}`,
-      Body: response.data,
-      ContentType: 'video/mp4',
-    };
+  // 2️⃣ Prepare file name
+  const finalName = fileName || `${fileId}.mp4`;
 
-    await this.s3.send(new PutObjectCommand(uploadParams));
+  // 3️⃣ Upload to S3
+  const uploadParams = {
+    Bucket: this.bucket,
+    Key: `videos/${finalName}`,
+    Body: response.data,
+    ContentType: 'video/mp4',
+  };
 
-    // Return public URL
-    return `https://${this.bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${uploadParams.Key}`;
-  }
+  await this.s3.send(new PutObjectCommand(uploadParams));
+
+  return `https://${this.bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${uploadParams.Key}`;
+}
+
 
     async listAllVideos(prefix) {
     const command = new ListObjectsV2Command({
