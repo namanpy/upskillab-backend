@@ -75,11 +75,11 @@ export class AuthLogicService {
     const otp = this.generateOTP();
 
     // Send OTP email
-    // await this.MailService.sendEmail({
-    //   to: email,
-    //   subject: 'Your OTP Code',
-    //   html: `<p>Your OTP is <strong>${otp}</strong>. It will expire in 5 minutes.</p>`,
-    // });
+    await this.MailService.sendEmail({
+      to: email,
+      subject: 'Your OTP Code',
+      html: `<p>Your OTP is <strong>${otp}</strong>. It will expire in 5 minutes.</p>`,
+    });
 
     const attempt = await this.loginAttemptDataService.createLoginAttempt({
       user: user._id.toString(),
@@ -104,18 +104,18 @@ export class AuthLogicService {
 
     const user = attempt.user;
 
-    // if (attempt.otpCode === Number(otpCode)) {
-    //   const payload = {
-    //     userId: user._id,
-    //     email: user.email,
-    //     mobileNumber: user.mobileNumber,
-    //   };
-          if (Number(otpCode) === Number(otpCode)) {
+    if (attempt.otpCode === Number(otpCode)) {
       const payload = {
         userId: user._id,
         email: user.email,
         mobileNumber: user.mobileNumber,
       };
+      //     if (Number(otpCode) === Number(otpCode)) {
+      // const payload = {
+      //   userId: user._id,
+      //   email: user.email,
+      //   mobileNumber: user.mobileNumber,
+      // };
       // const expiresInSec = 15 * 60; // 15 minutes
       const expiresInSec = 24 * 60 * 60; // 24 hours
       const authToken = await this.jwtService.signAsync(payload, {
