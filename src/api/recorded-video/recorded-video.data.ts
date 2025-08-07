@@ -10,7 +10,7 @@ export class RecordedVideoDataService {
   constructor(@InjectModel(RecordedVideo.name) private recordedVideoModel: Model<RecordedVideoDocument>) {}
 
   async getVideos(): Promise<RecordedVideoDocument[]> {
-    return this.recordedVideoModel.find().sort({createdAt:-1}).exec();
+    return this.recordedVideoModel.find().populate('batchIds').sort({createdAt:-1}).exec();
   }
 
   async getVideoById(id: string): Promise<RecordedVideoDocument | null> {

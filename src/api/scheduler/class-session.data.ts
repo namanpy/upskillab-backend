@@ -19,36 +19,42 @@ export class ClassSessionDataService {
     private classSessionModel: Model<ClassSessionDocument>,
   ) {}
 
-  async getClassSessions() {
-    return this.classSessionModel
-      .find()
-      .populate<{ batchId: Batch }>('batchId')
-      .populate<{ teacherId: Teacher }>('teacherId')
-      .lean()
-      .sort({ createdAt: -1 })
-      .exec();
-  }
+async getClassSessions() {
+  return this.classSessionModel
+    .find()
+    .populate<{ batchIds: Batch[] }>('batchIds')
+    .populate<{ teacherId: Teacher }>('teacherId')
+    .lean()
+    .sort({ createdAt: -1 })
+    .exec();
+}
 
   async getClassSessionsByTeacher(teacherId: string | Types.ObjectId) {
     return this.classSessionModel
       .find({ teacherId })
-      .populate<{ batchId: Batch }>('batchId')
       .populate<{ teacherId: Teacher }>('teacherId')
       .lean()
       .exec();
   }
 
-  async getClassSessionsByBatches(
-    batchIds: string[] | Types.ObjectId[],
-    isApproved: boolean,
-  ) {
-    return this.classSessionModel
-      .find({ batchId: { $in: batchIds }, isApproved })
-      .populate<{ batchId: Batch }>('batchId')
-      .populate<{ teacherId: Teacher }>('teacherId')
-      .lean()
-      .exec();
-  }
+async getClassSessionsByBatches(
+  batchIds: string[] | Types.ObjectId[],
+  isApproved: boolean,
+) {
+  return this.classSessionModel
+    .find({
+      isApproved,
+      $or: [
+        { batchId: { $in: batchIds } },      // single batchId case
+        { batchIds: { $elemMatch: { $in: batchIds } } }, // multiple batchIds case
+      ],
+    })
+    .populate<{ batchIds: Batch[] }>('batchIds')
+    .populate<{ teacherId: Teacher }>('teacherId')
+    .lean()
+    .exec();
+}
+
 
   async createClassSession(
     createClassSessionDto: CreateClassSessionDto & { isApproved?: boolean },
@@ -63,9 +69,8 @@ export class ClassSessionDataService {
   async getClassSessionById(id: string): Promise<ClassSessionDocument | null> {
     return this.classSessionModel
       .findById(new Types.ObjectId(id))
-      .populate('batchId')
+      .populate('batchIds')
       .populate('teacherId')
-      .lean()
       .exec();
   }
 
@@ -79,9 +84,8 @@ export class ClassSessionDataService {
     }
     return this.classSessionModel
       .findByIdAndUpdate(id, updateData, { new: true })
-      .populate('batchId')
+      .populate('batchIds')
       .populate('teacherId')
-      .lean()
       .exec();
   }
 

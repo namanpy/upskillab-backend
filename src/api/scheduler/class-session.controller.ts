@@ -17,14 +17,14 @@ export class ClassSessionController {
 
   @Get()
   @Roles('ADMIN')
-  async getClassSessions(@Request() req): Promise<GetClassSessionsResponseDTO> {
+  async getClassSessions(@Request() req) {
     return this.classSessionLogicService.getClassSessions(req.user);
   }
 
   @Get('student')
   @Roles('STUDENT')
   async getStudentClassSessions(@Request() req): Promise<GetClassSessionsResponseDTO> {
-    // console.log(this.getStudentClassSessions)
+    console.log(req.user,"1")
     return this.classSessionLogicService.getStudentClassSessions(req.user);
   }
   // console.log()
@@ -39,12 +39,6 @@ export class ClassSessionController {
   @Roles('ADMIN')
   async createClassSession(@Body() createClassSessionDto: CreateClassSessionDto, @Request() req) {
     return this.classSessionLogicService.createClassSession(createClassSessionDto, req.user);
-  }
-
-  @Post('teacher')
-  @Roles('TEACHER')
-  async createTeacherClassSession(@Body() createClassSessionDto: CreateClassSessionDto, @Request() req) {
-    return this.classSessionLogicService.createTeacherClassSession(createClassSessionDto, req.user);
   }
 
   @Get(':id')

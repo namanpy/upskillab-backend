@@ -27,6 +27,7 @@ import { Model } from 'mongoose';
 import { Batch, BatchDocument } from '../../schemas/course/batch.schema';
 import { Course } from '../../schemas/course/course.schema';
 import { Teacher, TeacherDocument } from '../../schemas/teacher.schema';
+import { Console } from 'console';
 @Injectable()
 export class FeedbackLogicService {
   constructor(
@@ -102,83 +103,169 @@ export class FeedbackLogicService {
   }
 
   // Fixed createFeedback method - Ensures one feedback per student per class session
-  async createFeedback(createFeedbackDto: CreateFeedbackDto, user: any) {
-    if (user.userType !== USER_TYPES.STUDENT) {
-      throw new ForbiddenException('Only students can give feedback');
-    }
-    console.log(user,createFeedbackDto)
-    // FIRST: Check if feedback already exists for this student and class session
-    // This should be the first check to prevent duplicate feedback
-    const existingFeedback = await this.feedbackDataService.checkExistingFeedback(
-      user._id,
-      createFeedbackDto.classSessionId
-    );
+//   async createFeedback(createFeedbackDto: CreateFeedbackDto, user: any) {
+//     if (user.userType !== USER_TYPES.STUDENT) {
+//       throw new ForbiddenException('Only students can give feedback');
+//     }
+//     console.log(user,createFeedbackDto)
+//     // FIRST: Check if feedback already exists for this student and class session
+//     // This should be the first check to prevent duplicate feedback
+//     const existingFeedback = await this.feedbackDataService.checkExistingFeedback(
+//       user._id,
+//       createFeedbackDto.classSessionId
+//     );
     
-    if (existingFeedback) {
-      throw new BadRequestException('You have already given feedback for this class session');
-    }
+//     if (existingFeedback) {
+//       throw new BadRequestException('You have already given feedback for this class session');
+//     }
 
-    // Check if class session exists and is approved
-    const classSession = await this.classSessionDataService.getClassSessionById(
-      createFeedbackDto.classSessionId
-    );
-    if (!classSession) {
-      throw new NotFoundException('Class session not found');
-    }
-    if (!classSession.isApproved) {
-      throw new BadRequestException('Cannot give feedback for unapproved sessions');
-    }
+//     // Check if class session exists and is approved
+//     const classSession = await this.classSessionDataService.getClassSessionById(
+//       createFeedbackDto.classSessionId
+//     );
+//     if (!classSession) {
+//       throw new NotFoundException('Class session not found');
+//     }
+//     if (!classSession.isApproved) {
+//       throw new BadRequestException('Cannot give feedback for unapproved sessions');
+//     }
 
-    // Check if teacher exists
-    const teacher = await this.teacherDataService.getTeacherById(
-      createFeedbackDto.teacherId
-    );
-    if (!teacher) {
-      throw new NotFoundException('Teacher not found');
-    }
+//     // Check if teacher exists
+//     const teacher = await this.teacherDataService.getTeacherById(
+//       createFeedbackDto.teacherId
+//     );
+//     if (!teacher) {
+//       throw new NotFoundException('Teacher not found');
+//     }
 
-    // Fix: Handle populated teacherId object safely
-    const sessionTeacherId = (classSession.teacherId as any)?._id
-      ? (classSession.teacherId as any)._id.toString()
-      : classSession.teacherId.toString();
+//     // Fix: Handle populated teacherId object safely
+//     const sessionTeacherId = (classSession.teacherId as any)?._id
+//       ? (classSession.teacherId as any)._id.toString()
+//       : classSession.teacherId.toString();
 
-    if (sessionTeacherId !== createFeedbackDto.teacherId) {
-      throw new BadRequestException('Teacher is not assigned to this session');
-    }
+//     if (sessionTeacherId !== createFeedbackDto.teacherId) {
+//       throw new BadRequestException('Teacher is not assigned to this session');
+//     }
 
-    // Check if student is enrolled in the batch
-    const enrollment = await this.enrollmentDataService.getEnrollmentByUserId(user._id);
-    if (!enrollment || !enrollment.order || enrollment.order.length === 0) {
-      throw new ForbiddenException('You are not enrolled in any batch');
-    }
+//     // Check if student is enrolled in the batch
+//     const enrollment = await this.enrollmentDataService.getEnrollmentByUserId(user._id);
+//     if (!enrollment || !enrollment.order || enrollment.order.length === 0) {
+//       throw new ForbiddenException('You are not enrolled in any batch');
+//     }
 
-    const enrolledBatchIds = enrollment.order.map(order => order?.batch?._id.toString());
+//     const enrolledBatchIds = enrollment.order.map(order => order?.batch?._id.toString());
 
-    // Fix: Handle populated batchId object safely
-    const sessionBatchId = (classSession.batchId as any)?._id
-      ? (classSession.batchId as any)._id.toString()
-      : classSession.batchId.toString();
+//     // Fix: Handle populated batchId object safely
+//     const sessionBatchId = (classSession.batchId as any)?._id
+//       ? (classSession.batchId as any)._id.toString()
+//       : classSession.batchId.toString();
 
-    if (!enrolledBatchIds.includes(sessionBatchId)) {
-      throw new ForbiddenException('You are not enrolled in this batch');
-    }
+//     if (!enrolledBatchIds.includes(sessionBatchId)) {
+//       throw new ForbiddenException('You are not enrolled in this batch');
+//     }
 
-    // Create feedback - by this point we're sure no duplicate exists
-    const feedbackData = {
-      ...createFeedbackDto,
-      studentId: user._id,
-      batchId: sessionBatchId,
-    };
+//     // Create feedback - by this point we're sure no duplicate exists
+//     const feedbackData = {
+//       ...createFeedbackDto,
+//       studentId: user._id,
+//       batchId: sessionBatchId,
+//     };
 
-    const feedback = await this.feedbackDataService.createFeedback(feedbackData);
-    const populatedFeedback = await this.feedbackDataService.getFeedbackById(
-      (feedback._id as Types.ObjectId).toString()
-    );
+//     const feedback = await this.feedbackDataService.createFeedback(feedbackData);
+//     const populatedFeedback = await this.feedbackDataService.getFeedbackById(
+//       (feedback._id as Types.ObjectId).toString()
+//     );
 
-   return {
-  feedback: await this.mapToDto(populatedFeedback!),
-};
+//    return {
+//   feedback: await this.mapToDto(populatedFeedback!),
+// };
+//   }
+async createFeedback(createFeedbackDto: CreateFeedbackDto, user: any) {
+  if (user.userType !== USER_TYPES.STUDENT) {
+    throw new ForbiddenException('Only students can give feedback');
   }
+
+  // ✅ Check if feedback already exists
+  const existingFeedback = await this.feedbackDataService.checkExistingFeedback(
+    user._id,
+    createFeedbackDto.classSessionId,
+  );
+  if (existingFeedback) {
+    throw new BadRequestException('You have already given feedback for this class session');
+  }
+
+  // ✅ Validate class session
+  const classSession = await this.classSessionDataService.getClassSessionById(
+    createFeedbackDto.classSessionId,
+  );
+  if (!classSession) {
+    throw new NotFoundException('Class session not found');
+  }
+  if (!classSession.isApproved) {
+    throw new BadRequestException('Cannot give feedback for unapproved sessions');
+  }
+
+  // ✅ Validate teacher
+  const teacher = await this.teacherDataService.getTeacherById(createFeedbackDto.teacherId);
+  if (!teacher) {
+    throw new NotFoundException('Teacher not found');
+  }
+
+  const sessionTeacherId = (classSession.teacherId as any)?._id
+    ? (classSession.teacherId as any)._id.toString()
+    : classSession.teacherId.toString();
+
+  if (sessionTeacherId !== createFeedbackDto.teacherId) {
+    throw new BadRequestException('Teacher is not assigned to this session');
+  }
+
+  // ✅ Get enrolled batch IDs
+  const enrollment = await this.enrollmentDataService.getEnrollmentByUserId(user._id);
+  if (!enrollment || !enrollment.order || enrollment.order.length === 0) {
+    throw new ForbiddenException('You are not enrolled in any batch');
+  }
+
+  const enrolledBatchIds = enrollment.order
+    .map((order) => order?.batch?._id?.toString())
+    .filter((id) => !!id);
+
+  // ✅ Get session batch IDs (new or old format)
+  const sessionBatchIds: string[] = Array.isArray(classSession.batchIds)
+    ? classSession.batchIds.map((b: any) => b?._id?.toString?.() ?? b?.toString?.())
+    : [];
+
+  let matchedBatchId: string | undefined;
+  if (sessionBatchIds.length > 0) {
+    matchedBatchId = enrolledBatchIds.find((id) => sessionBatchIds.includes(id));
+  } else{
+    const singleBatchId =(classSession as any).batchId?.toString()
+    if (singleBatchId && enrolledBatchIds.includes(singleBatchId)) {
+      matchedBatchId = singleBatchId;
+    }
+  }
+
+  if (!matchedBatchId) {
+    throw new ForbiddenException('You are not enrolled in any of the batches for this session');
+  }
+
+  // ✅ Create feedback
+  const feedbackData: CreateFeedbackDto & { studentId: string; batchId: string } = {
+    ...createFeedbackDto,
+    studentId: user._id,
+    batchId: matchedBatchId,
+  };
+
+  const feedback = await this.feedbackDataService.createFeedback(feedbackData);
+  const populatedFeedback = await this.feedbackDataService.getFeedbackById(
+    (feedback._id as Types.ObjectId).toString(),
+  );
+
+  return {
+    feedback: await this.mapToDto(populatedFeedback!),
+  };
+}
+
+
 
   // Student gets their own feedbacks
   async getStudentFeedbacks(user: any): Promise<GetFeedbacksResponseDTO> {

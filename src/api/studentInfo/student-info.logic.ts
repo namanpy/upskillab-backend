@@ -74,17 +74,28 @@ export class StudentInfoLogicService {
       },
     );
     console.log(attendanceData)
-    const attendanceHistory = attendanceData.map(
-      ({ classSession, attendances }) => ({
+    // const attendanceHistory = attendanceData.map(
+    //   ({ classSession, attendances }) => ({
         
-        classId: classSession._id.toString(),
-        batchId:classSession.batchId.toString(),
-        meetingLink: classSession.meetingLink,
-        scheduledDate: classSession.scheduledDate,
-        scheduledStartTime: classSession.scheduledStartTime,
-        isAttended: !!attendances?.at(0)?.isAttended,
-      }),
-    );
+    //     classId: classSession._id.toString(),
+    //     batchId:classSession.batchId.toString(),
+    //     meetingLink: classSession.meetingLink,
+    //     scheduledDate: classSession.scheduledDate,
+    //     scheduledStartTime: classSession.scheduledStartTime,
+    //     isAttended: !!attendances?.at(0)?.isAttended,
+    //   }),
+    // );
+
+    const attendanceHistory = attendanceData.map(({ classSession, attendances }) => ({
+  classId: classSession._id.toString(),
+  batchIds: (classSession.batchIds || []).map((id: any) =>
+    typeof id === 'string' ? id : id._id?.toString()
+  ),
+  meetingLink: classSession.meetingLink,
+  scheduledDate: classSession.scheduledDate,
+  scheduledStartTime: classSession.scheduledStartTime,
+  isAttended: !!attendances?.[0]?.isAttended,
+}));
 
     return {
       userId: user._id.toString(),

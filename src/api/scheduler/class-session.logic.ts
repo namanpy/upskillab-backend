@@ -39,78 +39,158 @@ export class ClassSessionLogicService {
   ) {}
 
   private async mapToDto(session: ClassSessionDocument): Promise<ClassSession> {
-    await session.populate('batchId');
-    await session.populate('teacherId');
+  await session.populate('batchIds');
+  await session.populate('teacherId');
 
-    const batchName = session.batchId ? (session.batchId as any).name : '';
-    const teacherName = session.teacherId
-      ? (session.teacherId as any).username
-      : '';
-    const dto = mapToDto<ClassSession, ClassSessionDocument>(session);
-    return { ...dto };
-  }
+  const batchIds = Array.isArray(session.batchIds)
+    ? session.batchIds.map((batch: any) => batch._id.toString())
+    : [];
 
-  private async mapToDtoArray(
-    sessions: ClassSessionDocument[],
-  ): Promise<ClassSession[]> {
-    const populatedSessions = await Promise.all(
-      sessions.map(async (session) => {
-        await session.populate('batchId');
-        await session.populate('teacherId');
-        return session;
-      }),
-    );
+  const teacherName = session.teacherId
+    ? (session.teacherId as any).username
+    : '';
+  const dto = mapToDto<ClassSession, ClassSessionDocument>(session);
 
-    return populatedSessions.map((session) => {
-      const batchName = session.batchId ? (session.batchId as any).name : '';
-      const teacherName = session.teacherId
-        ? (session.teacherId as any).username
-        : '';
-      const dto = mapToDto<ClassSession, ClassSessionDocument>(session);
-      return { ...dto, batchName, teacherName };
-    });
-  }
+  return {
+    ...dto,
+    batchIds
+  };
+}
+
+
+
+  // private async mapToDtoArray(
+  //   sessions: ClassSessionDocument[],
+  // ): Promise<ClassSession[]> {
+  //   const populatedSessions = await Promise.all(
+  //     sessions.map(async (session) => {
+  //       await session.populate('batchId');
+  //       await session.populate('teacherId');
+  //       return session;
+  //     }),
+  //   );
+
+  //   return populatedSessions.map((session) => {
+  //     const batchName = session.batchId ? (session.batchId as any).name : '';
+  //     const teacherName = session.teacherId
+  //       ? (session.teacherId as any).username
+  //       : '';
+  //     const dto = mapToDto<ClassSession, ClassSessionDocument>(session);
+  //     return { ...dto, batchName, teacherName };
+  //   });
+  // }
 
   // For Admins: Get all sessions
-  async getClassSessions(user: any): Promise<GetClassSessionsResponseDTO> {
-    if (user.userType !== USER_TYPES.ADMIN) {
-      throw new ForbiddenException('Only admins can access all class sessions');
-    }
-    const sessions = await this.classSessionDataService.getClassSessions();
-    return {
-      classSessions: sessions.map((s) => ({ ...s, _id: s._id.toString() })),
-    };
+ 
+//   async getClassSessions(user: any): Promise<GetClassSessionsResponseDTO> {
+//     if (user.userType !== USER_TYPES.ADMIN) {
+//       throw new ForbiddenException('Only admins can access all class sessions');
+//     }
+//     const sessions = await this.classSessionDataService.getClassSessions();
+//     return {
+//       classSessions: sessions.map((s) => ({
+//   ...s,
+//   _id: s._id.toString(),
+//   batchIds: s.batchIds.map((b: any) => b._id.toString()), // convert Batch[] -> string[]
+// }))
+//     };
+//   }
+
+// async getClassSessions(user: any): Promise<GetClassSessionsResponseDTO> {
+//   if (user.userType !== USER_TYPES.ADMIN) {
+//     throw new ForbiddenException('Only admins can access all class sessions');
+//   }
+
+//   const sessions = await this.classSessionDataService.getClassSessions();
+
+//   return {
+//     classSessions: sessions.map((s) => {
+//       // Support both old `batchId` and new `batchIds`
+//       let batchIds: string[];
+
+//       if ('batchIds' in s && Array.isArray(s.batchIds)) {
+//         batchIds = s.batchIds.map((b: any) =>
+//           typeof b === 'string' ? b : b._id.toString(),
+//         );
+//       } else if ('batchId' in s && s.batchId) {
+//         batchIds = [s.batchId.toString()];
+//       } else {
+//         batchIds = [];
+//       }
+
+//       return {
+//         ...s,
+//         _id: s._id.toString(),
+//         batchIds,
+//       };
+//     }),
+//   };
+// }
+
+async getClassSessions(user: any) {
+  if (user.userType !== USER_TYPES.ADMIN) {
+    throw new ForbiddenException('Only admins can access all class sessions');
   }
+
+  const sessions = await this.classSessionDataService.getClassSessions();
+
+  return {
+    classSessions: sessions.map((s) => ({
+      ...s,
+      _id: s._id.toString(),
+      teacherId: s.teacherId
+        ? {
+            ...s.teacherId,
+            _id: s.teacherId._id?.toString(),
+          }
+        : null,
+      batchIds: Array.isArray(s.batchIds)
+        ? s.batchIds.map((batch: any) => ({
+            ...batch,
+            _id: batch._id?.toString?.() ?? batch._id,
+          }))
+        : [],
+    })),
+  };
+}
+
+
+
 
   // For Students: Get sessions for enrolled batches
 
-  async getStudentClassSessions(
-    user: any,
-  ): Promise<GetClassSessionsResponseDTO> {
-    if (user.userType !== USER_TYPES.STUDENT) {
-      throw new ForbiddenException(
-        'Only students can access their class sessions',
-      );
-    }
-    const enrollment = await this.enrollmentDataService.getEnrollmentByUserId(
-      user._id,
+ async getStudentClassSessions(
+  user: any,
+): Promise<GetClassSessionsResponseDTO> {
+  if (user.userType !== USER_TYPES.STUDENT) {
+    throw new ForbiddenException(
+      'Only students can access their class sessions',
     );
-    const batchIds = enrollment.order.map((order) => order.batch._id);
-    // console.log('====================================');
-    // console.log(enrollment);
-    // console.log(batchIds);
-    // console.log('====================================');
-
-    // Get approved sessions for those batches
-    const sessions =
-      await this.classSessionDataService.getClassSessionsByBatches(
-        batchIds,
-        true,
-      );
-    return {
-      classSessions: sessions.map((s) => ({ ...s, _id: s._id.toString() })),
-    };
   }
+
+  const enrollment = await this.enrollmentDataService.getEnrollmentByUserId(
+    user._id,
+  );
+  const batchIds = enrollment.order.map((order) => order.batch._id);
+
+  const sessions =
+    await this.classSessionDataService.getClassSessionsByBatches(
+      batchIds,
+      true,
+    );
+
+  return {
+    classSessions: sessions.map((s) => ({
+      ...s,
+      _id: s._id.toString(),
+      batchIds: Array.isArray(s.batchIds)
+        ? s.batchIds.map((b: any) => b._id?.toString?.() ?? b?.toString?.())
+        : [],
+    })),
+  };
+}
+
+
 
   // For Teachers: Get sessions for their batches
   async getTeacherClassSessions(
@@ -139,19 +219,30 @@ export class ClassSessionLogicService {
     if (user.userType !== USER_TYPES.ADMIN) {
       throw new ForbiddenException('Only admins can create class sessions directly');
     }
-    const batch = await this.batchDataService.getBatchById(createClassSessionDto.batchId);
-    if (!batch) {
-      throw new BadRequestException(`Batch with ID ${createClassSessionDto.batchId} not found`);
-    }
-
     const teacher = await this.teacherDataService.getTeacherById(createClassSessionDto.teacherId);
     if (!teacher) {
       throw new BadRequestException(`Teacher with ID ${createClassSessionDto.teacherId} not found`);
     }
     
-    const students = await this.OrderLogicService.getOrderByBatchId(createClassSessionDto.batchId)
-    const studentEmails = students.map(order => order.user?.email)  
-      .filter(email => !!email);   
+    // const students = await this.OrderLogicService.getOrderByBatchId(createClassSessionDto.batchId)
+    // const studentEmails = students.map(order => order.user?.email)  
+    //   .filter(email => !!email);   
+    let allOrders: any[] = [];
+for (const batchId of createClassSessionDto.batchIds) {
+  const batch = await this.batchDataService.getBatchById(batchId);
+  if (!batch) {
+    throw new BadRequestException(`Batch with IDs ${batchId} not found`);
+  }
+
+  const orders = await this.OrderLogicService.getOrderByBatchId(batchId);
+  allOrders = allOrders.concat(orders);
+}
+
+// ✅ Extract all student emails from all orders
+const studentEmails = allOrders
+  .map(order => order.user?.email)
+  .filter((email): email is string => !!email);
+
     // Validate timing
     const startTime = this.parseTime(createClassSessionDto.scheduledStartTime);
     const endTime = this.parseTime(createClassSessionDto.scheduledEndTime);
@@ -214,98 +305,6 @@ export class ClassSessionLogicService {
     };
   }
 
-  // For Teachers: Create session (pending approval)
-  async createTeacherClassSession(
-    createClassSessionDto: CreateClassSessionDto,
-    user: User,
-  ) {
-    if (user.userType !== USER_TYPES.TEACHER) {
-      throw new ForbiddenException('Only teachers can create class sessions');
-    }
-  
-    const batch = await this.batchDataService.getBatchById(
-      createClassSessionDto.batchId,
-    );
-    if (!batch) {
-      throw new BadRequestException(
-        `Batch with ID ${createClassSessionDto.batchId} not found`,
-      );
-    }
-  
-    const teacher = await this.teacherDataService.getTeacherByUserId(user._id);
-    if (!teacher || !batch.teacher._id.equals(teacher._id)) {
-      throw new ForbiddenException(
-        'You can only schedule sessions for your assigned batches',
-      );
-    }
-  
-    if (createClassSessionDto.teacherId !== teacher._id.toString()) {
-      throw new BadRequestException(
-        'Teacher ID must match the authenticated teacher',
-      );
-    }
-  
-    const now = new Date();
-    const scheduledDate = new Date(createClassSessionDto.scheduledDate);
-  
-    const [startHour, startMinute] = createClassSessionDto.scheduledStartTime.split(':').map(Number);
-    const [endHour, endMinute] = createClassSessionDto.scheduledEndTime.split(':').map(Number);
-  
-    const startDateTime = new Date(
-      scheduledDate.getFullYear(),
-      scheduledDate.getMonth(),
-      scheduledDate.getDate(),
-      startHour,
-      startMinute,
-      0,
-    );
-  
-    const endDateTime = new Date(
-      scheduledDate.getFullYear(),
-      scheduledDate.getMonth(),
-      scheduledDate.getDate(),
-      endHour,
-      endMinute,
-      0,
-    );
-  
-    if (scheduledDate.toDateString() === now.toDateString() && startDateTime <= now) {
-      throw new BadRequestException('Start time must be in the future for today');
-    }
-  
-    if (scheduledDate < new Date(now.getFullYear(), now.getMonth(), now.getDate())) {
-      throw new BadRequestException('Scheduled date must be today or in the future');
-    }
-  
-    if (endDateTime <= startDateTime) {
-      throw new BadRequestException('End time must be after start time');
-    }
-  
-    const conflict = await this.classSessionDataService.checkTeacherConflict(
-      createClassSessionDto.teacherId,
-      scheduledDate,
-      createClassSessionDto.scheduledStartTime,
-      createClassSessionDto.scheduledEndTime,
-    );
-    if (conflict) {
-      throw new BadRequestException(
-        'Teacher is already scheduled for this time',
-      );
-    }
-  
-    const sessionData = {
-      ...createClassSessionDto,
-      isApproved: false,
-    };
-  
-    const session =
-      await this.classSessionDataService.createClassSession(sessionData);
-    return {
-      classSession: await this.mapToDto(session),
-    };
-  }
-  
-
   // For Admins: Approve a session
   async approveClassSession(id: string, user: any) {
     if (user.userType !== USER_TYPES.ADMIN) {
@@ -354,9 +353,15 @@ export class ClassSessionLogicService {
         user._id.toString(),
       );
       const batchIds = orders.map((order) => order?.batch?.toString());
-      if (!batchIds.includes(session.batchId.toString())) {
-        throw new ForbiddenException('You are not enrolled in this batch');
-      }
+      const sessionBatchIds = session.batchIds.map((id: any) =>
+  typeof id === 'string' ? id : id._id?.toString()
+);
+
+const isEnrolled = sessionBatchIds.some((id) => batchIds.includes(id));
+
+if (!isEnrolled) {
+  throw new ForbiddenException('You are not enrolled in this batch');
+}
       if (!session.isApproved) {
         throw new ForbiddenException('This class session is not yet approved');
       }
@@ -367,137 +372,133 @@ export class ClassSessionLogicService {
     };
   }
 
-  async updateClassSession(
-    id: string,
-    updateClassSessionDto: UpdateClassSessionDto,
-    user: any,
-  ) {
-    const session = await this.classSessionDataService.getClassSessionById(id);
-    if (!session) {
-      throw new NotFoundException(`Class session with ID ${id} not found`);
+async updateClassSession(
+  id: string,
+  updateClassSessionDto: UpdateClassSessionDto,
+  user: any,
+) {
+  const session = await this.classSessionDataService.getClassSessionById(id);
+  if (!session) {
+    throw new NotFoundException(`Class session with ID ${id} not found`);
+  }
+
+  if (user.userType === USER_TYPES.TEACHER) {
+    if (session.teacherId.toString() !== user._id) {
+      throw new ForbiddenException('You can only update your own class sessions');
     }
-  
-    if (user.userType === USER_TYPES.TEACHER) {
-      if (session.teacherId.toString() !== user._id) {
-        throw new ForbiddenException(
-          'You can only update your own class sessions',
-        );
-      }
-      const allowedFields: Partial<UpdateClassSessionDto> = {
-        recordingUrl: updateClassSessionDto.recordingUrl,
-      };
-      const updatedSession =
-        await this.classSessionDataService.updateClassSession(
-          id,
-          allowedFields,
-        );
-      if (!updatedSession) {
-        throw new NotFoundException(`Class session with ID ${id} not found`);
-      }
-      return {
-        classSession: await this.mapToDto(updatedSession),
-      };
-    }
-  
-    if (user.userType !== USER_TYPES.ADMIN) {
-      throw new ForbiddenException('Only admins can update class sessions');
-    }
-  
-    if (updateClassSessionDto.batchId) {
-      const batch = await this.batchDataService.getBatchById(
-        updateClassSessionDto.batchId,
-      );
-      if (!batch) {
-        throw new BadRequestException(
-          `Batch with ID ${updateClassSessionDto.batchId} not found`,
-        );
-      }
-    }
-  
-    if (updateClassSessionDto.teacherId) {
-      const teacher = await this.teacherDataService.getTeacherById(updateClassSessionDto.teacherId);
-      if (!teacher) {
-        throw new BadRequestException(
-          `Teacher with ID ${updateClassSessionDto.teacherId} not found`,
-        );
-      }
-    }
-  
-    if (
-      updateClassSessionDto.scheduledDate ||
-      updateClassSessionDto.scheduledStartTime ||
-      updateClassSessionDto.scheduledEndTime
-    ) {
-      const now = new Date();
-  
-      const scheduledDate = updateClassSessionDto.scheduledDate
-        ? new Date(updateClassSessionDto.scheduledDate)
-        : session.scheduledDate;
-  
-      const startTime = updateClassSessionDto.scheduledStartTime || session.scheduledStartTime;
-      const endTime = updateClassSessionDto.scheduledEndTime || session.scheduledEndTime;
-  
-      const [startHour, startMinute] = startTime.split(':').map(Number);
-      const [endHour, endMinute] = endTime.split(':').map(Number);
-  
-      const startDateTime = new Date(
-        scheduledDate.getFullYear(),
-        scheduledDate.getMonth(),
-        scheduledDate.getDate(),
-        startHour,
-        startMinute,
-        0,
-      );
-  
-      const endDateTime = new Date(
-        scheduledDate.getFullYear(),
-        scheduledDate.getMonth(),
-        scheduledDate.getDate(),
-        endHour,
-        endMinute,
-        0,
-      );
-  
-      if (scheduledDate.toDateString() === now.toDateString() && startDateTime <= now) {
-        throw new BadRequestException('Start time must be in the future for today');
-      }
-  
-      if (scheduledDate < new Date(now.getFullYear(), now.getMonth(), now.getDate())) {
-        throw new BadRequestException('Scheduled date must be today or in the future');
-      }
-  
-      if (endDateTime <= startDateTime) {
-        throw new BadRequestException('End time must be after start time');
-      }
-  
-      const teacherId =
-        updateClassSessionDto.teacherId || session.teacherId.toString();
-      const conflict = await this.classSessionDataService.checkTeacherConflict(
-        teacherId,
-        scheduledDate,
-        startTime,
-        endTime,
-        id,
-      );
-      if (conflict) {
-        throw new BadRequestException(
-          'Teacher is already scheduled for this time',
-        );
-      }
-    }
-  
-    const updatedSession =
-      await this.classSessionDataService.updateClassSession(
-        id,
-        updateClassSessionDto,
-      );
+
+    const allowedFields: Partial<UpdateClassSessionDto> = {
+      recordingUrl: updateClassSessionDto.recordingUrl,
+    };
+
+    const updatedSession = await this.classSessionDataService.updateClassSession(id, allowedFields);
     if (!updatedSession) {
       throw new NotFoundException(`Class session with ID ${id} not found`);
     }
+
     return {
-      classSession: updatedSession,
+      classSession: await this.mapToDto(updatedSession),
     };
   }
+
+  if (user.userType !== USER_TYPES.ADMIN) {
+    throw new ForbiddenException('Only admins can update class sessions');
+  }
+
+  // ✅ Validate all batch IDs
+  if (updateClassSessionDto.batchIds && updateClassSessionDto.batchIds.length) {
+    for (const batchId of updateClassSessionDto.batchIds) {
+      const batch = await this.batchDataService.getBatchById(batchId);
+      if (!batch) {
+        throw new BadRequestException(`Batch with ID ${batchId} not found`);
+      }
+    }
+  }
+
+  // ✅ Validate teacher if provided
+  if (updateClassSessionDto.teacherId) {
+    const teacher = await this.teacherDataService.getTeacherById(updateClassSessionDto.teacherId);
+    if (!teacher) {
+      throw new BadRequestException(`Teacher with ID ${updateClassSessionDto.teacherId} not found`);
+    }
+  }
+
+  // ✅ Validate scheduling if provided
+  if (
+    updateClassSessionDto.scheduledDate ||
+    updateClassSessionDto.scheduledStartTime ||
+    updateClassSessionDto.scheduledEndTime
+  ) {
+    const now = new Date();
+
+    const scheduledDate = updateClassSessionDto.scheduledDate
+      ? new Date(updateClassSessionDto.scheduledDate)
+      : session.scheduledDate;
+
+    const startTime = updateClassSessionDto.scheduledStartTime || session.scheduledStartTime;
+    const endTime = updateClassSessionDto.scheduledEndTime || session.scheduledEndTime;
+
+    const [startHour, startMinute] = startTime.split(':').map(Number);
+    const [endHour, endMinute] = endTime.split(':').map(Number);
+
+    const startDateTime = new Date(
+      scheduledDate.getFullYear(),
+      scheduledDate.getMonth(),
+      scheduledDate.getDate(),
+      startHour,
+      startMinute,
+      0,
+    );
+
+    const endDateTime = new Date(
+      scheduledDate.getFullYear(),
+      scheduledDate.getMonth(),
+      scheduledDate.getDate(),
+      endHour,
+      endMinute,
+      0,
+    );
+
+    if (scheduledDate.toDateString() === now.toDateString() && startDateTime <= now) {
+      throw new BadRequestException('Start time must be in the future for today');
+    }
+
+    if (scheduledDate < new Date(now.getFullYear(), now.getMonth(), now.getDate())) {
+      throw new BadRequestException('Scheduled date must be today or in the future');
+    }
+
+    if (endDateTime <= startDateTime) {
+      throw new BadRequestException('End time must be after start time');
+    }
+
+    const teacherId = updateClassSessionDto.teacherId || session.teacherId.toString();
+    const conflict = await this.classSessionDataService.checkTeacherConflict(
+      teacherId,
+      scheduledDate,
+      startTime,
+      endTime,
+      id,
+    );
+
+    if (conflict) {
+      throw new BadRequestException('Teacher is already scheduled for this time');
+    }
+  }
+
+  const updatedSession = await this.classSessionDataService.updateClassSession(
+    id,
+    updateClassSessionDto,
+  );
+
+  if (!updatedSession) {
+    throw new NotFoundException(`Class session with ID ${id} not found`);
+  }
+
+  return {
+    classSession: updatedSession,
+  };
+}
+
   
   
 

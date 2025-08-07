@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import * as mongoose from 'mongoose';
+import { Batch } from './course/batch.schema';
 
 export type ClassSessionDocument = ClassSession & Document;
 
@@ -19,9 +20,8 @@ export class ClassSession {
   @Prop()
   description: string;
 
-  @ApiProperty()
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Batch', required: true })
-  batchId: string;
+@Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'Batch', required: true })
+batchIds: string[];
 
   @ApiProperty()
   @Prop({ required: true })

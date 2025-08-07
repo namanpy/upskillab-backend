@@ -25,7 +25,6 @@ export class FeedbackDataService {
     studentId: any,
     classSessionId: string
   ): Promise<FeedbackDocument | null> {
-    console.log(studentId,classSessionId)
     return this.feedbackModel
       .findOne({ 
         studentId,
