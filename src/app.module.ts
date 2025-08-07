@@ -57,6 +57,8 @@ import { VideoModule } from './api/video-storage/video.module';
 import { ScheduleMeetingModule } from './api/schedule-meeting/schedule-meeting.module';
 import { DriveModule } from './api/drive/driver.module';
 import { AwsModule } from './api/aws-upload/aws.module';
+import { BullModule } from '@nestjs/bull';
+import { uploadModule } from './api/upload-status/video-upload.module';
 // import { RecordedModule } from './api/recording/recording.module';
 // import { ConfigModule } from '@nestjs/config';
 //MongooseModule.forRoot('mongodb://localhost/nest')
@@ -65,6 +67,12 @@ import { AwsModule } from './api/aws-upload/aws.module';
     MongooseModule.forRoot(
       'mongodb+srv://namanpy:namanpy@namanpy.fr257.mongodb.net/?retryWrites=true&w=majority&appName=namanpy',
     ),
+    BullModule.forRoot({
+      redis: {
+        host: 'localhost', // or use Redis cloud/URL
+        port: 6379,
+      },
+    }),
     ConfigModule.forRoot({ isGlobal: true }),
     StoriesModule,
     TestimonialModule,
@@ -120,6 +128,7 @@ import { AwsModule } from './api/aws-upload/aws.module';
 ScheduleMeetingModule,
 DriveModule,
 AwsModule,
+uploadModule,
 // RecordedModule,
   ],
   controllers: [AppController],
