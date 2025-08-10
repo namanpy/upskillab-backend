@@ -87,8 +87,9 @@ export class BatchController {
   // }
 
   @Post('')
-@UsePipes(new TransformBooleanPipe())
+// @UsePipes(new TransformBooleanPipe())
 async createBatch(@Body() createBatchDto: CreateBatchDto) {
+  console.log("hi",createBatchDto)
   return await this.batchLogicService.createBatch(createBatchDto);
 }
 

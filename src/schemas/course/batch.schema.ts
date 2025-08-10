@@ -16,9 +16,10 @@ export class Batch {
   })
   _id: Types.ObjectId;
 
-  @ApiProperty()
-  @Prop({ required: true, unique: true })
-  batchCode: string;
+@ApiProperty()
+@Prop({ required: true })
+batchCode: string;
+
 
   @ApiProperty()
   @Prop({

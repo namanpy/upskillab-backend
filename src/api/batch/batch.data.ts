@@ -19,6 +19,7 @@ export class BatchDataService {
       .find()
       .populate<{ course: Course }>('course')
       .populate<{ teacher: TeacherDocument }>('teacher')
+      .sort({ createdAt: -1 })
       .exec();
   }
 
@@ -122,6 +123,7 @@ async createBatch(createBatchDto: CreateBatchDto): Promise<BatchDocument> {
         path: 'category',
       },
     })
+    .sort({ createdAt: -1 })
     .lean()
     .exec();
 

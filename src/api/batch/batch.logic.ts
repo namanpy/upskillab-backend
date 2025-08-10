@@ -43,6 +43,7 @@ export class BatchLogicService {
   }
 
  async createBatch(createBatchDto: CreateBatchDto) {
+  console.log(createBatchDto)
   const batch = await this.batchDataService.createBatch(createBatchDto);
   return {
     batch: {
