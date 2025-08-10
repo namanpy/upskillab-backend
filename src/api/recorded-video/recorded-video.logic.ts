@@ -61,14 +61,14 @@ export class RecordedVideoLogicService {
   else if (user.userType === USER_TYPES.STUDENT) {
     // 1️⃣ Fetch student batches from enrollment service
     const studentData = await this.EnrollmentDataService.getEnrollmentByUserId(user._id);
-    const studentBatches = studentData.order.map((d) => d.batch._id); 
+    const studentBatches = studentData.order.map((d) => d.batch.course); 
     if (!studentBatches || studentBatches.length === 0) {
       return { videos: [] };
     }
     videos = await this.recordedVideoDataService.getVideos();
     const studentBatchStrings = studentBatches.map(id => id.toString());
     videos = videos.filter(video =>
-  video.batchIds.some(batchId =>(
+  video.courseIds.some(batchId =>(
    studentBatchStrings.includes(batchId._id.toString()))
    )
 );

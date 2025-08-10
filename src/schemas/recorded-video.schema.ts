@@ -34,9 +34,9 @@ export class RecordedVideo {
   @Prop({ required: true })
   duration: string;
 
-  @ApiProperty({ type: [String], description: 'Multiple batch IDs' })
-  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'Batch', required: true })
-  batchIds: Types.ObjectId[];
+  @ApiProperty({ type: [String], description: 'Multiple course IDs' })
+  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'Course', required: true })
+  courseIds: Types.ObjectId[];
 
   @ApiProperty({ enum: VIDEO_STATUS })
   @Prop({ required: true, enum: VIDEO_STATUS, default: VIDEO_STATUS.PENDING })

@@ -22,10 +22,10 @@ export class CreateRecordedVideoDto {
   @IsNotEmpty()
   duration: string;
 
-  @ApiProperty({ type: [String], description: 'Array of batch IDs' })
+  @ApiProperty({ type: [String], description: 'Array of course IDs' })
   @IsMongoId({ each: true })
   @IsNotEmpty()
-  batchIds: string[];
+  courseIds: string[];
 }
 
 export class UpdateRecordedVideoDto {
@@ -47,7 +47,7 @@ export class UpdateRecordedVideoDto {
   @ApiPropertyOptional({ type: [String] })
   @IsMongoId({ each: true })
   @IsOptional()
-  batchIds?: string[];
+  courseIds?: string[];
 
   @ApiPropertyOptional({ enum: VIDEO_STATUS })
   @IsEnum(VIDEO_STATUS)
@@ -74,7 +74,7 @@ export class RecordedVideo {
   duration: string;
 
   @ApiProperty()
-  batchIds?: string[];
+  courseIds?: string[];
 
   @ApiProperty()
   status: string;
