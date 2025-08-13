@@ -68,9 +68,11 @@ export class RecordedVideoLogicService {
     videos = await this.recordedVideoDataService.getVideos();
     const studentBatchStrings = studentBatches.map(id => id.toString());
     videos = videos.filter(video =>
-  video.courseIds.some(batchId =>(
-   studentBatchStrings.includes(batchId._id.toString()))
-   )
+  video.courseIds.some(batchId =>
+    studentBatchStrings.includes(batchId._id.toString())
+  ) &&
+  video.status === "APPROVED" &&
+  video.isPublic === true
 );
   } 
   else {
